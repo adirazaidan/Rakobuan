@@ -22,9 +22,13 @@ use App\Http\Controllers\Customer\CartController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+Route::get('/', [CustomerSessionController::class, 'create'])->name('customer.login.form');
 
 // Grup Rute untuk Admin
 Route::prefix('admin')->name('admin.')->group(function () {
