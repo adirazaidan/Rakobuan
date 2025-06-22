@@ -1,0 +1,263 @@
+/* public/css/admin.css */
+
+/* --- Import Font & Variabel Warna --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #0A2647;
+    --secondary-color: #144272;
+    --accent-color: #FFB100;
+    --text-color: #343a40;
+    --bg-color: #f8f9fa;
+    --white-color: #fff;
+    --border-color: #dee2e6;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+    --orange-color: #fd7e14;
+    --blue-color: #0d6efd;
+}
+
+/* --- Global Styles --- */
+body { margin: 0; font-family: 'Poppins', sans-serif; background-color: var(--bg-color); color: var(--text-color); font-size: 15px; }
+.admin-container { display: flex; }
+h1, h2, h3, h4, h5, h6 { color: var(--primary-color); font-weight: 600; }
+a { text-decoration: none; }
+ul { list-style: none; padding: 0; margin: 0; }
+.mb-4 { margin-bottom: 2rem !important; }
+
+/* --- Sidebar --- */
+.sidebar { width: 260px; background-color: var(--primary-color); color: var(--white-color); min-height: 100vh; transition: all 0.3s; }
+.sidebar-header { padding: 1.5rem; text-align: center; border-bottom: 1px solid var(--secondary-color); }
+.sidebar-header h3 { margin: 0; font-size: 1.75rem; color: var(--white-color); }
+.sidebar-menu { list-style: none; padding: 0; margin: 1rem 0; }
+.sidebar-menu hr { border-color: var(--secondary-color); margin: 1rem 1.5rem; }
+.sidebar-menu li a { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; color: #e0e0e0; transition: background-color 0.2s, color 0.2s; border-left: 4px solid transparent; }
+.sidebar-menu li a:hover { background-color: var(--secondary-color); color: var(--white-color); }
+.sidebar-menu li.active > a { background-color: var(--accent-color); color: var(--primary-color); font-weight: 500; border-left-color: var(--white-color); }
+.sidebar-menu li a i { width: 20px; text-align: center; font-size: 1.1rem; }
+
+/* --- Main Content --- */
+.main-content { flex-grow: 1; transition: margin-left 0.3s; }
+.main-header { display: flex; align-items: center; gap: 1rem; background-color: var(--white-color); padding: 1rem 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+.content-body { padding: 2rem; }
+
+/* --- Tombol --- */
+.btn { padding: 0.6rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 500; transition: all 0.2s; font-size: 14px; }
+.btn-primary { background-color: var(--primary-color); color: var(--white-color); }
+.btn-primary:hover { background-color: var(--secondary-color); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+.btn-warning { background-color: var(--warning-color); color: var(--text-color); }
+.btn-danger { background-color: var(--danger-color); color: var(--white-color); }
+.btn-success { background-color: var(--success-color); color: var(--white-color); }
+.btn-secondary { background-color: #6c757d; color: var(--white-color); }
+.btn-sm { padding: 0.3rem 0.8rem; font-size: 0.875rem; }
+
+/* --- Card --- */
+.card { background: var(--white-color); border-radius: 12px; box-shadow: 0 4px 25px rgba(0,0,0,0.07); border: 1px solid #e9ecef; }
+.card-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+.card .card-img {width: 100%; height: 180px; object-fit: cover; border-top-left-radius: 12px; border-top-right-radius: 12px;}
+.card .card-body { padding: 1.5rem; }
+.card .card-actions { display: flex; gap: 0.5rem; }
+
+/* --- Tabel --- */
+.table-container { background: var(--white-color); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 25px rgba(0,0,0,0.07); overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 1rem; border-bottom: 1px solid var(--border-color); text-align: left; vertical-align: middle; }
+.table thead th { background-color: #f8f9fa; font-weight: 600; color: var(--secondary-color); border-bottom-width: 2px; }
+.table tbody tr:hover { background-color: #f8f9fa; }
+.table .action-buttons { display: flex; gap: 0.5rem; }
+
+/* Helper untuk Tabel Responsif */
+.table-responsive-wrapper {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Membuat scroll lebih mulus di iOS */
+}
+
+/* --- Form --- */
+.form-group { margin-bottom: 1.5rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+.form-control { display: block; width: 100%; padding: 0.75rem 1rem; font-size: 1rem; font-family: 'Poppins', sans-serif; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out; }
+.form-control:focus { border-color: var(--primary-color); outline: 0; box-shadow: 0 0 0 0.2rem rgba(10, 38, 71, 0.25); }
+.form-check { display: flex; align-items: center; gap: 0.5rem; }
+
+/* --- Alert --- */
+.alert { padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid transparent; }
+.alert-success { background-color: #d1e7dd; color: #0f5132; border-color: #badbcc; }
+
+/* --- Order/Call Card --- */
+.order-container { display: flex; flex-direction: column; gap: 1.5rem; }
+.order-card { background-color: var(--white-color); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 5px solid; }
+.order-card.status-pending { border-color: var(--orange-color); }
+.order-card.status-processing, .order-card.status-handled { border-color: var(--blue-color); }
+.order-card.status-completed { border-color: var(--success-color); }
+.order-header, .order-footer { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; }
+.order-header { border-bottom: 1px solid #eee; }
+.order-footer { border-top: 1px solid #eee; }
+.order-status strong { text-transform: capitalize; }
+.order-body { padding: 1.5rem; }
+.order-actions { display: flex; gap: 0.5rem; }
+
+/* --- Analytics & Ranked List Styles --- */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.ranked-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+}
+
+.ranked-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.ranked-list-item:first-child {
+    padding-top: 0;
+}
+
+.ranked-list-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.ranked-list-item-empty {
+    padding: 1rem 0;
+    color: #888;
+}
+
+.item-count {
+    background-color: #e9ecef;
+    color: var(--text-color);
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+
+/* --- STYLE UNTUK OVERLAY --- */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+/* --- ATURAN RESPONSIVE (MEDIA QUERY) --- */
+/* Ganti blok media query yang lama dengan yang lebih lengkap ini */
+@media (max-width: 992px) { /* Kita gunakan 992px sebagai breakpoint yang lebih umum */
+    .sidebar {
+        position: fixed;
+        left: -260px; /* Sembunyikan di luar layar selebar ukurannya */
+        top: 0;
+        height: 100%;
+        z-index: 1000;
+        transition: left 0.3s ease-in-out;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    .sidebar.open {
+        left: 0; /* Munculkan sidebar saat memiliki class .open */
+    }
+    
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .menu-toggle {
+        display: block; /* Tampilkan tombol hamburger di layar kecil */
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--primary-color);
+    }
+
+    /* --- Aturan untuk Stacking Table --- */
+    .table thead {
+        display: none; /* Sembunyikan header tabel di mobile */
+    }
+
+    .table tr {
+        display: block; /* Ubah baris menjadi blok seperti kartu */
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .table td {
+        display: flex; /* Gunakan flexbox untuk menata sel */
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #f0f0f0;
+        text-align: right; /* Pindahkan data ke kanan */
+    }
+
+    .table td:last-child {
+        border-bottom: none;
+    }
+
+    .table td::before {
+        content: attr(data-label); /* Ambil teks dari atribut data-label */
+        font-weight: 600;
+        text-align: left; /* Pindahkan label ke kiri */
+        margin-right: 1rem;
+        color: var(--primary-color);
+    }
+
+    /* --- Aturan untuk Form Filter --- */
+    .sales-filter-form div {
+        flex-direction: column; /* Susun vertikal */
+        align-items: stretch; /* Penuhi lebar */
+    }
+
+    .sales-filter-form .form-group {
+        width: 100%;
+    }
+
+    .analytics-grid {
+    grid-template-columns: 1fr; /* Kartu akan tersusun vertikal di layar kecil */
+    }   
+}
+
+/* Untuk layar yang sangat kecil, sesuaikan padding */
+@media (max-width: 576px) {
+    .content-body {
+        padding: 1rem;
+    }
+    .main-header {
+        padding: 1rem;
+    }
+    .card .card-body {
+        padding: 1rem;
+    }
+    .table-container, .form-card {
+        padding: 1rem;
+    }
+}
