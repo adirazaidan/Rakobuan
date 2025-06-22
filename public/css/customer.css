@@ -1,28 +1,295 @@
 /* public/css/customer.css */
+
 :root {
     --primary-color: #0A2647;
+    --secondary-color: #144272;
     --accent-color: #FFB100;
     --bg-color: #f8f9fa;
     --text-color: #343a40;
+    --white-color: #fff;
+    --danger-color: #721c24;
+    --danger-bg: #f8d7da;
 }
-body { font-family: 'Poppins', sans-serif; margin: 0; background-color: var(--bg-color); }
+
+body, html {
+    font-family: 'Poppins', sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    margin: 0;
+    background-color: var(--bg-color);
+}
+
+/* --- Halaman Login --- */
+.login-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.page-header-login {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: var(--white-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    color: var(--primary-color);
+}
+
+.page-header-login h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.page-header-login i {
+    font-size: 2rem;
+}
+
+.login-container {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.login-card {
+    background-color: var(--white-color);
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+}
+
+.login-title {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.login-subtitle {
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.login-form .form-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.login-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.btn-submit:hover {
+    background-color: var(--secondary-color);
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+.alert-danger {
+    background-color: var(--danger-bg);
+    color: var(--danger-color);
+}
+.alert-danger ul {
+    margin: 0;
+    padding-left: 1.2rem;
+}
+
+/* --- Struktur Layout Utama Pelanggan --- */
+.customer-app-container {
+    display: flex;
+    background-color: var(--bg-color);
+}
+.sidebar-customer {
+    width: 260px;
+    background: var(--white-color);
+    border-right: 1px solid #e9ecef;
+    min-height: 100vh;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+.sidebar-header {
+    padding: 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid #e9ecef;
+}
+.sidebar-header h3 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 1.75rem;
+}
+.sidebar-header span {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+.sidebar-menu {
+    list-style: none;
+    padding: 1rem 0;
+    margin: 0;
+}
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+.sidebar-menu li a:hover, .sidebar-menu li.active a {
+    background-color: #f0f2f5;
+}
+.sidebar-menu li a .badge {
+    margin-left: auto;
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    font-weight: bold;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.8rem;
+}
+
+.content-wrapper {
+    flex-grow: 1;
+}
+.header-customer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--white-color);
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.menu-toggle { display: none; /* Sembunyi di desktop */ }
+.page-content {
+    padding: 2rem;
+}
 
 /* --- Modal Styling --- */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; display: none; justify-content: center; align-items: center; }
-.modal-content { background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 500px; position: relative; }
-.modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
-.modal-body { display: flex; gap: 1.5rem; margin-top: 1rem; }
-.modal-body img { width: 150px; height: 150px; object-fit: cover; border-radius: 8px; }
-.modal-product-details h3 { margin: 0 0 0.5rem 0; color: var(--primary-color); }
-.modal-product-details .price { font-size: 1.2rem; font-weight: 600; color: var(--accent-color); }
-.modal-product-details .description { font-size: 0.9rem; color: #666; margin-top: 0.5rem; }
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 100;
+    display: none; /* <-- INI YANG PALING PENTING untuk menyembunyikan modal secara default */
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    box-sizing: border-box;
+}
 
-/* --- Form di dalam Modal --- */
-.modal-form { margin-top: 1.5rem; }
-.form-group { margin-bottom: 1rem; }
-.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-.form-control { width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
-.quantity-selector { display: flex; align-items: center; gap: 0.5rem; }
-.quantity-selector button { width: 40px; height: 40px; border: 1px solid #ccc; background: #f0f0f0; cursor: pointer; font-size: 1.5rem; }
-.quantity-selector input { width: 50px; text-align: center; border: 1px solid #ccc; padding: 0.75rem 0; }
-.btn-submit { width: 100%; padding: 1rem; border: none; background-color: var(--primary-color); color: white; border-radius: 8px; font-size: 1rem; cursor: pointer; margin-top: 1rem; }
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+    color: #888;
+}
+
+.modal-body {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.modal-body img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.modal-product-details h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--primary-color);
+}
+
+.modal-product-details .price {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--accent-color);
+}
+
+.modal-product-details .description {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.5rem;
+    max-height: 60px; /* Batasi tinggi deskripsi jika terlalu panjang */
+    overflow-y: auto;
+}
+
+/* ... Style lain untuk form di dalam modal ... */
+
+/* --- Aturan Responsif untuk Layout Pelanggan --- */
+@media (max-width: 992px) {
+    .sidebar-customer {
+        position: fixed;
+        left: -260px;
+        top: 0;
+        height: 100%;
+        z-index: 1000;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+    .sidebar-customer.open {
+        left: 0;
+    }
+    .menu-toggle {
+        display: block;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--primary-color);
+    }
+}
