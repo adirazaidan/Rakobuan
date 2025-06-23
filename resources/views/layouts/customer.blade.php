@@ -79,5 +79,10 @@
 
     <script src="{{ asset('js/customer.js') }}"></script>
     @stack('scripts')
+
+    <div id="imageLightbox" class="lightbox-overlay">
+        <span class="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightboxImage">
+    </div>
 </body>
 </html>

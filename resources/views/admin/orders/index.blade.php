@@ -27,10 +27,17 @@
                     <h4>Item Pesanan:</h4>
                     <ul>
                         @foreach ($order->orderItems as $item)
-                            <li>
+                        <li>
+                            <div>
                                 <span>{{ $item->quantity }}x {{ $item->product->name }}</span>
-                                <span>Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</span>
-                            </li>
+                                @if($item->notes)
+                                    <small class="item-note">
+                                        <strong>Catatan:</strong> {{ $item->notes }}
+                                    </small>
+                                @endif
+                            </div>
+                            <span>Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</span>
+                        </li>
                         @endforeach
                     </ul>
                 </div>
@@ -71,37 +78,10 @@
 </div>
 @endsection
 
-{{-- dalam resources/views/admin/orders/index.blade.php --}}
 
 @push('scripts')
 
 <script>
-    // // Pastikan variabel Pusher di-load oleh bootstrap.js
-    // if (typeof window.Pusher !== 'undefined') {
-    //     console.log('Pusher JS & Laravel Echo loaded successfully.');
-
-    //     // Inisialisasi audio player
-    //     const notificationSound = new Audio('/sounds/notification.mp3');
-
-    //     // Dengarkan siaran di channel privat 'orders'
-    //     window.Echo.private('orders')
-    //         .listen('NewOrderReceived', (e) => {
-    //             console.log('Event NewOrderReceived Diterima:', e.order);
-
-    //             // Mainkan suara notifikasi
-    //             notificationSound.play().catch(error => console.log("Gagal memutar suara:", error));
-
-    //             // Tampilkan notifikasi sederhana di browser
-    //             alert('Ada pesanan baru masuk dari Meja ' + e.order.table_number + '!');
-
-    //             // Refresh halaman untuk menampilkan pesanan baru
-    //             window.location.reload();
-    //         });
-
-    //     console.log("Listening for events on 'private-orders' channel...");
-
-    // } else {
-    //     console.error('Laravel Echo atau Pusher JS gagal dimuat. Pastikan Anda sudah menjalankan "npm run dev".');
-    // }
+ 
 </script>
 @endpush

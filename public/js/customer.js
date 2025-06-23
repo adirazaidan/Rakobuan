@@ -37,26 +37,45 @@ document.addEventListener('DOMContentLoaded', function() {
     const menuList = document.getElementById('menu-list');
 
     if (addToCartModal && menuList) {
+        // Ambil semua elemen modal sekali saja untuk efisiensi
         const closeModalBtn = document.getElementById('closeModalBtn');
         const addToCartForm = document.getElementById('addToCartForm');
         const quantityInput = document.getElementById('quantity');
         const plusBtn = document.getElementById('increaseQty');
         const minusBtn = document.getElementById('decreaseQty');
-        const modalPriceElement = document.getElementById('modalProductPrice');
+        const notesTextarea = document.getElementById('notes');
+        const bungkusCheckbox = document.getElementById('bungkusCheckbox');
+        
+        // Ambil elemen harga dan tombol
+        const modalPriceOverlayElement = document.getElementById('modalProductPriceOverlay'); // Harga di gambar
+        const addToCartButton = document.querySelector('.btn-submit-cart.with-total');      // Tombol simpan
 
         let currentBasePrice = 0; // Variabel untuk menyimpan harga satuan produk
 
-        // --- FUNGSI BARU UNTUK MEMPERBARUI HARGA ---
-        const updateModalPrice = (quantity) => {
-            if (modalPriceElement) {
+        // --- FUNGSI DIPERBARUI: SEKARANG HANYA MENGUBAH HARGA DI TOMBOL ---
+        const updateButtonPrice = (quantity) => {
+            if (addToCartButton) {
                 const totalPrice = currentBasePrice * quantity;
-                modalPriceElement.textContent = 'Rp ' + totalPrice.toLocaleString('id-ID');
+                const formattedPrice = 'Rp ' + totalPrice.toLocaleString('id-ID');
+                addToCartButton.textContent = `Tambah ke Keranjang (${formattedPrice})`;
             }
         };
 
-        // Fungsi untuk membuka modal dan mengisi data
         const openAddToCartModal = (button) => {
-            // Simpan harga satuan saat modal dibuka
+            const isBestseller = button.dataset.bestseller === '1';
+            const discountPercent = button.dataset.discountPercent;
+            const bestsellerBadge = document.getElementById('modalBestsellerBadge');
+            const discountBadge = document.getElementById('modalDiscountBadge');
+            bestsellerBadge.style.display = 'none';
+            discountBadge.style.display = 'none';
+
+            if (isBestseller) {
+                bestsellerBadge.style.display = 'inline-block';
+            }
+            if (discountPercent && parseFloat(discountPercent) > 0) {
+                discountBadge.textContent = `${discountPercent}% OFF`;
+                discountBadge.style.display = 'inline-block';
+            }
             currentBasePrice = parseInt(button.dataset.price);
 
             document.getElementById('modalProductId').value = button.dataset.id;
@@ -65,12 +84,18 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('modalProductImage').src = button.dataset.image;
             document.getElementById('modalProductImage').alt = button.dataset.name;
             
-            // Reset form dan harga ke nilai awal
+            if (modalPriceOverlayElement) {
+                modalPriceOverlayElement.textContent = 'Rp ' + currentBasePrice.toLocaleString('id-ID');
+            }
+        
             quantityInput.value = 1;
-            document.getElementById('notes').value = '';
-            updateModalPrice(1); // Tampilkan harga awal untuk 1 item
+            notesTextarea.value = '';
+            bungkusCheckbox.checked = false;
+            updateButtonPrice(1); 
 
             addToCartModal.style.display = 'flex';
+
+            
         };
 
         // Fungsi untuk menutup modal
@@ -84,7 +109,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Event listener untuk menutup modal
         closeModalBtn.addEventListener('click', closeAddToCartModal);
         addToCartModal.addEventListener('click', (e) => {
             if (e.target === addToCartModal) closeAddToCartModal();
@@ -93,32 +117,31 @@ document.addEventListener('DOMContentLoaded', function() {
         // Event listener untuk tombol kuantitas
         plusBtn.addEventListener('click', () => {
             quantityInput.value = parseInt(quantityInput.value) + 1;
-            updateModalPrice(quantityInput.value); // Panggil fungsi update harga
+            updateButtonPrice(quantityInput.value); // Panggil fungsi update harga tombol
         });
         minusBtn.addEventListener('click', () => {
             const currentQty = parseInt(quantityInput.value);
             if (currentQty > 1) {
                 quantityInput.value = currentQty - 1;
-                updateModalPrice(quantityInput.value); // Panggil fungsi update harga
+                updateButtonPrice(quantityInput.value); // Panggil fungsi update harga tombol
             }
         });
 
-        // Event listener untuk submit form via AJAX (tidak ada perubahan di sini)
+        // Event listener untuk submit form via AJAX
         addToCartForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            const bungkusText = "(Bungkus)";
+            let originalNotes = notesTextarea.value.trim();
+            if (bungkusCheckbox.checked) {
+                notesTextarea.value = originalNotes ? `${bungkusText} ${originalNotes}` : bungkusText;
+            }
             const formData = new FormData(this);
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
             fetch(appConfig.routes.cartAdd, {
                 method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json',
-                },
+                headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
                 body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
+            }).then(response => response.json()).then(data => {
                 if (data.message) {
                     document.getElementById('sidebar-cart-count').textContent = data.cartCount;
                     alert(data.message);
@@ -126,8 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (data.error) {
                     alert('Error: ' + data.error);
                 }
-            })
-            .catch(error => console.error('Error:', error));
+            }).catch(error => console.error('Error:', error));
         });
     }
 
@@ -184,29 +206,94 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     const productCards = document.querySelectorAll('.product-card');
 
-    // Filter Kategori
-    const categoryButtons = document.querySelectorAll('.btn-category');
-    categoryButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            categoryButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            const selectedCategoryId = this.dataset.categoryId;
+    // --- LOGIKA BARU UNTUK FILTER KATEGORI DROPDOWN ---
+    const categoryDropdown = document.getElementById('categoryFilterDropdown');
+
+    if (categoryDropdown) {
+        categoryDropdown.addEventListener('change', function() {
+            const selectedCategoryId = this.value;
 
             productCards.forEach(card => {
-                card.style.display = (selectedCategoryId === 'all' || card.dataset.categoryId === selectedCategoryId) ? 'flex' : 'none';
+                // Tampilkan kartu jika 'Semua' dipilih atau jika ID kategori kartu cocok
+                if (selectedCategoryId === 'all' || card.dataset.categoryId === selectedCategoryId) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
             });
         });
-    });
+    }
 
-    // Filter Pencarian
+
+    // --- Logika Pencarian (tidak berubah) ---
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         searchInput.addEventListener('keyup', function() {
             const searchTerm = this.value.toLowerCase();
             productCards.forEach(card => {
                 const productName = card.dataset.productName || '';
-                card.style.display = productName.includes(searchTerm) ? 'flex' : 'none';
+                // Tampilkan kartu jika nama produk mengandung teks pencarian
+                if (productName.includes(searchTerm)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
             });
+        });
+    }
+
+    /**
+     * =================================
+     * BAGIAN LIGHTBOX GAMBAR
+     * =================================
+     */
+    const imageLightbox = document.getElementById('imageLightbox');
+
+    if (imageLightbox) {
+        const lightboxImage = document.getElementById('lightboxImage');
+        const lightboxCloseBtn = document.querySelector('.lightbox-close');
+        const modalImageContainer = document.querySelector('.modal-header-visual');
+
+        // Fungsi untuk membuka lightbox, menerima URL gambar sebagai parameter
+        const openLightbox = (imageUrl) => {
+            if (imageUrl) {
+                lightboxImage.src = imageUrl;
+                imageLightbox.style.display = 'flex';
+            }
+        };
+
+        const closeLightbox = () => {
+            imageLightbox.style.display = 'none';
+        };
+
+        // Event listener untuk tombol zoom di dalam MODAL
+        if (modalImageContainer) {
+            modalImageContainer.addEventListener('click', (e) => {
+                if (e.target.closest('.zoom-btn')) {
+                    e.stopPropagation();
+                    const currentModalImageSrc = document.getElementById('modalProductImage').src;
+                    openLightbox(currentModalImageSrc);
+                }
+            });
+        }
+
+        // Event listener untuk tombol zoom di KARTU MENU UTAMA
+        if (menuList) {
+            menuList.addEventListener('click', (e) => {
+                const zoomButton = e.target.closest('.card-zoom-btn'); // Cari tombol zoom spesifik
+                if (zoomButton) {
+                    e.stopPropagation(); // Hentikan event agar tidak memicu hal lain
+                    openLightbox(zoomButton.dataset.imageUrl); // Buka lightbox dengan URL dari data-attribute
+                }
+            });
+        }
+
+        // Event listener untuk menutup lightbox
+        lightboxCloseBtn.addEventListener('click', closeLightbox);
+        imageLightbox.addEventListener('click', (e) => {
+            if (e.target === imageLightbox) {
+                closeLightbox();
+            }
         });
     }
 });

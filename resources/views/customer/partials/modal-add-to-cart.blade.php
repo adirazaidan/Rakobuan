@@ -1,19 +1,39 @@
 <div class="modal-overlay" id="addToCartModal">
-    <div class="modal-content compact">
-        {{-- Gambar akan menjadi header dari modal --}}
-        <img id="modalProductImage" src="https://via.placeholder.com/400" alt="Gambar Produk" class="modal-header-image">
-        
-        <button class="modal-close" id="closeModalBtn">&times;</button>
-        
-        {{-- Semua konten teks dan form berada di dalam div ini --}}
-        <div class="modal-product-info">
-            <h3 id="modalProductName" class="product-title">Nama Produk</h3>
-            <p id="modalProductDescription" class="product-description-modal">Deskripsi produk akan muncul di sini.</p>
+    <div class="modal-content visual-cart">
+        <div class="modal-header-visual">
+            <img id="modalProductImage" src="https://via.placeholder.com/400" alt="Gambar Produk">
+            <button id="zoomImageBtn" class="zoom-btn" title="Perbesar gambar">
+                <i class="fas fa-expand"></i>
+            </button>
+            <span id="modalBestsellerBadge" class="bestseller-badge modal-badge" style="display: none;">Best Seller</span>
+            <span id="modalDiscountBadge" class="discount-badge modal-badge" style="display: none;">Diskon 0%</span>
+            
+            <div class="product-info-overlay">
+                <h3 id="modalProductName" class="product-title-overlay">Nama Produk</h3>
+                <p class="product-price-overlay" id="modalProductPriceOverlay">Rp 0</p>
+            </div>
+            
+            <button class="modal-close" id="closeModalBtn">&times;</button>
+        </div>
+
+        <div class="modal-body-compact">
+            <p id="modalProductDescription" class="product-description-modal"></p>
 
             <form id="addToCartForm" class="modal-form">
                 <input type="hidden" id="modalProductId" name="product_id">
-                
-                {{-- Grup untuk menyejajarkan label dan tombol kuantitas --}}
+
+                <div class="form-group">
+                    <div class="form-check">
+                        <input type="checkbox" id="bungkusCheckbox" class="form-check-input">
+                        <label for="bungkusCheckbox" class="form-check-label">Bungkus (Takeaway)</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Catatan (Opsional)</label>
+                    <textarea id="notes" name="notes" rows="2" class="form-control" placeholder="Contoh: Tidak pedas"></textarea>
+                </div>
+
                 <div class="form-group quantity-group">
                     <label for="quantity">Jumlah</label>
                     <div class="quantity-selector">
@@ -26,16 +46,8 @@
                         </button>
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="notes">Catatan (Opsional)</label>
-                    <textarea id="notes" name="notes" rows="2" class="form-control" placeholder="Contoh: Jangan pakai bawang"></textarea>
-                </div>
-                
-                <div class="modal-form-footer">
-                    <span class="product-price-modal" id="modalProductPrice">Rp 0</span>
-                    <button type="submit" class="btn-submit-cart">Tambah ke Keranjang</button>
-                </div>
+
+                <button type="submit" class="btn-submit-cart with-total">Tambah ke Keranjang (Rp 0)</button>
             </form>
         </div>
     </div>

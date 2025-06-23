@@ -31,8 +31,7 @@ class MenuController extends Controller
         $products = Product::whereHas('category', function ($query) use ($outlet) {
             $query->where('outlet_id', $outlet->id);
         })
-        ->with('activeDiscount')
-        ->get();
+        ->with('activeDiscount')->get();
 
         // Kirim data outlet yang sedang aktif ke view untuk menandai sidebar
         $currentOutlet = $outlet;

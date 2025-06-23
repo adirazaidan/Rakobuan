@@ -99,6 +99,13 @@ ul { list-style: none; padding: 0; margin: 0; }
 .order-status strong { text-transform: capitalize; }
 .order-body { padding: 1.5rem; }
 .order-actions { display: flex; gap: 0.5rem; }
+.item-note {
+    display: block; /* Membuat catatan berada di baris baru */
+    font-style: italic;
+    color: #555;
+    margin-left: 20px; /* Sedikit inden agar rapi */
+    font-size: 13px;
+}
 
 /* --- Analytics & Ranked List Styles --- */
 .analytics-grid {
