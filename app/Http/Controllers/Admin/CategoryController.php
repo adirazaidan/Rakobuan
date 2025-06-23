@@ -4,17 +4,30 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Models\Outlet; // <-- Import model Outlet
+use App\Models\Outlet; 
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Ambil kategori beserta relasi outlet-nya untuk ditampilkan
-        $categories = Category::with('outlet')->latest()->paginate(10);
-        return view('admin.categories.index', compact('categories'));
-    }
+        $outlets = Outlet::all();
+        $selectedOutletId = $request->input('outlet_id');
+
+        // Query dasar
+        $query = Category::query();
+
+        // Jika ada outlet yang dipilih, tambahkan kondisi 'where'
+        if ($selectedOutletId) {
+            $query->where('outlet_id', $selectedOutletId);
+        }
+
+        // Eksekusi query dan ambil hasilnya
+        $categories = $query->with('outlet')->latest()->paginate(10);
+
+        // Kirim data ke view
+        return view('admin.categories.index', compact('categories', 'outlets', 'selectedOutletId'));
+}
 
     public function create()
     {

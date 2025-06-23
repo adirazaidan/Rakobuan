@@ -21,32 +21,41 @@
 </head>
 <body>
     <div class="customer-app-container">
-        {{-- SIDEBAR PELANGGAN --}}
-        <aside class="sidebar-customer">
-            <div class="sidebar-header">
-                <h3>Rakobuan</h3>
-                {{-- Nanti bisa diisi dinamis sesuai outlet --}}
-                <span>Outlet Pusat</span>
-            </div>
-            <ul class="sidebar-menu">
-                <li>
-                    <a href="{{ route('cart.index') }}">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Keranjang</span>
-                        <span class="badge" id="sidebar-cart-count">{{ count((array) session('cart')) }}</span>
+    <aside class="sidebar-customer">
+        <div class="sidebar-header">
+            <h3>Rakobuan</h3>
+            <span>{{ $currentOutlet->name ?? 'Pilih Outlet' }}</span>
+        </div>
+        <ul class="sidebar-menu">
+            @foreach ($outletsForSidebar as $outlet)
+                <li class="{{ isset($currentOutlet) && $currentOutlet->id == $outlet->id ? 'active' : '' }}">
+                    <a href="{{ route('customer.menu.index', $outlet) }}">
+                        <img src="{{ $outlet->image ? Storage::url('outlets/' . $outlet->image) : 'https://via.placeholder.com/40' }}" alt="{{ $outlet->name }}" class="sidebar-outlet-img">
+                        <span>{{ $outlet->name }}</span>
                     </a>
                 </li>
-                <li>
-                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Keluar dari Meja</span>
-                    </a>
-                    <form id="logout-form" action="{{ route('customer.logout') }}" method="POST" style="display: none;">
-                        @csrf
-                    </form>
-                </li>
-            </ul>
-        </aside>
+            @endforeach
+
+            <hr style="margin: 1rem 1.5rem;">
+
+            <li class="{{ request()->routeIs('cart.index') ? 'active' : '' }}">
+                <a href="{{ route('cart.index') }}">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Keranjang</span>
+                    <span class="badge" id="sidebar-cart-count">{{ count((array) session('cart')) }}</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Keluar dari Meja</span>
+                </a>
+                <form id="logout-form" action="{{ route('customer.logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+            </li>
+        </ul>
+    </aside>
 
         {{-- KONTEN UTAMA --}}
         <div class="content-wrapper">

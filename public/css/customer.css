@@ -1,205 +1,90 @@
-/* public/css/customer.css */
-
 :root {
     --primary-color: #0A2647;
     --secondary-color: #144272;
     --accent-color: #FFB100;
     --bg-color: #f8f9fa;
     --text-color: #343a40;
+    --text-muted: #6c757d;
     --white-color: #fff;
-    --danger-color: #721c24;
-    --danger-bg: #f8d7da;
+    --border-color: #dee2e6;
+    --success-color: #198754;
+    --danger-color: #dc3545;
 }
 
 body, html {
-    font-family: 'Poppins', sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
     margin: 0;
     background-color: var(--bg-color);
-}
-
-/* --- Halaman Login --- */
-.login-page {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-.page-header-login {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 2rem;
-    background: var(--white-color);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    color: var(--primary-color);
-}
-
-.page-header-login h1 {
-    margin: 0;
-    font-size: 1.5rem;
-}
-
-.page-header-login i {
-    font-size: 2rem;
-}
-
-.login-container {
-    flex-grow: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
-}
-
-.login-card {
-    background-color: var(--white-color);
-    padding: 2.5rem;
-    border-radius: 16px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 420px;
-    text-align: center;
-}
-
-.login-title {
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-    color: var(--primary-color);
-}
-
-.login-subtitle {
-    color: #666;
-    margin-bottom: 2rem;
-}
-
-.login-form .form-group {
-    margin-bottom: 1.5rem;
-    text-align: left;
-}
-
-.login-form label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-}
-
-.form-control {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    color: var(--text-color);
     box-sizing: border-box;
-    font-size: 1rem;
+}
+*, *::before, *::after {
+    box-sizing: inherit;
 }
 
-.btn-submit {
-    width: 100%;
-    padding: 1rem;
-    border: none;
-    background-color: var(--primary-color);
-    color: white;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-.btn-submit:hover {
-    background-color: var(--secondary-color);
-}
-
-.alert {
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-    text-align: left;
-}
-.alert-danger {
-    background-color: var(--danger-bg);
-    color: var(--danger-color);
-}
-.alert-danger ul {
-    margin: 0;
-    padding-left: 1.2rem;
-}
-
-/* --- Struktur Layout Utama Pelanggan --- */
+/* --- 1. KOMPONEN UTAMA (LAYOUT & SIDEBAR) --- */
 .customer-app-container {
     display: flex;
-    background-color: var(--bg-color);
 }
+
 .sidebar-customer {
     width: 260px;
     background: var(--white-color);
-    border-right: 1px solid #e9ecef;
+    border-right: 1px solid var(--border-color);
     min-height: 100vh;
-    transition: all 0.3s;
-    display: flex;
-    flex-direction: column;
+    transition: transform 0.3s ease-in-out;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    z-index: 1001;
 }
-.sidebar-header {
-    padding: 1.5rem;
-    text-align: center;
-    border-bottom: 1px solid #e9ecef;
-}
-.sidebar-header h3 {
-    margin: 0;
-    color: var(--primary-color);
-    font-size: 1.75rem;
-}
-.sidebar-header span {
-    font-size: 0.9rem;
-    color: #6c757d;
-}
-.sidebar-menu {
-    list-style: none;
-    padding: 1rem 0;
-    margin: 0;
-}
-.sidebar-menu li a {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.5rem;
-    color: var(--text-color);
-    text-decoration: none;
-    font-weight: 500;
-    transition: background-color 0.2s;
-}
-.sidebar-menu li a:hover, .sidebar-menu li.active a {
-    background-color: #f0f2f5;
-}
-.sidebar-menu li a .badge {
-    margin-left: auto;
-    background-color: var(--accent-color);
-    color: var(--primary-color);
-    font-weight: bold;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 0.8rem;
-}
+.sidebar-header { padding: 1.5rem; text-align: center; border-bottom: 1px solid var(--border-color); }
+.sidebar-header h3 { margin: 0; color: var(--primary-color); font-size: 1.75rem; }
+.sidebar-header span { font-size: 0.9rem; color: var(--text-muted); }
+.sidebar-menu { list-style: none; padding: 1rem 0; margin: 0; }
+.sidebar-menu li a { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; color: var(--text-color); text-decoration: none; font-weight: 500; }
+.sidebar-menu li a:hover, .sidebar-menu li.active a { background-color: #f0f2f5; }
+.sidebar-outlet-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); }
+.sidebar-menu li a .badge { margin-left: auto; background-color: var(--accent-color); color: var(--primary-color); font-weight: bold; border-radius: 50%; width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; font-size: 0.8rem; }
 
-.content-wrapper {
-    flex-grow: 1;
-}
-.header-customer {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background-color: var(--white-color);
-    padding: 1rem 1.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-.menu-toggle { display: none; /* Sembunyi di desktop */ }
-.page-content {
-    padding: 2rem;
-}
+.content-wrapper { flex-grow: 1; transition: margin-left 0.3s ease-in-out; margin-left: 260px; }
+.header-customer { display: flex; align-items: center; gap: 1rem; background-color: var(--white-color); padding: 1rem 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+.menu-toggle { display: none; }
+.page-content { padding: 2rem; }
 
-/* --- Modal Styling --- */
+/* --- 2. HALAMAN LOGIN (MANDIRI) --- */
+.login-page-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+.page-header-login { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: var(--white-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); color: var(--primary-color); }
+.page-header-login h1 { margin: 0; font-size: 1.5rem; }
+.page-header-login i { font-size: 2rem; }
+.login-container { flex-grow: 1; display: flex; justify-content: center; align-items: center; padding: 2rem; }
+.login-card { background-color: var(--white-color); padding: 2.5rem; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); width: 100%; max-width: 420px; text-align: center; }
+
+/* --- 3. HALAMAN MENU --- */
+.category-filters { margin-bottom: 2rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.btn-category { padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 20px; background: white; cursor: pointer; transition: all 0.2s; }
+.btn-category.active, .btn-category:hover { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+.menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+.product-card { background: var(--white-color); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; position: relative; }
+.product-image { width: 100%; height: 210px; object-fit: cover; }
+.bestseller-badge { position: absolute; top: 1rem; left: 1rem; background: var(--accent-color); color: var(--primary-color); padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; z-index: 2; }
+.discount-badge { position: absolute; top: 1rem; right: 1rem; background: var(--danger-color); color: white; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; z-index: 2; }
+.product-info { padding: 1rem; flex-grow: 1; display: flex; flex-direction: column; }
+.product-name { margin: 0 0 0.5rem 0; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.product-description { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; min-height: 44px; }
+.product-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+.price-wrapper { display: flex; flex-direction: column; align-items: flex-start; }
+.product-price { font-size: 1.2rem; font-weight: 600; color: var(--primary-color); }
+.product-price-discounted { font-size: 1.2rem; font-weight: 600; color: var(--primary-color); }
+.product-price-original { font-size: 0.9rem; color: var(--text-muted); }
+.btn-add-cart { background: var(--primary-color); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; transition: background-color 0.2s; }
+.btn-add-cart:hover { background: var(--secondary-color); }
+.btn-add-cart:disabled { background-color: #ccc; cursor: not-allowed; }
+.out-of-stock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); display: flex; justify-content: center; align-items: center; z-index: 1; }
+.out-of-stock-text { background: var(--danger-color); color: white; padding: 0.5rem 1rem; border-radius: 6px; font-weight: bold; }
+
+/* --- 4. MODAL (ADD TO CART & CALL WAITER) --- */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -207,8 +92,8 @@ body, html {
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.6);
-    z-index: 100;
-    display: none; /* <-- INI YANG PALING PENTING untuk menyembunyikan modal secara default */
+    z-index: 1002;
+    display: none;
     justify-content: center;
     align-items: center;
     padding: 1rem;
@@ -217,79 +102,155 @@ body, html {
 
 .modal-content {
     background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 500px;
+    border-radius: 16px; /* Radius lebih besar untuk desain modern */
+    width: 90%;
+    max-width: 480px; /* Ukuran modal yang lebih ringkas */
     position: relative;
     box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    overflow: hidden; /* Penting untuk menjaga border-radius gambar */
+}
+
+.modal-header-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
 }
 
 .modal-close {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: none;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.5);
+    color: white;
     border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
     font-size: 1.5rem;
+    line-height: 32px;
+    text-align: center;
     cursor: pointer;
-    line-height: 1;
-    color: #888;
+    transition: background-color 0.2s;
+    z-index: 5;
+}
+.modal-close:hover {
+    background: rgba(0,0,0,0.8);
 }
 
-.modal-body {
+.modal-product-info {
+    padding: 1.5rem;
+}
+
+.product-title { margin: 0 0 0.5rem 0; font-size: 1.6rem; color: var(--primary-color); }
+.product-description-modal { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+.product-price-modal { font-size: 1.5rem; font-weight: 600; color: var(--accent-color); }
+
+.modal-form .form-group { margin-bottom: 1.5rem; }
+.modal-form label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+.form-control { width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+
+.quantity-group {
     display: flex;
-    gap: 1.5rem;
-    margin-top: 1rem;
+    justify-content: space-between;
+    align-items: center;
+}
+.quantity-group label {
+    margin-bottom: 0; /* Hapus margin bawah dari label jumlah */
+    font-size: 1.1rem;
 }
 
-.modal-body img {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
+.quantity-selector { display: flex; align-items: center; gap: 0.75rem; }
+.quantity-selector .btn-quantity {
+    background: #f0f2f5;
+    border: 1px solid var(--border-color);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.quantity-selector .btn-quantity:hover { background-color: #e2e6ea; }
+.quantity-selector .quantity-input {
+    width: 50px;
+    text-align: center;
+    border: none;
+    background: none;
+    font-size: 1.3rem;
+    font-weight: 500;
+    -moz-appearance: textfield;
+}
+.quantity-input::-webkit-outer-spin-button, .quantity-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.modal-form-footer {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+.btn-submit-cart {
+    flex-grow: 1; /* Membuat tombol mengisi sisa ruang */
+    padding: 1rem;
+    border: none;
+    background-color: var(--primary-color);
+    color: white;
     border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.btn-submit-cart:hover {
+    background-color: var(--secondary-color);
 }
 
-.modal-product-details h3 {
-    margin: 0 0 0.5rem 0;
-    color: var(--primary-color);
-}
+/* --- 5. HALAMAN KERANJANG & SUKSES --- */
+.cart-page-container, .success-page-container { padding: 2rem; max-width: 800px; margin: auto; }
+.cart-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+.back-button { font-size: 1.5rem; color: var(--text-color); }
+.cart-header h1 { margin: 0; font-size: 1.8rem; }
+.customer-details-box { background: #e9ecef; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; font-size: 1.1rem;}
+.cart-items-list { padding: 0; }
+.cart-item-card { display: grid; grid-template-columns: 100px 1fr auto; gap: 1.5rem; background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 1rem; align-items: flex-start; }
+.cart-item-card img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
+.item-details h4 { margin: 0 0 0.5rem 0; font-size: 1.2rem; }
+.remove-button { background: none; border: none; color: var(--danger-color); cursor: pointer; padding: 0; font-size: 0.9rem; }
+.btn-update { font-size: 0.9rem; padding: 0.5rem 1rem; border-radius: 6px; background-color: #e9ecef; color: var(--text-color); border: none; cursor: pointer; margin-top: 0.5rem; }
+.cart-summary { background: white; padding: 1.5rem; border-radius: 12px; margin-top: 2rem; box-shadow: 0 -4px 15px rgba(0,0,0,0.05); border-top: 1px solid var(--border-color); }
+.total-price { display: flex; justify-content: space-between; align-items: center; font-size: 1.2rem; margin-bottom: 1.5rem; }
+.btn-checkout { width: 100%; padding: 1rem; border: none; background-color: var(--accent-color); color: var(--primary-color); border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
+.empty-cart { text-align: center; padding: 3rem; background: white; border-radius: 12px; }
+.empty-cart i { color: #ccc; margin-bottom: 1rem; }
+.btn-primary { background-color: var(--primary-color); color: white; padding: 0.8rem 1.5rem; border-radius: 8px; text-decoration: none; }
+.success-card { background: white; padding: 2.5rem; border-radius: 12px; max-width: 600px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+.receipt-details { border: 1px solid #eee; background-color: #f8f9fa; border-radius: 8px; margin-top: 1.5rem; padding: 1.5rem; text-align: left; }
+.success-actions { margin-top: 2rem; display: flex; justify-content: center; gap: 1rem; }
 
-.modal-product-details .price {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--accent-color);
-}
+/* --- 6. OVERLAY & RESPONSIVE --- */
+.sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+.sidebar-overlay.active { opacity: 1; visibility: visible; }
 
-.modal-product-details .description {
-    font-size: 0.9rem;
-    color: #666;
-    margin-top: 0.5rem;
-    max-height: 60px; /* Batasi tinggi deskripsi jika terlalu panjang */
-    overflow-y: auto;
-}
-
-/* ... Style lain untuk form di dalam modal ... */
-
-/* --- Aturan Responsif untuk Layout Pelanggan --- */
 @media (max-width: 992px) {
-    .sidebar-customer {
-        position: fixed;
-        left: -260px;
-        top: 0;
-        height: 100%;
-        z-index: 1000;
-        box-shadow: 0 0 20px rgba(0,0,0,0.2);
-    }
-    .sidebar-customer.open {
-        left: 0;
-    }
-    .menu-toggle {
-        display: block;
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: var(--primary-color);
-    }
+    .sidebar-customer { transform: translateX(-260px); }
+    .sidebar-customer.open { transform: translateX(0); }
+    .content-wrapper { margin-left: 0; }
+    .menu-toggle { display: block; }
+}
+@media (max-width: 768px) {
+    .modal-content.large { max-width: 95%; padding: 1.5rem; }
+    .modal-body-split { grid-template-columns: 1fr; }
+    .modal-image-container img { aspect-ratio: 16 / 9; margin-bottom: 1rem; }
+    .product-title { font-size: 1.5rem; }
+    .product-price-modal { font-size: 1.3rem; }
+}
+@media (max-width: 600px) {
+    .cart-item-card { grid-template-columns: 1fr; text-align: center; }
+    .cart-item-card img { margin: 0 auto 1rem auto; }
+    .item-actions { margin-top: 1rem; }
+    .page-content { padding: 1rem; }
 }

@@ -8,6 +8,8 @@
         <a href="{{ route('admin.products.create') }}" class="btn btn-primary">Tambah Menu</a>
     </div>
 
+    @include('admin.partials.outlet-filter')
+
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif

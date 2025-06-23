@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // <-- Import DB Facade
+use App\Events\NewOrderReceived;
+use Illuminate\Support\Facades\DB; 
 
 class CheckoutController extends Controller
 {
@@ -15,6 +16,7 @@ class CheckoutController extends Controller
      */
     public function store(Request $request)
     {
+
         $cart = session()->get('cart', []);
 
         // Validasi jika keranjang kosong
@@ -55,6 +57,8 @@ class CheckoutController extends Controller
 
             // 4. Jika transaksi berhasil, hapus keranjang dari session
             session()->forget('cart');
+
+            NewOrderReceived::dispatch($order);
 
             // 5. Redirect ke halaman sukses dengan membawa ID pesanan
             return redirect()->route('order.success', ['order' => $order->id]);

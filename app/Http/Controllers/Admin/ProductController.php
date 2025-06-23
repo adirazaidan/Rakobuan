@@ -4,17 +4,30 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\Outlet;
 use App\Models\Category; // <-- Import model Category
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage; // <-- Import Storage
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Ambil produk beserta relasi kategori dan outlet-nya
-        $products = Product::with('category.outlet')->latest()->paginate(10);
-        return view('admin.products.index', compact('products'));
+        $outlets = Outlet::all();
+        $selectedOutletId = $request->input('outlet_id');
+
+        $query = Product::query();
+
+        // Jika outlet dipilih, filter produk yang kategorinya milik outlet tersebut
+        if ($selectedOutletId) {
+            $query->whereHas('category', function ($q) use ($selectedOutletId) {
+                $q->where('outlet_id', $selectedOutletId);
+            });
+        }
+
+        $products = $query->with('category.outlet')->latest()->paginate(10);
+
+        return view('admin.products.index', compact('products', 'outlets', 'selectedOutletId'));
     }
 
     public function create()

@@ -71,22 +71,37 @@
 </div>
 @endsection
 
-<!-- @push('styles')
-<style> /* Style sementara, bisa dipindah ke admin.css */
-.order-container { display: flex; flex-direction: column; gap: 1.5rem; }
-.order-card { background-color: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 5px solid; }
-.order-card.status-pending { border-color: #fd7e14; /* Oranye */ }
-.order-card.status-processing { border-color: #0d6efd; /* Biru */ }
-.order-header, .order-footer { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; }
-.order-header { border-bottom: 1px solid #eee; }
-.order-footer { border-top: 1px solid #eee; }
-.order-header h3 { margin: 0 0 5px 0; }
-.order-status { text-align: right; }
-.order-status strong { display: block; }
-.order-body { padding: 1rem 1.5rem; }
-.order-body ul { list-style: none; padding: 0; margin: 0; }
-.order-body ul li { display: flex; justify-content: space-between; padding: 0.5rem 0; }
-.order-actions { display: flex; gap: 0.5rem; }
-.btn-success { background-color: #198754; color: white; }
-</style>
-@endpush -->
+{{-- dalam resources/views/admin/orders/index.blade.php --}}
+
+@push('scripts')
+
+<script>
+    // // Pastikan variabel Pusher di-load oleh bootstrap.js
+    // if (typeof window.Pusher !== 'undefined') {
+    //     console.log('Pusher JS & Laravel Echo loaded successfully.');
+
+    //     // Inisialisasi audio player
+    //     const notificationSound = new Audio('/sounds/notification.mp3');
+
+    //     // Dengarkan siaran di channel privat 'orders'
+    //     window.Echo.private('orders')
+    //         .listen('NewOrderReceived', (e) => {
+    //             console.log('Event NewOrderReceived Diterima:', e.order);
+
+    //             // Mainkan suara notifikasi
+    //             notificationSound.play().catch(error => console.log("Gagal memutar suara:", error));
+
+    //             // Tampilkan notifikasi sederhana di browser
+    //             alert('Ada pesanan baru masuk dari Meja ' + e.order.table_number + '!');
+
+    //             // Refresh halaman untuk menampilkan pesanan baru
+    //             window.location.reload();
+    //         });
+
+    //     console.log("Listening for events on 'private-orders' channel...");
+
+    // } else {
+    //     console.error('Laravel Echo atau Pusher JS gagal dimuat. Pastikan Anda sudah menjalankan "npm run dev".');
+    // }
+</script>
+@endpush

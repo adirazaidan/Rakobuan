@@ -62,7 +62,7 @@ Route::post('/logout', [CustomerSessionController::class, 'destroy'])->name('cus
 
 // Grup rute yang memerlukan sesi pelanggan
 Route::middleware('customer.session')->group(function () {
-    Route::get('/menu', [MenuController::class, 'index'])->name('customer.menu.index');
+    Route::get('/menu/{outlet?}', [MenuController::class, 'index'])->name('customer.menu.index');
 
     // Rute Keranjang
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');

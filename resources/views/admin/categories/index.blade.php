@@ -7,6 +7,8 @@
         <h1>Daftar Kategori</h1>
         <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">Tambah Kategori</a>
     </div>
+    
+    @include('admin.partials.outlet-filter')
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>

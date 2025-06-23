@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\Call;
 use Illuminate\Http\Request;
+use App\Events\NewCallReceived;
 
 class CallController extends Controller
 {
@@ -22,12 +23,14 @@ class CallController extends Controller
             return response()->json(['error' => 'Sesi tidak ditemukan.'], 401);
         }
 
-        Call::create([
+        $call = Call::create([
             'customer_name' => session('customer_name'),
             'table_number' => session('table_number'),
             'notes' => $request->notes,
-            'status' => 'pending', // Status awal selalu pending
+            'status' => 'pending',
         ]);
+
+        NewCallReceived::dispatch($call);
 
         return response()->json(['message' => 'Panggilan telah terkirim! Pelayan akan segera datang.']);
     }

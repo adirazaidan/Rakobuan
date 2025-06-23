@@ -6,14 +6,27 @@ use App\Http\Controllers\Controller;
 use App\Models\Discount;
 use App\Models\Product; // <-- Import Product
 use Illuminate\Http\Request;
+use App\Models\Outlet;
 
 class DiscountController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Ambil diskon beserta produk yang terkait
-        $discounts = Discount::with('product')->latest()->paginate(10);
-        return view('admin.discounts.index', compact('discounts'));
+        $outlets = Outlet::all();
+        $selectedOutletId = $request->input('outlet_id');
+
+        $query = Discount::query();
+
+        // Jika outlet dipilih, filter diskon yang produknya milik outlet tersebut
+        if ($selectedOutletId) {
+            $query->whereHas('product.category', function ($q) use ($selectedOutletId) {
+                $q->where('outlet_id', $selectedOutletId);
+            });
+        }
+
+        $discounts = $query->with('product')->latest()->paginate(10);
+
+        return view('admin.discounts.index', compact('discounts', 'outlets', 'selectedOutletId'));
     }
 
     public function create()

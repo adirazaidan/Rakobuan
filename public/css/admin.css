@@ -244,6 +244,28 @@ ul { list-style: none; padding: 0; margin: 0; }
     .analytics-grid {
     grid-template-columns: 1fr; /* Kartu akan tersusun vertikal di layar kecil */
     }   
+
+    .notification-bar {
+        position: fixed;
+        top: -100px; /* Sembunyi di atas layar secara default */
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        z-index: 9999;
+        font-weight: 500;
+        transition: top 0.5s ease-in-out;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .notification-bar.show {
+        top: 0; /* Munculkan ke layar */
+    }
 }
 
 /* Untuk layar yang sangat kecil, sesuaikan padding */

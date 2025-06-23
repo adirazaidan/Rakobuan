@@ -19,8 +19,13 @@ class CartController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        $product = Product::findOrFail($request->product_id);
+        $product = Product::with('activeDiscount')->findOrFail($request->product_id); // <-- MUAT RELASI DISKON
         $cart = session()->get('cart', []);
+
+        // Tentukan harga yang akan digunakan (harga diskon jika ada, jika tidak, harga normal)
+        $priceToUse = $product->activeDiscount 
+                        ? ($product->price - ($product->price * $product->activeDiscount->percentage / 100)) 
+                        : $product->price;
 
         if (isset($cart[$product->id])) {
             $cart[$product->id]['quantity'] += (int)$request->quantity;
@@ -28,11 +33,12 @@ class CartController extends Controller
             $cart[$product->id] = [
                 "name" => $product->name,
                 "quantity" => (int)$request->quantity,
-                "price" => $product->price,
+                "price" => $priceToUse, // <-- GUNAKAN HARGA YANG SUDAH DITENTUKAN
                 "image" => $product->image,
                 "notes" => $request->notes
             ];
         }
+
         session()->put('cart', $cart);
 
         return response()->json([
