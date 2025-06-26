@@ -10,7 +10,7 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    <div class="call-container">
+    <div class="call-container calls-page">
         @forelse ($calls as $call)
             <div class="order-card status-{{ $call->status }}">
                 <div class="order-header">

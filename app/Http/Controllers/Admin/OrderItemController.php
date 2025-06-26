@@ -4,37 +4,36 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\OrderItem;
-use App\Events\TableStatusUpdated; // Import event kita
+use App\Events\TableStatusUpdated;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class OrderItemController extends Controller
 {
-    /**
-     * Menandai satu kuantitas item sebagai telah diantar.
-     */
     public function deliver(OrderItem $orderItem)
     {
-        if ($orderItem->quantity_delivered < $orderItem->quantity) {
-            $orderItem->increment('quantity_delivered');
+        try {
+            if ($orderItem->quantity_delivered < $orderItem->quantity) {
+                $orderItem->increment('quantity_delivered');
+            }
+
+            $order = $orderItem->order->load('orderItems');
+
+            $allItemsDelivered = $order->orderItems->every(fn($item) => $item->quantity <= $item->quantity_delivered);
+
+            if ($allItemsDelivered) {
+                $order->update(['status' => 'completed']);
+            }
+
+            if ($order->dining_table_id) {
+                TableStatusUpdated::dispatch($order->dining_table_id);
+            }
+
+            return response()->json(['success' => true, 'message' => 'Status pengantaran diperbarui.']);
+
+        } catch (\Exception $e) {
+            Log::error("Gagal update status antar: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan di server.'], 500);
         }
-
-        $order = $orderItem->order->load('orderItems'); // Muat ulang order dengan item-itemnya
-
-        $allItemsDelivered = $order->orderItems->every(function ($item) {
-            return $item->quantity <= $item->quantity_delivered;
-        });
-
-        if ($allItemsDelivered) {
-            // Jika ya, ubah status order utama menjadi 'completed'
-            $order->update(['status' => 'completed']);
-            // Baris di bawah ini kita hapus/komentari agar sesi tidak otomatis bersih
-            // $order->diningTable()->update(['session_id' => null]);
-        }
-
-        // Muat relasi diningTable dengan data order terbarunya untuk dikirim
-        TableStatusUpdated::dispatch($order->dining_table_id);
-
-        // Kembalikan respon JSON, bukan redirect
-        return response()->json(['success' => true, 'message' => 'Status pengantaran diperbarui.']);
     }
 }

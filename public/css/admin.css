@@ -271,12 +271,23 @@ ul { list-style: none; padding: 0; margin: 0; }
 .btn-action-edit { color: var(--secondary-color); }
 .btn-action-delete { color: var(--danger-color); }
 
+
 .table-card-footer {
     border-top: 1px solid var(--border-color);
     padding: 0.75rem;
     margin-top: auto;
+    display: flex;
+    flex-direction: column; 
+    gap: 0.5rem; /* Beri jarak antar tombol */
 }
-
+/* Pastikan form di dalam footer tidak memiliki margin bawah */
+.table-card-footer form {
+    margin-bottom: 0;
+    width: 100%; /* Pastikan form memenuhi lebar footer */
+}
+.table-card-footer form button {
+    width: 100%; /* Buat tombol memenuhi lebar form */
+}
 .table-card-order-details {
     padding: 0.75rem 1rem;
     border-top: 1px solid var(--border-color);

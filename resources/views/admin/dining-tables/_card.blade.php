@@ -32,9 +32,12 @@
                     <span class="item-name">{{ $item->product->name }}</span>
                 </div>
                 <div class="item-delivery-status">
-                    <button class="btn-deliver-action" data-url="{{ route('admin.order-items.deliver', $item) }}" @if($item->quantity <= $item->quantity_delivered) disabled @endif>
-                        <i class="fas fa-check"></i>
-                    </button>
+                    <form action="{{ route('admin.order-items.deliver', $item) }}" method="POST" class="deliver-form">
+                        @csrf
+                        <button type="submit" class="btn-deliver-action" title="Tandai 1 item telah diantar" @if($item->quantity <= $item->quantity_delivered) disabled @endif>
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </form>
                     <span>{{ $item->quantity_delivered }}/{{ $item->quantity }}</span>
                 </div>
             </li>
@@ -42,7 +45,7 @@
         </ul>
     </div>
     @endif
-
+    
     <div class="table-card-details">
         <div class="table-card-info">
             <span class="table-location">{{ $table->location }}</span>
@@ -58,18 +61,19 @@
         </div>
     </div>
 
-    @if($table->session_id || $table->latestCompletedOrder)
+    @if($table->session_id || ($table->latestCompletedOrder && !$table->activeOrder))
     <div class="table-card-footer">
-        @if ($table->session_id)
-            <form action="{{ route('admin.dining-tables.clearSession', $table) }}" method="POST" onsubmit="return confirm('Yakin ingin membersihkan sesi meja ini?');">
+        @if($table->latestCompletedOrder && !$table->activeOrder && $table->session_id)
+            <button class="btn btn-sm btn-secondary w-100 btn-view-history"
+                    data-order='{{ $table->latestCompletedOrder->load('orderItems.product')->toJson() }}'>
+                Lihat Riwayat Sesi Ini
+            </button>
+        @endif
+        @if($table->session_id)
+            <form action="{{ route('admin.dining-tables.clearSession', $table) }}" method="POST" onsubmit="return confirm('Yakin ingin membersihkan sesi ini?');" class="clear-session-form">
                 @csrf
                 <button type="submit" class="btn btn-sm btn-info w-100">Clear Session</button>
             </form>
-        @elseif($table->latestCompletedOrder)
-            <button class="btn btn-sm btn-secondary w-100 btn-view-history"
-                    data-order='{{ $table->latestCompletedOrder->toJson() }}'>
-                Lihat Riwayat Terakhir
-            </button>
         @endif
     </div>
     @endif
