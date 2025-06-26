@@ -7,6 +7,9 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use App\Events\NewOrderReceived;
+use App\Events\TableStatusUpdated; 
+use App\Models\DiningTable;  
+
 use Illuminate\Support\Facades\DB; 
 
 class CheckoutController extends Controller
@@ -16,10 +19,8 @@ class CheckoutController extends Controller
      */
     public function store(Request $request)
     {
-
         $cart = session()->get('cart', []);
 
-        // Validasi jika keranjang kosong
         if (empty($cart)) {
             return redirect()->route('customer.menu.index')->with('error', 'Keranjang Anda kosong!');
         }
@@ -27,44 +28,58 @@ class CheckoutController extends Controller
         try {
             // Mulai transaksi database
             $order = DB::transaction(function () use ($cart) {
-                // 1. Hitung ulang total harga di sisi server
+                // Hitung total harga
                 $totalPrice = 0;
                 foreach ($cart as $details) {
                     $totalPrice += $details['price'] * $details['quantity'];
                 }
 
-                // 2. Buat record di tabel 'orders'
-                $order = Order::create([
+                // Buat record di tabel 'orders'
+                $newOrder = Order::create([
+                    'dining_table_id' => session('dining_table_id'),
                     'customer_name' => session('customer_name'),
                     'table_number' => session('table_number'),
                     'total_price' => $totalPrice,
-                    'status' => 'pending', // Status awal saat pesanan masuk
+                    'status' => 'pending',
                 ]);
 
-                // 3. Buat record di tabel 'order_items' untuk setiap item
+                // Buat record di tabel 'order_items'
                 foreach ($cart as $id => $details) {
                     OrderItem::create([
-                        'order_id' => $order->id,
+                        'order_id' => $newOrder->id,
                         'product_id' => $id,
                         'quantity' => $details['quantity'],
-                        'price' => $details['price'], // Simpan harga saat itu
+                        'price' => $details['price'],
                         'notes' => $details['notes'],
                     ]);
                 }
-
-                return $order;
+                
+                // Kembalikan order yang baru dibuat dari transaksi
+                return $newOrder;
             });
 
-            // 4. Jika transaksi berhasil, hapus keranjang dari session
-            session()->forget('cart');
-
+            // =================================================================
+            // ===== LOGIKA EVENT DIPINDAHKAN KE SINI (SETELAH TRANSAKSI) =====
+            // =================================================================
+            
+            // Picu event notifikasi suara
             NewOrderReceived::dispatch($order);
 
-            // 5. Redirect ke halaman sukses dengan membawa ID pesanan
+            // Ambil data meja yang terkait dengan pesanan
+            $table = DiningTable::find(session('dining_table_id'));
+            if ($table) {
+                // Kirim event untuk update tampilan visual meja di admin panel
+                // Sekarang, $table->activeOrder dijamin sudah ada karena transaksi telah selesai.
+                TableStatusUpdated::dispatch($table->id);
+            }
+            
+            // Jika transaksi berhasil, hapus keranjang dari session
+            session()->forget('cart');
+
+            // Redirect ke halaman sukses
             return redirect()->route('order.success', ['order' => $order->id]);
 
         } catch (\Exception $e) {
-            // Jika terjadi error selama transaksi, kembalikan ke keranjang dengan pesan error
             return redirect()->route('cart.index')->with('error', 'Gagal membuat pesanan, silakan coba lagi. Error: ' . $e->getMessage());
         }
     }

@@ -1,0 +1,76 @@
+@php
+    $statusClass = '';
+    if ($table->is_locked) {
+        $statusClass = 'is-locked';
+    } elseif ($table->session_id) {
+        $statusClass = 'is-occupied';
+    }
+@endphp
+
+<div class="table-card {{ $statusClass }}" id="table-card-{{ $table->id }}">
+    <div class="table-visual">
+        <span class="table-visual-name">{{ $table->name }}</span>
+        <div class="table-status-text">
+            @if($table->is_locked)
+                <span class="status-locked">Terkunci</span>
+            @elseif($table->session_id)
+                <span class="status-occupied">Diduduki</span>
+            @else
+                <span class="status-available">Tersedia</span>
+            @endif
+        </div>
+    </div>
+
+    @if($table->activeOrder)
+    <div class="table-card-order-details">
+        <h5>Pesanan Aktif: #{{ $table->activeOrder->id }}</h5>
+        <ul class="order-item-list">
+            @foreach($table->activeOrder->orderItems as $item)
+            <li class="order-item-row {{ $item->quantity <= $item->quantity_delivered ? 'item-delivered' : '' }}">
+                <div class="item-info">
+                    <span class="item-quantity">{{ $item->quantity }}x</span>
+                    <span class="item-name">{{ $item->product->name }}</span>
+                </div>
+                <div class="item-delivery-status">
+                    <button class="btn-deliver-action" data-url="{{ route('admin.order-items.deliver', $item) }}" @if($item->quantity <= $item->quantity_delivered) disabled @endif>
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <span>{{ $item->quantity_delivered }}/{{ $item->quantity }}</span>
+                </div>
+            </li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
+    <div class="table-card-details">
+        <div class="table-card-info">
+            <span class="table-location">{{ $table->location }}</span>
+            <p class="table-notes">{{ $table->notes ?: 'Tidak ada catatan' }}</p>
+        </div>
+        <div class="table-card-actions">
+            <a href="{{ route('admin.dining-tables.edit', $table) }}" class="btn-action-edit" title="Edit Meja"><i class="fas fa-edit"></i></a>
+            <form action="{{ route('admin.dining-tables.destroy', $table) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus meja ini?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn-action-delete" title="Hapus Meja"><i class="fas fa-trash"></i></button>
+            </form>
+        </div>
+    </div>
+
+    @if($table->session_id || $table->latestCompletedOrder)
+    <div class="table-card-footer">
+        @if ($table->session_id)
+            <form action="{{ route('admin.dining-tables.clearSession', $table) }}" method="POST" onsubmit="return confirm('Yakin ingin membersihkan sesi meja ini?');">
+                @csrf
+                <button type="submit" class="btn btn-sm btn-info w-100">Clear Session</button>
+            </form>
+        @elseif($table->latestCompletedOrder)
+            <button class="btn btn-sm btn-secondary w-100 btn-view-history"
+                    data-order='{{ $table->latestCompletedOrder->toJson() }}'>
+                Lihat Riwayat Terakhir
+            </button>
+        @endif
+    </div>
+    @endif
+</div>

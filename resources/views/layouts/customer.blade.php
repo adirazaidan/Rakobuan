@@ -10,8 +10,10 @@
     <link rel="stylesheet" href="{{ asset('css/customer.css') }}">
 
     {{-- Ini akan kita gunakan untuk URL di JS --}}
+    @vite(['resources/js/app.js'])
     <script>
         const appConfig = {
+            sessionId: "{{ session()->getId() }}",
             routes: {
                 cartAdd: "{{ route('cart.add') }}",
                 callWaiterStore: "{{ route('call.waiter.store') }}" // <-- TAMBAHKAN INI

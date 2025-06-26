@@ -76,13 +76,27 @@ class CartController extends Controller
         $cart = session()->get('cart', []);
 
         if (isset($cart[$productId])) {
+            // Update data di session
             $cart[$productId]['quantity'] = (int)$request->quantity;
-            $cart[$productId]['notes'] = $request->notes; // Update catatan
+            $cart[$productId]['notes'] = $request->notes;
             session()->put('cart', $cart);
-            return redirect()->route('cart.index')->with('success', 'Keranjang berhasil diperbarui.');
+
+            // Hitung ulang total harga keseluruhan untuk dikirim kembali
+            $grandTotal = 0;
+            foreach ($cart as $details) {
+                $grandTotal += $details['price'] * $details['quantity'];
+            }
+
+            // Kembalikan respon JSON
+            return response()->json([
+                'success' => true,
+                'message' => 'Keranjang berhasil diperbarui.',
+                'grandTotal' => $grandTotal,
+                'cartCount' => count($cart)
+            ]);
         }
 
-        return redirect()->route('cart.index')->with('error', 'Item tidak ditemukan di keranjang.');
+        return response()->json(['success' => false, 'message' => 'Item tidak ditemukan.'], 404);
     }
 
     /**

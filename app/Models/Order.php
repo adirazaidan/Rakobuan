@@ -19,6 +19,7 @@ class Order extends Model
         'table_number',
         'status',
         'total_price',
+        'dining_table_id',
     ];
 
     /**
@@ -28,5 +29,10 @@ class Order extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function diningTable()
+    {
+        return $this->belongsTo(DiningTable::class);
     }
 }

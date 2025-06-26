@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Auth;
 
 // Controller untuk Admin
 use App\Http\Controllers\Admin\Auth\AuthenticatedSessionController;
@@ -13,6 +15,8 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\CallController;
 use App\Http\Controllers\Admin\SalesReportController;
 use App\Http\Controllers\Customer\CheckoutController;
+use App\Http\Controllers\Admin\DiningTableController;
+use App\Http\Controllers\Admin\OrderItemController;
 
 
 // Controller untuk Customer
@@ -26,36 +30,9 @@ use App\Http\Controllers\Customer\MenuController; // <-- USE INI SEBELUMNYA HILA
 |--------------------------------------------------------------------------
 */
 
-// // ========================================================================
-// // RUTE UNTUK PELANGGAN (CUSTOMER)
-// // ========================================================================
-
-// Route::get('/', [CustomerSessionController::class, 'create'])->name('customer.login.form');
-// Route::post('/login', [CustomerSessionController::class, 'store'])->name('customer.login');
-// Route::post('/logout', [CustomerSessionController::class, 'destroy'])->name('customer.logout');
-
-// // Grup rute yang memerlukan sesi pelanggan (seperti halaman menu & keranjang)
-// Route::middleware('customer.session')->group(function () {
-//     Route::get('/menu', [MenuController::class, 'index'])->name('customer.menu.index');
-//     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-//     // RUTE BARU UNTUK HALAMAN KERANJANG
-//     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-//     Route::patch('/cart/update/{productId}', [CartController::class, 'update'])->name('cart.update');
-//     Route::delete('/cart/remove/{productId}', [CartController::class, 'remove'])->name('cart.remove');
-
-//     // RUTE BARU UNTUK CHECKOUT
-//     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-//     Route::get('/order/success/{order}', [CheckoutController::class, 'success'])->name('order.success');
-
-//     // RUTE BARU UNTUK PANGGIL PELAYAN
-//     Route::post('/call-waiter', [\App\Http\Controllers\Customer\CallController::class, 'store'])->name('call.waiter.store');
-// });
-
-/*
-|--------------------------------------------------------------------------
-| Customer Routes
-|--------------------------------------------------------------------------
-*/
+// ========================================================================
+// RUTE UNTUK PELANGGAN
+// ========================================================================
 Route::get('/', [CustomerSessionController::class, 'create'])->name('customer.login.form');
 Route::post('/login', [CustomerSessionController::class, 'store'])->name('customer.login');
 Route::post('/logout', [CustomerSessionController::class, 'destroy'])->name('customer.logout');
@@ -77,6 +54,8 @@ Route::middleware('customer.session')->group(function () {
     // Rute Panggil Pelayan (Dengan path controller yang sudah diperbaiki)
     Route::post('/call-waiter', [\App\Http\Controllers\Customer\CallController::class, 'store'])->name('call.waiter.store');
 });
+
+Route::get('/get-available-tables', [CustomerSessionController::class, 'getAvailableTables'])->name('customer.get-tables');
 
 
 // ========================================================================
@@ -116,5 +95,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
     
         // Rute Laporan Penjualan
         Route::get('sales-report', [SalesReportController::class, 'index'])->name('sales.report.index');
+   
+        Route::resource('dining-tables', DiningTableController::class);
+        Route::post('dining-tables/lock-all', [DiningTableController::class, 'lockAll'])->name('dining-tables.lockAll');
+        Route::post('dining-tables/unlock-all', [DiningTableController::class, 'unlockAll'])->name('dining-tables.unlockAll');
+        Route::post('dining-tables/{diningTable}/clear-session', [DiningTableController::class, 'clearSession'])->name('dining-tables.clearSession');
+
+        Route::get('dining-tables/{diningTable}/render', [DiningTableController::class, 'renderCard'])->name('dining-tables.renderCard');
+        Route::post('order-items/{orderItem}/deliver', [OrderItemController::class, 'deliver'])->name('order-items.deliver');
+    
     });
+});
+
+Broadcast::channel('layout-tables', function ($user) {
+    return Auth::check();
 });

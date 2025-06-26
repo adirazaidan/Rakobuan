@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Models\DiningTable;
 use Illuminate\Http\Request;
-
+use App\Events\TableStatusUpdated;
+use App\Events\AvailableTablesUpdated;
 class CustomerSessionController extends Controller
 {
     /**
@@ -12,11 +14,18 @@ class CustomerSessionController extends Controller
      */
     public function create()
     {
-        // Cek jika pelanggan sudah memiliki sesi, langsung arahkan ke menu
         if (session()->has('customer_name')) {
             return redirect()->route('customer.menu.index');
         }
-        return view('customer.login');
+
+        $availableTables = DiningTable::where('is_locked', false)
+                                      ->whereNull('session_id')
+                                      ->get()
+                                      ->sortBy('name', SORT_NATURAL);
+
+        $tablesByLocation = $availableTables->groupBy('location');
+
+        return view('customer.login', compact('tablesByLocation'));
     }
 
     /**
@@ -25,15 +34,26 @@ class CustomerSessionController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'customer_name' => 'required|string|max:100',
-            'table_number' => 'required|string|max:20',
+            'dining_table_id' => 'required|exists:dining_tables,id',
+            'customer_name'   => 'required|string|max:100',
         ]);
+
+        $table = DiningTable::findOrFail($validated['dining_table_id']);
+
+        if ($table->is_locked || !is_null($table->session_id)) {
+            return back()->with('error', 'Meja yang Anda pilih tidak tersedia saat ini. Silakan pilih meja lain.');
+        }
+
+        $table->update(['session_id' => session()->getId()]);
+        TableStatusUpdated::dispatch($table->id);
 
         session([
-            'customer_name' => $validated['customer_name'],
-            'table_number' => $validated['table_number'],
+            'dining_table_id' => $table->id,
+            'customer_name'   => $validated['customer_name'],
+            'table_number'    => $table->name,
         ]);
 
+        // Redirect ke halaman menu utama (nanti akan diarahkan ke outlet pertama secara otomatis)
         return redirect()->route('customer.menu.index');
     }
 
@@ -42,8 +62,29 @@ class CustomerSessionController extends Controller
      */
     public function destroy(Request $request)
     {
-        $request->session()->flush(); // Menghapus semua data dari sesi
+        if (session()->has('dining_table_id')) {
+            $table = DiningTable::find(session('dining_table_id'));
+            if ($table) {
+                $table->update(['session_id' => null]);
+                TableStatusUpdated::dispatch($table->id);
+                AvailableTablesUpdated::dispatch();
+            }
+        }
 
+        $request->session()->flush();
         return redirect()->route('customer.login.form');
+    }
+
+    public function getAvailableTables()
+    {
+        $availableTables = DiningTable::where('is_locked', false)
+                                    ->whereNull('session_id')
+                                    ->get()
+                                    ->sortBy('name', SORT_NATURAL);
+
+        $tablesByLocation = $availableTables->groupBy('location');
+
+        // Return view partial yang hanya berisi <option>
+        return view('customer.partials._tables_options', compact('tablesByLocation'));
     }
 }

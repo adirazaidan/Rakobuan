@@ -254,7 +254,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const lightboxCloseBtn = document.querySelector('.lightbox-close');
         const modalImageContainer = document.querySelector('.modal-header-visual');
 
-        // Fungsi untuk membuka lightbox, menerima URL gambar sebagai parameter
         const openLightbox = (imageUrl) => {
             if (imageUrl) {
                 lightboxImage.src = imageUrl;
@@ -266,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
             imageLightbox.style.display = 'none';
         };
 
-        // Event listener untuk tombol zoom di dalam MODAL
+        // Event listener untuk tombol zoom di MODAL
         if (modalImageContainer) {
             modalImageContainer.addEventListener('click', (e) => {
                 if (e.target.closest('.zoom-btn')) {
@@ -277,13 +276,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Event listener untuk tombol zoom di KARTU MENU UTAMA
-        if (menuList) {
-            menuList.addEventListener('click', (e) => {
-                const zoomButton = e.target.closest('.card-zoom-btn'); // Cari tombol zoom spesifik
+        // Event listener untuk tombol zoom di KARTU MENU dan KERANJANG
+        if (menuList || document.querySelector('.cart-items-list')) {
+            const container = menuList || document.querySelector('.cart-items-list');
+            container.addEventListener('click', (e) => {
+                const zoomButton = e.target.closest('.card-zoom-btn');
                 if (zoomButton) {
-                    e.stopPropagation(); // Hentikan event agar tidak memicu hal lain
-                    openLightbox(zoomButton.dataset.imageUrl); // Buka lightbox dengan URL dari data-attribute
+                    e.stopPropagation();
+                    openLightbox(zoomButton.dataset.imageUrl);
                 }
             });
         }
@@ -296,4 +296,179 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // LOGIKA TOMBOL SUNTING DI KERANJANG
+    const cartItemList = document.querySelector('.cart-items-list');
+    if (cartItemList) {
+        cartItemList.addEventListener('click', (e) => {
+            const editButton = e.target.closest('.btn-edit-cart');
+            if (editButton) {
+                const itemId = editButton.dataset.itemId;
+                console.log(`Tombol Sunting diklik untuk item ID: ${itemId}`);
+                // Di sini Anda bisa menambahkan logika sebenarnya untuk menampilkan form sunting
+                // Misalnya, menampilkan modal atau mengubah tampilan item untuk diedit.
+            }
+        });
+    }
+
+    /**
+     * =================================
+     * BAGIAN INTERAKTIVITAS HALAMAN KERANJANG
+     * =================================
+     */
+    const cartPage = document.getElementById('cart-items-list');
+
+    if (cartPage) {
+        const grandTotalElement = document.getElementById('grand-total');
+
+        // Fungsi untuk menghitung ulang semua harga secara visual
+        const updateAllPrices = () => {
+            let grandTotal = 0;
+            const cartItems = document.querySelectorAll('.cart-item-card-new');
+            
+            cartItems.forEach(item => {
+                const basePrice = parseFloat(item.dataset.price);
+                const quantity = parseInt(item.querySelector('.quantity-input').value);
+                const subtotal = basePrice * quantity;
+                grandTotal += subtotal;
+                
+                // Update sub-total per item
+                item.querySelector('.item-subtotal').textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
+            });
+
+            // Update grand total di bagian bawah
+            grandTotalElement.textContent = 'Rp ' + grandTotal.toLocaleString('id-ID');
+        };
+
+        // Event listener untuk seluruh area item keranjang
+        cartPage.addEventListener('click', (e) => {
+            const target = e.target;
+            const itemCard = target.closest('.cart-item-card-new');
+            if (!itemCard) return;
+
+            const quantityInput = itemCard.querySelector('.quantity-input');
+            let currentQty = parseInt(quantityInput.value);
+
+            // Logika untuk tombol +
+            if (target.classList.contains('btn-increase')) {
+                quantityInput.value = currentQty + 1;
+                updateAllPrices(); // Update tampilan harga secara instan
+            }
+            // Logika untuk tombol -
+            if (target.classList.contains('btn-decrease')) {
+                if (currentQty > 1) {
+                    quantityInput.value = currentQty - 1;
+                    updateAllPrices(); // Update tampilan harga secara instan
+                }
+            }
+        });
+
+        // Event listener untuk form update (AJAX)
+        cartPage.addEventListener('submit', function(e) {
+            if (e.target.classList.contains('item-update-form')) {
+                e.preventDefault();
+                const form = e.target;
+                const formData = new FormData(form);
+                const productId = form.closest('.cart-item-card-new').dataset.id;
+                const url = `/cart/update/${productId}`; // Bangun URL secara dinamis
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                // Tambahkan method PATCH secara manual untuk FormData
+                formData.append('_method', 'PATCH');
+                
+                form.querySelector('.btn-update-cart').textContent = 'Menyimpan...';
+
+                fetch(url, {
+                    method: 'POST', // Form method spoofing
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.success) {
+                        // Update total di keranjang sidebar
+                        document.getElementById('sidebar-cart-count').textContent = data.cartCount;
+                        // Kembalikan teks tombol ke semula
+                        form.querySelector('.btn-update-cart').innerHTML = '<i class="fas fa-sync-alt"></i> Update';
+                        // Optional: tampilkan notifikasi sukses kecil
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+    }
+
+    /**
+     * =================================
+     * FIX STICKY FOOTER OVERLAP (HALAMAN KERANJANG)
+     * =================================
+     */
+    // Cek apakah kita berada di halaman yang memiliki sticky footer dan kontainer keranjang
+    const stickyCartSummary = document.querySelector('.cart-summary-sticky');
+    const cartPageContainer = document.querySelector('.cart-page-container');
+
+    if (stickyCartSummary && cartPageContainer) {
+        // Ukur tinggi elemen sticky footer secara akurat
+        const footerHeight = stickyCartSummary.offsetHeight; 
+
+        // Terapkan tinggi tersebut sebagai padding-bottom pada kontainer utama halaman keranjang
+        cartPageContainer.style.paddingBottom = footerHeight + 20 + 'px'; // Ditambah 20px sebagai spasi ekstra
+
+        // Log ini untuk debugging, Anda bisa melihatnya di Console (F12)
+        console.log(`Sticky footer height detected: ${footerHeight}px. Padding bottom applied.`);
+    }
+
+    /**
+     * =================================
+     * LISTENER UNTUK FORCE LOGOUT DARI ADMIN
+     * =================================
+     */
+    if (typeof window.Echo !== 'undefined' && appConfig.sessionId) {
+        const channelName = `customer-logout.${appConfig.sessionId}`;
+        console.log(`Listening for logout signal on public channel: ${channelName}`);
+
+        // Dengarkan di channel PUBLIK dengan nama yang unik
+        window.Echo.channel(channelName)
+            .listen('SessionCleared', (e) => {
+                console.log('Logout signal received from admin!', e);
+                alert('Sesi Anda untuk meja ini telah dihentikan oleh admin. Anda akan dikembalikan ke halaman login.');
+                
+                const logoutForm = document.getElementById('logout-form');
+                if (logoutForm) {
+                    logoutForm.submit();
+                } else {
+                    window.location.href = '/'; 
+                }
+            });
+    }
+
+    /**
+ * =================================
+ * REAL-TIME UPDATE UNTUK DROPDOWN MEJA LOGIN
+ * =================================
+ */
+const tableDropdown = document.getElementById('dining_table_id');
+
+if (tableDropdown && typeof window.Echo !== 'undefined') {
+    console.log("Login page detected. Listening for table status updates...");
+
+    const updateTableDropdown = () => {
+        fetch(appConfig.routes.getAvailableTables)
+            .then(response => response.text())
+            .then(html => {
+                tableDropdown.innerHTML = html;
+                console.log("Table dropdown updated via real-time.");
+            });
+    };
+
+    window.Echo.channel('tables-status')
+        .listen('.AvailableTablesUpdated', (e) => {
+            console.log('AvailableTablesUpdated event received!', e);
+            updateTableDropdown();
+        });
+}
+
 });

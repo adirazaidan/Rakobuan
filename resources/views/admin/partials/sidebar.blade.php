@@ -7,6 +7,7 @@
         <li class="{{ request()->routeIs('admin.calls.index') ? 'active' : '' }}"><a href="{{ route('admin.calls.index') }}"><i class="fa-solid fa-bell-concierge"></i><span>Panggilan</span></a></li>
         <li class="{{ request()->routeIs('admin.orders.history') ? 'active' : '' }}"><a href="{{ route('admin.orders.history') }}"><i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat Orderan</span></a></li>
         <li class="{{ request()->routeIs('admin.calls.history') ? 'active' : '' }}"><a href="{{ route('admin.calls.history') }}"><i class="fa-solid fa-book"></i><span>Riwayat Panggilan</span></a></li>
+        <li class="{{ request()->routeIs('admin.dining-tables.*') ? 'active' : '' }}"><a href="{{ route('admin.dining-tables.index') }}"><i class="fa-solid fa-chair"></i><span>Meja</span></a></li>
         <hr>
         <li class="{{ request()->routeIs('admin.outlets.*') ? 'active' : '' }}"><a href="{{ route('admin.outlets.index') }}"><i class="fa-solid fa-store"></i><span>Outlet</span></a></li>
         <li class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"><a href="{{ route('admin.categories.index') }}"><i class="fa-solid fa-tags"></i><span>Kategori</span></a></li>
