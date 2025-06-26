@@ -46,6 +46,30 @@
         </ul>
     </div>
     @endif
+
+    @if($table->activeCalls->isNotEmpty())
+    <div class="table-card-call-details">
+        <h5>Panggilan Aktif:</h5>
+        <ul class="call-item-list">
+            @foreach($table->activeCalls as $call)
+            <li class="call-item-row">
+                <span class="call-note" title="{{ $call->notes }}"><i class="fas fa-comment-dots"></i> {{ Str::limit($call->notes, 20) ?: 'Memanggil pelayan' }}</span>
+                <div class="call-actions">
+                    {{-- Tombol ini akan menandai panggilan sebagai 'completed' --}}
+                    <form action="{{ route('admin.calls.updateStatus', $call) }}" method="POST">
+                        @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="status" value="completed">
+                        <button type="submit" class="btn-deliver-action" title="Tandai Selesai">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </form>
+                </div>
+            </li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
     
     <div class="table-card-details">
         <div class="table-card-info">

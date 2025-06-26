@@ -24,6 +24,7 @@ class CallController extends Controller
         }
 
         $call = Call::create([
+            'dining_table_id' => session('dining_table_id'),
             'customer_name' => session('customer_name'),
             'table_number' => session('table_number'),
             'notes' => $request->notes,

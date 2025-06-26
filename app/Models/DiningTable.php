@@ -31,4 +31,9 @@ class DiningTable extends Model
     {
         return $this->hasOne(Order::class)->where('status', 'completed')->latestOfMany();
     }
+
+    public function activeCalls()
+    {
+        return $this->hasMany(Call::class)->where('status', '!=', 'completed');
+    }
 }

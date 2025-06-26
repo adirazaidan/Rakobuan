@@ -14,5 +14,11 @@ class Call extends Model
         'table_number',
         'notes',
         'status',
+        'dining_table_id',
     ];
+
+    public function diningTable()
+    {
+        return $this->belongsTo(DiningTable::class);
+    }
 }
