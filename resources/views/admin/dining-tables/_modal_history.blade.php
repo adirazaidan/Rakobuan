@@ -5,6 +5,7 @@
             <button type="button" class="modal-close" id="closeHistoryModalBtn">&times;</button>
         </div>
         <div class="modal-body" id="historyModalBody">
+            {{-- Konten riwayat akan diisi oleh JavaScript di sini --}}
         </div>
     </div>
 </div>

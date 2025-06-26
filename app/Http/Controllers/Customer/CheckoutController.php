@@ -37,6 +37,7 @@ class CheckoutController extends Controller
                 // Buat record di tabel 'orders'
                 $newOrder = Order::create([
                     'dining_table_id' => session('dining_table_id'),
+                    'session_id'      => session()->getId(),
                     'customer_name' => session('customer_name'),
                     'table_number' => session('table_number'),
                     'total_price' => $totalPrice,

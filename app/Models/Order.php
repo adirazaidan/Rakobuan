@@ -20,6 +20,7 @@ class Order extends Model
         'status',
         'total_price',
         'dining_table_id',
+        'session_id',
     ];
 
     /**

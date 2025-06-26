@@ -5,6 +5,7 @@
     } elseif ($table->session_id) {
         $statusClass = 'is-occupied';
     }
+    $completedOrderForThisSession = $table->latestCompletedOrder && $table->session_id && $table->latestCompletedOrder->session_id === $table->session_id;
 @endphp
 
 <div class="table-card {{ $statusClass }}" id="table-card-{{ $table->id }}">
@@ -61,20 +62,18 @@
         </div>
     </div>
 
-    @if($table->session_id || ($table->latestCompletedOrder && !$table->activeOrder))
+    @if($table->session_id)
     <div class="table-card-footer">
-        @if($table->latestCompletedOrder && !$table->activeOrder && $table->session_id)
+        @if($completedOrderForThisSession)
             <button class="btn btn-sm btn-secondary w-100 btn-view-history"
                     data-order='{{ $table->latestCompletedOrder->load('orderItems.product')->toJson() }}'>
                 Lihat Riwayat Sesi Ini
             </button>
         @endif
-        @if($table->session_id)
-            <form action="{{ route('admin.dining-tables.clearSession', $table) }}" method="POST" onsubmit="return confirm('Yakin ingin membersihkan sesi ini?');" class="clear-session-form">
-                @csrf
-                <button type="submit" class="btn btn-sm btn-info w-100">Clear Session</button>
-            </form>
-        @endif
+        <form action="{{ route('admin.dining-tables.clearSession', $table) }}" method="POST" onsubmit="return confirm('Yakin ingin membersihkan sesi ini?');" class="clear-session-form">
+            @csrf
+            <button type="submit" class="btn btn-sm btn-info w-100">Clear Session</button>
+        </form>
     </div>
     @endif
 </div>
