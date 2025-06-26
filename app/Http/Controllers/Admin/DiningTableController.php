@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Support\Facades\Log;
+
 use App\Http\Controllers\Controller;
 use App\Models\DiningTable;
 use Illuminate\Http\Request;
@@ -55,8 +57,12 @@ class DiningTableController extends Controller
         ]);
         $validated['is_locked'] = $request->has('is_locked');
         $diningTable->update($validated);
+
+        // Perbaikan: Kirim seluruh objek meja yang sudah di-refresh dan di-load relasinya
+        TableStatusUpdated::dispatch($diningTable->fresh()->load(['activeOrder.orderItems.product', 'latestCompletedOrder.orderItems.product']));
+        
+        // Picu juga event ini agar dropdown di halaman login pelanggan terupdate
         AvailableTablesUpdated::dispatch();
-        TableStatusUpdated::dispatch($diningTable->id);
 
         return redirect()->route('admin.dining-tables.index')->with('success', 'Data meja berhasil diperbarui.');
     }
@@ -83,10 +89,15 @@ class DiningTableController extends Controller
     {
         $sessionIdToClear = $diningTable->session_id;
         $diningTable->update(['session_id' => null]);
+
         if ($sessionIdToClear) {
             SessionCleared::dispatch($sessionIdToClear);
         }
-        TableStatusUpdated::dispatch($diningTable->id);
+        
+        // Perbaikan: Kirim seluruh objek meja yang sudah di-refresh dan di-load relasinya
+        TableStatusUpdated::dispatch($diningTable->fresh()->load(['activeOrder.orderItems.product', 'latestCompletedOrder.orderItems.product']));
+        
+        // Picu juga event ini agar dropdown di halaman login pelanggan terupdate
         AvailableTablesUpdated::dispatch();
 
         return redirect()->route('admin.dining-tables.index')->with('success', 'Sesi untuk meja ' . $diningTable->name . ' berhasil dibersihkan.');

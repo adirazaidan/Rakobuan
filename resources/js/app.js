@@ -4,54 +4,62 @@ document.addEventListener('DOMContentLoaded', function() {
     
     /**
      * =================================
-     * NOTIFIKASI REAL-TIME (UNTUK HALAMAN ORDER & PANGGILAN)
+     * LISTENER NOTIFIKASI GLOBAL (SELALU AKTIF DI SEMUA HALAMAN ADMIN)
      * =================================
      */
     const notificationBar = document.getElementById('newOrderNotification');
+    // Hanya jalankan jika elemen notifikasi ada di layout
     if (notificationBar) {
         const notificationSound = new Audio('/sounds/notification.mp3');
+        
+        // Buat satu fungsi notifikasi yang bisa dipakai ulang
         const showNotification = (message) => {
             notificationSound.play().catch(error => console.error("Gagal memutar suara:", error));
             notificationBar.innerHTML = `<i class="fa-solid fa-bell fa-shake"></i> ${message}`;
             notificationBar.classList.add('show');
+            // Alih-alih reload, kita beri link untuk pindah ke halaman yang relevan
+            notificationBar.onclick = () => {
+                if (message.includes('Pesanan')) {
+                    window.location.href = '/admin/orders';
+                } else if (message.includes('Panggilan')) {
+                    window.location.href = '/admin/calls';
+                }
+            };
+            // Sembunyikan setelah beberapa detik
             setTimeout(() => {
                 notificationBar.classList.remove('show');
-                setTimeout(() => window.location.reload(), 500);
-            }, 5000);
+            }, 8000); // Waktu tampil notifikasi lebih lama
         };
 
-        // Listener untuk halaman Orderan
-        if (document.querySelector('.order-container')) {
-            window.Echo.private('orders')
-                .listen('.NewOrderReceived', (e) => {
-                    console.log('Event NewOrderReceived Diterima:', e.order);
-                    showNotification(`Pesanan Baru dari Meja ${e.order.table_number}!`);
-                });
-        }
+        // Listener untuk notifikasi pesanan baru (sekarang menjadi global)
+        console.log("Listening for new orders globally...");
+        window.Echo.private('orders')
+            .listen('.NewOrderReceived', (e) => {
+                console.log('Global event NewOrderReceived Diterima:', e.order);
+                showNotification(`Pesanan Baru dari Meja ${e.order.table_number}! Klik untuk melihat.`);
+            });
 
-        // Listener untuk halaman Panggilan
-        if (document.querySelector('.call-container')) {
-            window.Echo.private('calls')
-                .listen('.NewCallReceived', (e) => {
-                    console.log('Event NewCallReceived Diterima:', e.call);
-                    showNotification(`Panggilan Baru dari Meja ${e.call.table_number}!`);
-                });
-        }
+        // Listener untuk notifikasi panggilan baru (sekarang menjadi global)
+        console.log("Listening for new calls globally...");
+        window.Echo.private('calls')
+            .listen('.NewCallReceived', (e) => {
+                console.log('Global event NewCallReceived Diterima:', e.call);
+                showNotification(`Panggilan Baru dari Meja ${e.call.table_number}! Klik untuk melihat.`);
+            });
     }
+
 
     /**
      * ==============================================================
-     * REAL-TIME UPDATE UNTUK HALAMAN LAYOUT MEJA (HTML over the Wire)
+     * LOGIKA SPESIFIK UNTUK HALAMAN LAYOUT MEJA
      * ==============================================================
      */
     const tableGrid = document.querySelector('.table-visual-grid');
-
-    if (tableGrid) {
+    if (tableGrid && typeof window.Echo !== 'undefined') {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-        // Listener untuk semua aksi submit form di dalam grid
+        // Listener untuk form 'antar' via AJAX
         tableGrid.addEventListener('submit', function(e) {
-            // Hanya tangani form 'antar' dengan AJAX
             if (e.target.classList.contains('deliver-form')) {
                 e.preventDefault();
                 const form = e.target;
@@ -61,16 +69,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 fetch(url, {
                     method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json',
-                    },
+                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
                     body: new FormData(form)
                 })
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Server responded with status: ${response.status}`);
-                    }
+                    if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
                     return response.json();
                 })
                 .then(data => {
@@ -78,7 +81,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         alert('Gagal memperbarui status dari server.');
                         button.disabled = false;
                     }
-                    // Jika sukses, kita tidak melakukan apa-apa karena event real-time akan menangani update.
                 })
                 .catch(error => {
                     console.error("Error updating delivery status:", error);
@@ -107,45 +109,70 @@ document.addEventListener('DOMContentLoaded', function() {
                                   </li>`;
                 });
                 itemsHtml += '</ul>';
-
                 let totalHtml = `<div class="receipt-total" style="margin-top:1rem; padding-top:1rem; border-top: 1px solid #ccc;">
                                     <span>Total</span>
                                     <strong>Rp ${ parseInt(orderData.total_price).toLocaleString('id-ID') }</strong>
                                  </div>`;
-
                 historyBody.innerHTML = `
                     <p><strong>Pesanan #${orderData.id}</strong> untuk <strong>${orderData.customer_name}</strong></p>
                     ${itemsHtml}
                     ${totalHtml}
                 `;
-                
                 historyModal.style.display = 'flex';
             }
         });
 
-        // Listener utama dari Pusher untuk semua pembaruan status meja
+        // Listener untuk memperbarui kartu meja secara spesifik
         window.Echo.private('layout-tables')
-            .listen('TableStatusUpdated', (e) => {
-                console.log('Event Diterima untuk Table ID:', e.tableId);
-                const tableId = e.tableId;
+            .listen('.TableStatusUpdated', (e) => {
+                console.log('Event Diterima:', e.table);
+                const table = e.table; // Sekarang kita menerima seluruh objek meja
+                const tableId = table.id;
                 const cardToReplace = document.getElementById(`table-card-${tableId}`);
+
+                // --- BAGIAN LOGIKA NOTIFIKASI BARU ---
+                const notificationBar = document.getElementById('newOrderNotification');
+                const notificationSound = new Audio('/sounds/notification.mp3');
+                let notificationMessage = '';
+
+                // Tentukan pesan notifikasi berdasarkan perubahan status
+                if (cardToReplace) { // Hanya tampilkan notif jika kartu sudah ada (update)
+                    const oldStatus = cardToReplace.classList.contains('is-occupied') ? 'diduduki' : 'tersedia';
+                    const newStatus = table.session_id ? 'diduduki' : 'tersedia';
+
+                    if (oldStatus === 'tersedia' && newStatus === 'diduduki') {
+                        notificationMessage = `Meja ${table.name} sekarang diduduki!`;
+                    } else if (oldStatus === 'diduduki' && newStatus === 'tersedia') {
+                        notificationMessage = `Meja ${table.name} sekarang tersedia.`;
+                    }
+                }
                 
-                // Minta HTML kartu yang sudah ter-update dari server
+                // Tampilkan notifikasi jika ada pesan
+                if (notificationMessage && notificationBar) {
+                    notificationSound.play().catch(error => console.error("Gagal memutar suara:", error));
+                    notificationBar.innerHTML = `<i class="fa-solid fa-bell fa-shake"></i> ${notificationMessage}`;
+                    notificationBar.classList.add('show');
+                    setTimeout(() => {
+                        notificationBar.classList.remove('show');
+                    }, 5000);
+                }
+                // --- AKHIR BAGIAN LOGIKA NOTIFIKASI ---
+
+
+                // Minta HTML kartu yang sudah ter-update dari server (Logika ini tetap sama)
                 fetch(`/admin/dining-tables/${tableId}/render`)
                     .then(response => response.text())
                     .then(html => {
                         if (cardToReplace) {
-                            // Ganti kartu lama dengan yang baru
                             cardToReplace.outerHTML = html;
                         } else {
-                            // Jika ini meja baru, tambahkan ke grid
                             tableGrid.insertAdjacentHTML('beforeend', html);
                         }
                     })
                     .catch(error => console.error('Error fetching new card HTML:', error));
             });
             
-        console.log("Listening for table status updates (HTML over the Wire)...");
+        console.log("Listening for specific table status updates on this page...");
     }
 
     // Listener untuk menutup modal riwayat

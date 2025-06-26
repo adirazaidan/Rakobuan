@@ -45,15 +45,14 @@ class CustomerSessionController extends Controller
         }
 
         $table->update(['session_id' => session()->getId()]);
-        TableStatusUpdated::dispatch($table->id);
-
+        TableStatusUpdated::dispatch($table->fresh()->load('activeOrder.orderItems.product', 'latestCompletedOrder.orderItems.product'));
         session([
             'dining_table_id' => $table->id,
             'customer_name'   => $validated['customer_name'],
             'table_number'    => $table->name,
         ]);
 
-        // Redirect ke halaman menu utama (nanti akan diarahkan ke outlet pertama secara otomatis)
+        // Redirect ke halaman menu utama
         return redirect()->route('customer.menu.index');
     }
 
@@ -66,7 +65,7 @@ class CustomerSessionController extends Controller
             $table = DiningTable::find(session('dining_table_id'));
             if ($table) {
                 $table->update(['session_id' => null]);
-                TableStatusUpdated::dispatch($table->id);
+                TableStatusUpdated::dispatch($table->fresh()->load(['activeOrder.orderItems.product', 'latestCompletedOrder.orderItems.product']));
                 AvailableTablesUpdated::dispatch();
             }
         }

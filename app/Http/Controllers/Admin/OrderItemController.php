@@ -26,7 +26,7 @@ class OrderItemController extends Controller
             }
 
             if ($order->dining_table_id) {
-                TableStatusUpdated::dispatch($order->dining_table_id);
+                TableStatusUpdated::dispatch($order->diningTable->fresh()->load('activeOrder.orderItems.product', 'latestCompletedOrder.orderItems.product'));
             }
 
             return response()->json(['success' => true, 'message' => 'Status pengantaran diperbarui.']);

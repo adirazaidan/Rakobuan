@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\Call; // <-- Gunakan model Call
+use App\Models\Call; // Pastikan menggunakan model Call
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -15,26 +15,26 @@ class NewCallReceived implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $call; // Kita akan mengirim data panggilan
+    public $call;
 
-    /**
-     * Create a new event instance.
-     */
     public function __construct(Call $call)
     {
         $this->call = $call;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
     public function broadcastOn(): array
     {
-        // Kita siarkan di channel privat baru bernama 'calls'
         return [
             new PrivateChannel('calls'),
         ];
+    }
+
+    /**
+     * Menentukan nama siaran untuk event ini.
+     * INI JUGA PERBAIKANNYA.
+     */
+    public function broadcastAs(): string
+    {
+        return 'NewCallReceived';
     }
 }

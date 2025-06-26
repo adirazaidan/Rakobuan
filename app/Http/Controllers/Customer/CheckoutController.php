@@ -26,15 +26,12 @@ class CheckoutController extends Controller
         }
 
         try {
-            // Mulai transaksi database
             $order = DB::transaction(function () use ($cart) {
-                // Hitung total harga
                 $totalPrice = 0;
                 foreach ($cart as $details) {
                     $totalPrice += $details['price'] * $details['quantity'];
                 }
 
-                // Buat record di tabel 'orders'
                 $newOrder = Order::create([
                     'dining_table_id' => session('dining_table_id'),
                     'session_id'      => session()->getId(),
@@ -44,7 +41,6 @@ class CheckoutController extends Controller
                     'status' => 'pending',
                 ]);
 
-                // Buat record di tabel 'order_items'
                 foreach ($cart as $id => $details) {
                     OrderItem::create([
                         'order_id' => $newOrder->id,
@@ -54,30 +50,19 @@ class CheckoutController extends Controller
                         'notes' => $details['notes'],
                     ]);
                 }
-                
-                // Kembalikan order yang baru dibuat dari transaksi
+            
                 return $newOrder;
             });
 
-            // =================================================================
-            // ===== LOGIKA EVENT DIPINDAHKAN KE SINI (SETELAH TRANSAKSI) =====
-            // =================================================================
-            
-            // Picu event notifikasi suara
             NewOrderReceived::dispatch($order);
 
-            // Ambil data meja yang terkait dengan pesanan
+            
             $table = DiningTable::find(session('dining_table_id'));
             if ($table) {
-                // Kirim event untuk update tampilan visual meja di admin panel
-                // Sekarang, $table->activeOrder dijamin sudah ada karena transaksi telah selesai.
-                TableStatusUpdated::dispatch($table->id);
+                TableStatusUpdated::dispatch($table->fresh()->load(['activeOrder.orderItems.product', 'latestCompletedOrder.orderItems.product']));
             }
-            
-            // Jika transaksi berhasil, hapus keranjang dari session
             session()->forget('cart');
 
-            // Redirect ke halaman sukses
             return redirect()->route('order.success', ['order' => $order->id]);
 
         } catch (\Exception $e) {
@@ -85,13 +70,9 @@ class CheckoutController extends Controller
         }
     }
 
-    /**
-     * Menampilkan halaman sukses/resi setelah checkout.
-     */
+
     public function success(Order $order)
     {
-        // Gunakan Route Model Binding untuk mengambil data order secara otomatis
-        // Pastikan pelanggan hanya bisa melihat ordernya sendiri (bisa ditambahkan validasi nanti)
         return view('customer.checkout.success', compact('order'));
     }
 }

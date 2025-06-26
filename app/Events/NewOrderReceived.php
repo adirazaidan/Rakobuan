@@ -7,11 +7,11 @@ use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast; // <-- Pastikan ini ada
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class NewOrderReceived implements ShouldBroadcast // <-- IMPLEMENTASI INTERFACE
+class NewOrderReceived implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -22,14 +22,19 @@ class NewOrderReceived implements ShouldBroadcast // <-- IMPLEMENTASI INTERFACE
         $this->order = $order;
     }
 
-    /**
-     * Mendapatkan channel tempat event akan disiarkan.
-     */
     public function broadcastOn(): array
     {
-        // Kita gunakan PrivateChannel agar hanya admin yang bisa mendengar
         return [
             new PrivateChannel('orders'),
         ];
+    }
+
+    /**
+     * Menentukan nama siaran untuk event ini.
+     * INI ADALAH PERBAIKANNYA.
+     */
+    public function broadcastAs(): string
+    {
+        return 'NewOrderReceived';
     }
 }
