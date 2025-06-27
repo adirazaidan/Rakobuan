@@ -38,25 +38,34 @@ class DiningTable extends Model
         return $this->hasMany(Call::class)->where('status', '!=', 'completed');
     }
 
-    // public function getSessionHistoryAttribute()
-    // {
-    //     if (!$this->session_id) {
-    //         return collect(); 
-    //     }
+    /**
+     * ACCESSOR BARU: Mengambil SEMUA pesanan yang selesai
+     * untuk sesi yang sedang aktif di meja ini.
+     */
+    public function getCompletedOrdersForCurrentSessionAttribute()
+    {
+        if (!$this->session_id) {
+            return collect(); // Kembalikan koleksi kosong jika tidak ada sesi
+        }
+        return $this->orders()
+                    ->where('status', 'completed')
+                    ->where('session_id', $this->session_id)
+                    ->orderBy('created_at', 'asc') // Urutkan dari yang paling awal
+                    ->get();
+    }
 
-    //     $orders = $this->orders()
-    //                    ->where('session_id', $this->session_id)
-    //                    ->with('orderItems.product') 
-    //                    ->latest() 
-    //                    ->get();
-
-    //     $calls = $this->calls()
-    //                   ->where('session_id', $this->session_id)
-    //                   ->latest()
-    //                   ->get();
-        
-    //     $history = $orders->concat($calls)->sortByDesc('created_at');
-
-    //     return $history;
-    // }
+    /**
+     * ACCESSOR BARU: Mengambil SEMUA panggilan (baik aktif maupun selesai)
+     * untuk sesi yang sedang aktif di meja ini.
+     */
+    public function getCallsForCurrentSessionAttribute()
+    {
+        if (!$this->session_id) {
+            return collect(); // Kembalikan koleksi kosong jika tidak ada sesi
+        }
+        return $this->calls()
+                    ->where('session_id', $this->session_id)
+                    ->orderBy('created_at', 'asc')
+                    ->get();
+    }
 }

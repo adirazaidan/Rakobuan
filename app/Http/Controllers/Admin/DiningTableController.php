@@ -100,15 +100,13 @@ class DiningTableController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Sesi berhasil dibersihkan.']);
     }
+
     public function renderCard(DiningTable $diningTable)
     {
-        $table = $diningTable->load(['orders.orderItems.product', 'activeCalls']);
-        return view('admin.dining-tables._card', compact('table'))->render();
+        $table = $diningTable->load([
+            'orders.orderItems.product', 
+            'calls' 
+        ]);
+        return view('admin.dining-tables._card', compact('table'));
     }
-
-    // public function renderCard(DiningTable $diningTable)
-    // {
-    //     $table = $diningTable->load(['orders.orderItems.product', 'calls']);
-    //     return view('admin.dining-tables._card', compact('table'));
-    // }
 }

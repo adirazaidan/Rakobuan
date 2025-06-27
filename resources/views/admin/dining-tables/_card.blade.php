@@ -2,7 +2,7 @@
     $statusClass = '';
     if ($table->is_locked) {
         $statusClass = 'is-locked';
-    } elseif ($table->session_id) {
+    } elseif ($table->activeOrders->isNotEmpty() || $table->session_id) {
         $statusClass = 'is-occupied';
     }
 @endphp
@@ -90,11 +90,17 @@
     @if($table->session_id)
     <div class="table-card-footer">
         @php
-            $completedOrderForThisSession = $table->latestCompletedOrder && ($table->latestCompletedOrder->session_id === $table->session_id);
+            $completedOrders = $table->completed_orders_for_current_session;
+            $sessionCalls = $table->calls_for_current_session;
+            $historyData = [
+                'orders' => $completedOrders->load('orderItems.product'),
+                'calls'  => $sessionCalls
+            ];
         @endphp
-        @if($completedOrderForThisSession && $table->activeOrders->isEmpty())
+        @if ($completedOrders->isNotEmpty() || $sessionCalls->isNotEmpty())
             <button class="btn btn-sm btn-secondary w-100 btn-view-history"
-                    data-order='{{ $table->latestCompletedOrder->load('orderItems.product')->toJson() }}'>
+                    data-history='{{ json_encode($historyData) }}'
+                    data-customer-name="{{ $completedOrders->first()->customer_name ?? $sessionCalls->first()->customer_name ?? '' }}">
                 Lihat Riwayat Sesi Ini
             </button>
         @endif

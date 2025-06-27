@@ -27,15 +27,14 @@ class CallController extends Controller
         
         $call = Call::create([
             'dining_table_id' => $diningTableId,
+            'session_id'      => session()->getId(), 
             'customer_name'   => session('customer_name'),
             'table_number'    => session('table_number'),
             'notes'           => $request->notes,
             'status'          => 'pending',
         ]);
 
-    
         NewCallReceived::dispatch($call);
-
         TableStatusUpdated::dispatch($diningTableId);
 
         return response()->json(['message' => 'Panggilan telah terkirim! Pelayan akan segera datang.']);

@@ -15,6 +15,7 @@ class Call extends Model
         'notes',
         'status',
         'dining_table_id',
+        'session_id',
     ];
 
     public function diningTable()

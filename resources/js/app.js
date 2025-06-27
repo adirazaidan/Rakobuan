@@ -119,20 +119,47 @@ document.addEventListener('DOMContentLoaded', function() {
         tableGrid.addEventListener('click', function(e) {
             const historyButton = e.target.closest('.btn-view-history');
             if (historyButton) {
-                const orderData = JSON.parse(historyButton.dataset.order);
+                const historyData = JSON.parse(historyButton.dataset.history);
+                const customerName = historyButton.dataset.customerName;
                 const historyModal = document.getElementById('historyModal');
-                const historyBody = historyModal.querySelector('.modal-body');
+                const historyBody = historyModal.querySelector('.modal-body'); // Ambil elemen dengan benar
                 
-                let itemsHtml = '<ul class="order-item-list">';
-                orderData.order_items.forEach(item => {
-                    itemsHtml += `<li class="order-item-row item-delivered">
-                        <div class="item-info"><span class="item-quantity">${item.quantity}x</span> <span class="item-name">${item.product.name}</span></div>
-                        <span>Rp ${ (item.price * item.quantity).toLocaleString('id-ID') }</span>
-                    </li>`;
-                });
-                itemsHtml += '</ul>';
-                let totalHtml = `<div class="receipt-total" style="margin-top:1rem; padding-top:1rem; border-top: 1px solid #ccc;"><span>Total</span><strong>Rp ${parseInt(orderData.total_price).toLocaleString('id-ID')}</strong></div>`;
-                historyBody.innerHTML = `<p><strong>Pesanan #${orderData.id}</strong> untuk <strong>${orderData.customer_name}</strong></p>${itemsHtml}${totalHtml}`;
+                let html = `<p><strong>Riwayat Sesi</strong> untuk <strong>${customerName}</strong></p>`;
+
+                // Bagian untuk Riwayat Pesanan
+                if (historyData.orders && historyData.orders.length > 0) {
+                    html += '<h5>Riwayat Pesanan:</h5>';
+                    historyData.orders.forEach(order => {
+                        html += `<div class="history-group">`;
+                        html += `<p><strong>Pesanan #${order.id}</strong> - Total: Rp ${parseInt(order.total_price).toLocaleString('id-ID')}</p>`;
+                        html += '<ul class="order-item-list">';
+                        order.order_items.forEach(item => {
+                            html += `<li class="order-item-row item-delivered">
+                                        <div class="item-info">
+                                            <span class="item-quantity">${item.quantity}x</span>
+                                            <span class="item-name">${item.product.name}</span>
+                                        </div>
+                                    </li>`;
+                        });
+                        html += '</ul></div>';
+                    });
+                }
+
+                // Bagian untuk Riwayat Panggilan
+                if (historyData.calls && historyData.calls.length > 0) {
+                    html += '<h5 style="margin-top: 1rem;">Riwayat Panggilan:</h5>';
+                    html += '<ul class="call-item-list">';
+                    historyData.calls.forEach(call => {
+                        const callTime = new Date(call.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                        html += `<li class="call-item-row">
+                                    <span class="call-note"><i class="fas fa-comment-dots"></i> ${call.notes || 'Memanggil pelayan'}</span>
+                                    <span class="text-muted" style="font-size: 0.8em;">${callTime}</span>
+                                </li>`;
+                    });
+                    html += '</ul>';
+                }
+
+                historyBody.innerHTML = html;
                 historyModal.style.display = 'flex';
             }
         });
