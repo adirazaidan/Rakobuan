@@ -3,8 +3,8 @@
         <h3>Rakobuan</h3>
     </div>
     <ul class="sidebar-menu">
-        <li class="{{ request()->routeIs('admin.orders.index') ? 'active' : '' }}"><a href="{{ route('admin.orders.index') }}"><i class="fa-solid fa-receipt"></i><span>Orderan</span></a></li>
-        <li class="{{ request()->routeIs('admin.calls.index') ? 'active' : '' }}"><a href="{{ route('admin.calls.index') }}"><i class="fa-solid fa-bell-concierge"></i><span>Panggilan</span></a></li>
+        <li class="{{ request()->routeIs('admin.orders.index') ? 'active' : '' }}"><a href="{{ route('admin.orders.index') }}"><i class="fa-solid fa-receipt"></i><span>Orderan</span><span id="order-badge" class="notification-badge d-none"></span></a></li>
+        <li class="{{ request()->routeIs('admin.calls.index') ? 'active' : '' }}"><a href="{{ route('admin.calls.index') }}"><i class="fa-solid fa-bell-concierge"></i><span>Panggilan</span> <span id="call-badge" class="notification-badge d-none"></span></a></li>
         <li class="{{ request()->routeIs('admin.orders.history') ? 'active' : '' }}"><a href="{{ route('admin.orders.history') }}"><i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat Orderan</span></a></li>
         <li class="{{ request()->routeIs('admin.calls.history') ? 'active' : '' }}"><a href="{{ route('admin.calls.history') }}"><i class="fa-solid fa-book"></i><span>Riwayat Panggilan</span></a></li>
         <li class="{{ request()->routeIs('admin.dining-tables.*') ? 'active' : '' }}"><a href="{{ route('admin.dining-tables.index') }}"><i class="fa-solid fa-chair"></i><span>Meja</span></a></li>

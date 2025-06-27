@@ -536,7 +536,20 @@ ul { list-style: none; padding: 0; margin: 0; }
 .history-group.is-call { background-color: #f0f8ff; }
 .history-group h5 { margin-top: 0; }
 .call-note-history { font-style: italic; color: var(--text-muted); }
+.notification-badge {
+ margin-left: auto; 
+ background-color: #dc3545;
+ color: white; 
+ font-weight: bold; border-radius: 50%; 
+ width: 24px; height: 24px; display: flex; 
+ justify-content: center; 
+ align-items: center; 
+ font-size: 0.8rem;
+}
 
+.d-none {
+    display: none !important;
+}
 /* Untuk layar yang sangat kecil, sesuaikan padding */
 @media (max-width: 576px) {
     .content-body {

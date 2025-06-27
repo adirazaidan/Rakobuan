@@ -57,32 +57,43 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
         // 3. Listener Global untuk Perubahan Status Meja
-        window.Echo.private('layout-tables')
-            .listen('.TableStatusUpdated', (e) => {
-                console.log('Event Diterima untuk Table ID:', e.tableId);
-                const tableId = e.tableId;
-                const tableGrid = document.querySelector('.table-visual-grid');
+        window.Echo.private('layout-tables').listen('.TableStatusUpdated', (e) => {
+            console.log('Global event: TableStatusUpdated diterima untuk Table ID:', e.tableId);
+            const tableId = e.tableId;
+            const tableGrid = document.querySelector('.table-visual-grid');
 
-                // A. Tampilkan Notifikasi Global
-                // (Anda bisa menambahkan logika cerdas di sini untuk membandingkan status lama dan baru jika diperlukan)
-                // Untuk sekarang, kita buat notifikasi umum jika tidak di halaman meja
-                if (!tableGrid) {
-                    showNotification(`Status Meja ${table.name} telah diperbarui.`, '/admin/dining-tables');
-                }
+            // 1. Lakukan Update Visual JIKA kita berada di halaman Layout Meja
+            if (tableGrid) {
+                const cardToReplace = document.getElementById(`table-card-${tableId}`);
                 
-                // B. Lakukan update visual HANYA jika kita berada di halaman Layout Meja
-                if (tableGrid) {
-                    const cardToReplace = document.getElementById(`table-card-${tableId}`)
-                    fetch(`/admin/dining-tables/${tableId}/render`)
+                // Sebelum me-refresh, kita simpan status lamanya untuk notifikasi
+                const oldStatusIsOccupied = cardToReplace ? cardToReplace.classList.contains('is-occupied') : false;
+
+                fetch(`/admin/dining-tables/${tableId}/render`)
                     .then(response => response.text())
                     .then(html => {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = html;
+                        const newCard = tempDiv.firstElementChild;
+                        const newStatusIsOccupied = newCard.classList.contains('is-occupied');
+
+                        // 2. Tampilkan Notifikasi setelah mendapatkan status baru
+                        if (!oldStatusIsOccupied && newStatusIsOccupied) {
+                            showNotification(`Meja ${newCard.querySelector('.table-visual-name').textContent} sekarang Diduduki.`, '/admin/dining-tables');
+                        } else if (oldStatusIsOccupied && !newStatusIsOccupied) {
+                            showNotification(`Meja ${newCard.querySelector('.table-visual-name').textContent} sekarang Tersedia.`, '/admin/dining-tables');
+                        }
+                        
+                        // 3. Ganti kartu di halaman
                         if (cardToReplace) {
                             cardToReplace.outerHTML = html;
+                        } else {
+                            tableGrid.insertAdjacentHTML('beforeend', html);
                         }
                     })
                     .catch(error => console.error('Error fetching new card HTML:', error));
-                }
-            });
+            }
+        });
     }
 
     /**
@@ -172,6 +183,52 @@ document.addEventListener('DOMContentLoaded', function() {
         if(closeBtn) closeBtn.addEventListener('click', () => historyModal.style.display = 'none');
         historyModal.addEventListener('click', (e) => {
             if(e.target === historyModal) historyModal.style.display = 'none';
+        });
+    }
+
+    // =======================================================
+    // ===== LOGIKA BARU UNTUK LENCANA NOTIFIKASI SIDEBAR =====
+    // =======================================================
+    const orderBadge = document.getElementById('order-badge');
+    const callBadge = document.getElementById('call-badge');
+
+    const updateBadges = (counts) => {
+        if (orderBadge) {
+            if (counts.pending_orders > 0) {
+                orderBadge.textContent = counts.pending_orders;
+                orderBadge.classList.remove('d-none');
+            } else {
+                orderBadge.classList.add('d-none');
+            }
+        }
+
+        if (callBadge) {
+            if (counts.pending_calls > 0) {
+                callBadge.textContent = counts.pending_calls;
+                callBadge.classList.remove('d-none');
+            } else {
+                callBadge.classList.add('d-none');
+            }
+        }
+    };
+
+
+    const fetchInitialCounts = () => {
+        fetch('/admin/notifications/counts')
+            .then(response => response.json())
+            .then(data => updateBadges(data))
+            .catch(error => console.error('Error fetching notification counts:', error));
+    };
+
+    fetchInitialCounts();
+    
+   
+    if (typeof window.Echo !== 'undefined') {
+        window.Echo.private('orders').listen('.NewOrderReceived', (e) => {
+            fetchInitialCounts(); 
+        });
+        window.Echo.private('calls').listen('.NewCallReceived', (e) => {
+            fetchInitialCounts(); 
         });
     }
 });

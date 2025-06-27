@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\SalesReportController;
 use App\Http\Controllers\Customer\CheckoutController;
 use App\Http\Controllers\Admin\DiningTableController;
 use App\Http\Controllers\Admin\OrderItemController;
+use App\Http\Controllers\Admin\NotificationController;
 
 
 // Controller untuk Customer
@@ -103,7 +104,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('dining-tables/{diningTable}/render', [DiningTableController::class, 'renderCard'])->name('dining-tables.renderCard');
         Route::post('order-items/{orderItem}/deliver', [OrderItemController::class, 'deliver'])->name('order-items.deliver');
-    
+        
+        // Route baru untuk mengambil jumlah notifikasi
+        Route::get('/notifications/counts', [NotificationController::class, 'getCounts'])->name('notifications.counts');
     });
 });
 
