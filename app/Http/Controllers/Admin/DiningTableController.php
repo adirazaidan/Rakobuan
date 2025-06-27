@@ -17,10 +17,14 @@ class DiningTableController extends Controller
     {
         $locations = DiningTable::select('location')->whereNotNull('location')->distinct()->pluck('location');
         $selectedLocation = $request->input('location');
-        $query = DiningTable::with(['activeOrder.orderItems.product', 'latestCompletedOrder.orderItems.product', 'activeCalls']);
+
+        // Eager load relasi yang benar
+        $query = DiningTable::with(['orders.orderItems.product', 'activeCalls']);
+
         if ($selectedLocation) {
             $query->where('location', $selectedLocation);
         }
+        
         $allTables = $query->get();
         $tables = $allTables->sortBy('name', SORT_NATURAL);
         return view('admin.dining-tables.index', compact('tables', 'locations', 'selectedLocation'));
@@ -58,7 +62,7 @@ class DiningTableController extends Controller
         $validated['is_locked'] = $request->has('is_locked');
         $diningTable->update($validated);
 
-        TableStatusUpdated::dispatch($diningTable->fresh()->load(['activeOrder.orderItems.product', 'latestCompletedOrder.orderItems.product']));
+        TableStatusUpdated::dispatch($diningTable->id);
         AvailableTablesUpdated::dispatch();
 
         return redirect()->route('admin.dining-tables.index')->with('success', 'Data meja berhasil diperbarui.');
@@ -90,15 +94,21 @@ class DiningTableController extends Controller
         if ($sessionIdToClear) {
             SessionCleared::dispatch($sessionIdToClear);
         }
-        TableStatusUpdated::dispatch($diningTable->fresh()->load(['activeOrder.orderItems.product', 'latestCompletedOrder.orderItems.product']));
+        
+        TableStatusUpdated::dispatch($diningTable->id);
         AvailableTablesUpdated::dispatch();
 
-        return redirect()->route('admin.dining-tables.index')->with('success', 'Sesi untuk meja ' . $diningTable->name . ' berhasil dibersihkan.');
+        return response()->json(['success' => true, 'message' => 'Sesi berhasil dibersihkan.']);
     }
-
     public function renderCard(DiningTable $diningTable)
     {
-        $table = $diningTable->load(['activeOrder.orderItems.product', 'latestCompletedOrder.orderItems.product', 'activeCalls']); // <-- Tambah 'activeCalls'
+        $table = $diningTable->load(['orders.orderItems.product', 'activeCalls']);
         return view('admin.dining-tables._card', compact('table'))->render();
     }
+
+    // public function renderCard(DiningTable $diningTable)
+    // {
+    //     $table = $diningTable->load(['orders.orderItems.product', 'calls']);
+    //     return view('admin.dining-tables._card', compact('table'));
+    // }
 }

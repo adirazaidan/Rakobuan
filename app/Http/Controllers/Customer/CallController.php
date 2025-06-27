@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\Call;
 use Illuminate\Http\Request;
+use App\Models\DiningTable;
 use App\Events\NewCallReceived;
+use App\Events\TableStatusUpdated;
 
 class CallController extends Controller
 {
@@ -18,20 +20,23 @@ class CallController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        // Pastikan sesi pelanggan ada
-        if (!session()->has('customer_name')) {
-            return response()->json(['error' => 'Sesi tidak ditemukan.'], 401);
+        $diningTableId = session('dining_table_id');
+        if (!$diningTableId) {
+            return response()->json(['error' => 'Sesi meja tidak ditemukan.'], 401);
         }
-
+        
         $call = Call::create([
-            'dining_table_id' => session('dining_table_id'),
-            'customer_name' => session('customer_name'),
-            'table_number' => session('table_number'),
-            'notes' => $request->notes,
-            'status' => 'pending',
+            'dining_table_id' => $diningTableId,
+            'customer_name'   => session('customer_name'),
+            'table_number'    => session('table_number'),
+            'notes'           => $request->notes,
+            'status'          => 'pending',
         ]);
 
+    
         NewCallReceived::dispatch($call);
+
+        TableStatusUpdated::dispatch($diningTableId);
 
         return response()->json(['message' => 'Panggilan telah terkirim! Pelayan akan segera datang.']);
     }

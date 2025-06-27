@@ -82,7 +82,7 @@
             <strong id="grand-total">Rp {{ number_format($totalPrice, 0, ',', '.') }}</strong>
         </div>
         <div class="checkout-action">
-            <form action="{{ route('checkout.store') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mengirim pesanan ini?');" style="margin: 0;">
+            <form id="checkout-form" action="{{ route('checkout.store') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mengirim pesanan ini?');" style="margin: 0;">
                 @csrf
                 <button type="submit" class="btn-checkout">Kirim Orderan ke Dapur</button>
             </form>

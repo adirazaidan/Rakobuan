@@ -21,12 +21,12 @@ class OrderItemController extends Controller
 
             $allItemsDelivered = $order->orderItems->every(fn($item) => $item->quantity <= $item->quantity_delivered);
 
+
             if ($allItemsDelivered) {
                 $order->update(['status' => 'completed']);
             }
-
-            if ($order->dining_table_id) {
-                TableStatusUpdated::dispatch($order->diningTable->fresh()->load('activeOrder.orderItems.product', 'latestCompletedOrder.orderItems.product'));
+            if ($order->diningTable) {
+                TableStatusUpdated::dispatch($order->dining_table_id); 
             }
 
             return response()->json(['success' => true, 'message' => 'Status pengantaran diperbarui.']);

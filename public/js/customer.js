@@ -469,6 +469,54 @@ if (tableDropdown && typeof window.Echo !== 'undefined') {
             console.log('AvailableTablesUpdated event received!', e);
             updateTableDropdown();
         });
-}
+
+
+    }
+
+       /**
+     * =================================
+     * LOGIKA UNTUK PROSES CHECKOUT VIA AJAX
+     * =================================
+     */
+    const checkoutForm = document.getElementById('checkout-form');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Hentikan submit form biasa
+
+            const button = this.querySelector('.btn-checkout');
+            button.textContent = 'Memproses Pesanan...';
+            button.disabled = true;
+
+            const formData = new FormData(this);
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Jika sukses, arahkan ke URL resi dari server
+                    window.location.href = data.redirect_url;
+                } else {
+                    // Jika gagal, tampilkan pesan error dan aktifkan kembali tombolnya
+                    alert(data.message || 'Terjadi kesalahan saat memproses pesanan.');
+                    button.textContent = 'Kirim Orderan ke Dapur';
+                    button.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Checkout Error:', error);
+                alert('Terjadi kesalahan teknis. Silakan coba lagi.');
+                button.textContent = 'Kirim Orderan ke Dapur';
+                button.disabled = false;
+            });
+        });
+    } 
 
 });

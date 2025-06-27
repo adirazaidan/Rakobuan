@@ -5,9 +5,7 @@
     } elseif ($table->session_id) {
         $statusClass = 'is-occupied';
     }
-    $completedOrderForThisSession = $table->latestCompletedOrder && $table->session_id && $table->latestCompletedOrder->session_id === $table->session_id;
 @endphp
-
 <div class="table-card {{ $statusClass }}" id="table-card-{{ $table->id }}">
     <div class="table-visual">
         <span class="table-visual-name">{{ $table->name }}</span>
@@ -22,28 +20,32 @@
         </div>
     </div>
 
-    @if($table->activeOrder)
+    @if($table->activeOrders->isNotEmpty())
     <div class="table-card-order-details">
-        <h5>Pesanan Aktif: #{{ $table->activeOrder->id }}</h5>
-        <ul class="order-item-list">
-            @foreach($table->activeOrder->orderItems as $item)
-            <li class="order-item-row {{ $item->quantity <= $item->quantity_delivered ? 'item-delivered' : '' }}">
-                <div class="item-info">
-                    <span class="item-quantity">{{ $item->quantity }}x</span>
-                    <span class="item-name">{{ $item->product->name }}</span>
-                </div>
-                <div class="item-delivery-status">
-                    <form action="{{ route('admin.order-items.deliver', $item) }}" method="POST" class="deliver-form">
-                        @csrf
-                        <button type="submit" class="btn-deliver-action" title="Tandai 1 item telah diantar" @if($item->quantity <= $item->quantity_delivered) disabled @endif>
-                            <i class="fas fa-check"></i>
-                        </button>
-                    </form>
-                    <span>{{ $item->quantity_delivered }}/{{ $item->quantity }}</span>
-                </div>
-            </li>
-            @endforeach
-        </ul>
+        @foreach($table->activeOrders as $order)
+            <div class="order-group">
+                <h5>Pesanan Aktif: #{{ $order->id }}</h5>
+                <ul class="order-item-list">
+                    @foreach($order->orderItems as $item)
+                    <li class="order-item-row {{ $item->quantity <= $item->quantity_delivered ? 'item-delivered' : '' }}">
+                        <div class="item-info">
+                            <span class="item-quantity">{{ $item->quantity }}x</span>
+                            <span class="item-name">{{ $item->product->name }}</span>
+                        </div>
+                        <div class="item-delivery-status">
+                            <form action="{{ route('admin.order-items.deliver', $item) }}" method="POST" class="deliver-form">
+                                @csrf
+                                <button type="submit" class="btn-deliver-action" title="Tandai 1 item telah diantar" @if($item->quantity <= $item->quantity_delivered) disabled @endif>
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </form>
+                            <span>{{ $item->quantity_delivered }}/{{ $item->quantity }}</span>
+                        </div>
+                    </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endforeach
     </div>
     @endif
 
@@ -55,7 +57,6 @@
             <li class="call-item-row">
                 <span class="call-note" title="{{ $call->notes }}"><i class="fas fa-comment-dots"></i> {{ Str::limit($call->notes, 20) ?: 'Memanggil pelayan' }}</span>
                 <div class="call-actions">
-                    {{-- Tombol ini akan menandai panggilan sebagai 'completed' --}}
                     <form action="{{ route('admin.calls.updateStatus', $call) }}" method="POST">
                         @csrf
                         @method('PATCH')
@@ -88,7 +89,10 @@
 
     @if($table->session_id)
     <div class="table-card-footer">
-        @if($completedOrderForThisSession)
+        @php
+            $completedOrderForThisSession = $table->latestCompletedOrder && ($table->latestCompletedOrder->session_id === $table->session_id);
+        @endphp
+        @if($completedOrderForThisSession && $table->activeOrders->isEmpty())
             <button class="btn btn-sm btn-secondary w-100 btn-view-history"
                     data-order='{{ $table->latestCompletedOrder->load('orderItems.product')->toJson() }}'>
                 Lihat Riwayat Sesi Ini

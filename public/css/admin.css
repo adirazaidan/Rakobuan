@@ -520,6 +520,23 @@ ul { list-style: none; padding: 0; margin: 0; }
     color: var(--accent-color);
 }
 
+.order-group {
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px dashed var(--border-color);
+}
+.order-group:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.history-timeline { max-height: 400px; overflow-y: auto; margin-bottom: 1rem; }
+.history-group { padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 1rem; }
+.history-group.is-call { background-color: #f0f8ff; }
+.history-group h5 { margin-top: 0; }
+.call-note-history { font-style: italic; color: var(--text-muted); }
+
 /* Untuk layar yang sangat kecil, sesuaikan padding */
 @media (max-width: 576px) {
     .content-body {
