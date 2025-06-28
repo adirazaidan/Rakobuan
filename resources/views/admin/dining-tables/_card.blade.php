@@ -1,18 +1,26 @@
 @php
+    $isOccupied = $table->session_id || $table->activeOrders->isNotEmpty();
+    $isAbandoned = !$table->session_id && $table->activeOrders->isNotEmpty();
+
     $statusClass = '';
     if ($table->is_locked) {
         $statusClass = 'is-locked';
-    } elseif ($table->activeOrders->isNotEmpty() || $table->session_id) {
+    } elseif ($isAbandoned) {
+        $statusClass = 'is-abandoned'; 
+    } elseif ($isOccupied) {
         $statusClass = 'is-occupied';
     }
 @endphp
+
 <div class="table-card {{ $statusClass }}" id="table-card-{{ $table->id }}">
     <div class="table-visual">
         <span class="table-visual-name">{{ $table->name }}</span>
         <div class="table-status-text">
             @if($table->is_locked)
                 <span class="status-locked">Terkunci</span>
-            @elseif($table->session_id)
+            @elseif($isAbandoned)
+                <span class="status-abandoned"><i class="fas fa-exclamation-triangle"></i> Terabaikan</span>
+            @elseif($isOccupied)
                 <span class="status-occupied">Diduduki</span>
             @else
                 <span class="status-available">Tersedia</span>
@@ -27,10 +35,15 @@
                 <h5>Pesanan Aktif: #{{ $order->id }}</h5>
                 <ul class="order-item-list">
                     @foreach($order->orderItems as $item)
-                    <li class="order-item-row {{ $item->quantity <= $item->quantity_delivered ? 'item-delivered' : '' }}">
+                    <li class="order-item-row {{ $item->quantity <= $item->quantity_delivered ? 'item-delivered' : 'item-pending' }}"data-created-at="{{ $item->created_at->toIso8601String() }}">
                         <div class="item-info">
                             <span class="item-quantity">{{ $item->quantity }}x</span>
                             <span class="item-name">{{ $item->product->name }}</span>
+                            @if($item->is_overdue)
+                                <span class="overdue-warning" title="Pesanan ini sudah lebih dari 15 menit!">
+                                    <i class="fas fa-clock"></i> Terlambat
+                                </span>
+                            @endif                            
                         </div>
                         <div class="item-delivery-status">
                             <form action="{{ route('admin.order-items.deliver', $item) }}" method="POST" class="deliver-form">
@@ -54,8 +67,13 @@
         <h5>Panggilan Aktif:</h5>
         <ul class="call-item-list">
             @foreach($table->activeCalls as $call)
-            <li class="call-item-row">
+            <li class="call-item-row {{ $call->status === 'pending' ? 'item-pending' : '' }}" data-created-at="{{ $call->created_at->toIso8601String() }}">
                 <span class="call-note" title="{{ $call->notes }}"><i class="fas fa-comment-dots"></i> {{ Str::limit($call->notes, 20) ?: 'Memanggil pelayan' }}</span>
+                @if($call->is_overdue)
+                    <span class="overdue-warning" title="Panggilan ini sudah lebih dari 5 menit!">
+                        <i class="fas fa-clock"></i> Terlambat
+                    </span>
+                @endif
                 <div class="call-actions">
                     <form action="{{ route('admin.calls.updateStatus', $call) }}" method="POST">
                         @csrf
@@ -87,6 +105,7 @@
         </div>
     </div>
 
+
     @if($table->session_id)
     <div class="table-card-footer">
         @php
@@ -104,10 +123,12 @@
                 Lihat Riwayat Sesi Ini
             </button>
         @endif
-        <form action="{{ route('admin.dining-tables.clearSession', $table) }}" method="POST" onsubmit="return confirm('Yakin ingin membersihkan sesi ini?');" class="clear-session-form">
-            @csrf
-            <button type="submit" class="btn btn-sm btn-info w-100">Clear Session</button>
-        </form>
+        @if($isOccupied && $table->activeOrders->isEmpty())
+            <form action="{{ route('admin.dining-tables.clearSession', $table) }}" method="POST" onsubmit="return confirm('Yakin ingin membersihkan sesi ini?');" class="clear-session-form">
+                @csrf
+                <button type="submit" class="btn btn-sm btn-info w-100">Clear Session</button>
+            </form>
+        @endif
     </div>
     @endif
 </div>

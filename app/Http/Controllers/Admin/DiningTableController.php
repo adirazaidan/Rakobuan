@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Log;
 
 use App\Http\Controllers\Controller;
 use App\Models\DiningTable;
+use App\Models\Order;
+use App\Models\Call;
 use Illuminate\Http\Request;
 use App\Events\TableStatusUpdated; 
 use App\Events\SessionCleared;     
@@ -89,12 +91,13 @@ class DiningTableController extends Controller
     public function clearSession(DiningTable $diningTable)
     {
         $sessionIdToClear = $diningTable->session_id;
-        $diningTable->update(['session_id' => null]);
-
         if ($sessionIdToClear) {
+            Order::where('session_id', $sessionIdToClear)->where('status', 'pending')->update(['status' => 'cancelled']);
+            Call::where('session_id', $sessionIdToClear)->where('status', 'pending')->update(['status' => 'cancelled']);
             SessionCleared::dispatch($sessionIdToClear);
         }
-        
+
+        $diningTable->update(['session_id' => null]);
         TableStatusUpdated::dispatch($diningTable->id);
         AvailableTablesUpdated::dispatch();
 

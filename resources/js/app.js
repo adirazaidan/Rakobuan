@@ -174,6 +174,53 @@ document.addEventListener('DOMContentLoaded', function() {
                 historyModal.style.display = 'flex';
             }
         });
+
+        /**
+         * ==============================================================
+         * LOGIKA BARU: TIMER UNTUK MEMERIKSA STATUS TERLAMBAT REAL-TIME
+         * ==============================================================
+         */
+        const checkOverdueStatus = () => {
+            const now = new Date();
+            const fifteenMinutesInMs = 15 * 60 * 1000;
+
+            document.querySelectorAll('.order-item-row.item-pending').forEach(itemRow => {
+                const createdAt = new Date(itemRow.dataset.createdAt);
+                const timeDiff = now - createdAt;
+
+                if (timeDiff > fifteenMinutesInMs) {
+                    const itemNameEl = itemRow.querySelector('.item-name');
+                    if (!itemNameEl.querySelector('.overdue-warning')) {
+                        const warningBadge = document.createElement('span');
+                        warningBadge.className = 'overdue-warning';
+                        warningBadge.title = 'Pesanan ini sudah lebih dari 15 menit!';
+                        warningBadge.innerHTML = `<i class="fas fa-clock"></i> Terlambat`;
+                        itemNameEl.appendChild(warningBadge);
+                    }
+                }
+            });
+
+            document.querySelectorAll('.call-item-row.item-pending').forEach(callRow => {
+                const createdAt = new Date(callRow.dataset.createdAt);
+                const timeDiff = now - createdAt;
+
+                if (timeDiff > fifteenMinutesInMs) {
+                    const callNoteEl = callRow.querySelector('.call-note');
+                    if (!callNoteEl.querySelector('.overdue-warning')) {
+                        const warningBadge = document.createElement('span');
+                        warningBadge.className = 'overdue-warning';
+                        warningBadge.title = 'Panggilan ini sudah lebih dari 15 menit!';
+                        warningBadge.innerHTML = `<i class="fas fa-clock"></i> Terlambat`;
+                        callNoteEl.appendChild(warningBadge);
+                    }
+                }
+            });
+            
+            console.log('Overdue status checked.');
+        };
+
+        checkOverdueStatus();
+        setInterval(checkOverdueStatus, 60000);
     }
 
     // Listener untuk menutup modal riwayat

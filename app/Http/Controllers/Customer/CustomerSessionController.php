@@ -52,18 +52,17 @@ class CustomerSessionController extends Controller
 
     public function destroy(Request $request)
     {
-        if (session()->has('dining_table_id')) {
-            $table = DiningTable::find(session('dining_table_id'));
+        $tableId = session('dining_table_id');
+        if ($tableId) {
+            $table = DiningTable::find($tableId);
             if ($table) {
+                // HANYA kosongkan session_id di meja, JANGAN batalkan order
                 $table->update(['session_id' => null]);
-                // PERBAIKAN: Hanya muat relasi yang benar-benar ada
-                TableStatusUpdated::dispatch($table->id);
-                TableCleared::dispatch($table);
+                TableStatusUpdated::dispatch($tableId);
                 AvailableTablesUpdated::dispatch();
             }
         }
         $request->session()->flush();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect()->route('customer.login.form');
