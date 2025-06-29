@@ -23,7 +23,7 @@
 
         <div id="cart-items-list" class="cart-items-list">
             @forelse ($cart as $id => $details)
-                <div class="cart-item-card-new" data-id="{{ $id }}" data-price="{{ $details['price'] }}" data-stock="{{ $details['product']->stock }}">
+                <div class="cart-item-card-new" id="cart-item-{{ $id }}" data-id="{{ $id }}" data-price="{{ $details['price'] }}" data-stock="{{ $details['product']->stock }}">
                     <div class="cart-item-image-wrapper">
                         <img src="{{ $details['product']->image ? Storage::url('products/' . $details['product']->image) : 'https://via.placeholder.com/150' }}" alt="{{ $details['name'] }}" class="cart-item-image">
                         <button class="zoom-btn card-zoom-btn" title="Perbesar gambar" data-image-url="{{ $details['product']->image ? Storage::url('products/' . $details['product']->image) : 'https://via.placeholder.com/400' }}">
@@ -33,37 +33,35 @@
                     <div class="cart-item-details">
                         <div class="item-info-header">
                             <h4 class="item-name">{{ $details['name'] }}</h4>
-                            <strong class="item-subtotal" id="subtotal-{{ $id }}">Rp {{ number_format($details['price'] * $details['quantity'], 0, ',', '.') }}</strong>
+                            <strong class="item-subtotal">Rp {{ number_format($details['price'] * $details['quantity'], 0, ',', '.') }}</strong>
                         </div>
-                        <form class="item-update-form">
-                            @csrf
-                            <div class="form-group">
-                                <label>Catatan</label>
-                                <textarea name="notes" class="form-control item-notes-input" placeholder="Contoh: Tidak pedas">{{ $details['notes'] }}</textarea>
-                            </div>
-                            <div class="item-controls">
-                                <div class="quantity-selector-cart">
-                                    <button type="button" class="btn-quantity btn-decrease">-</button>
-                                    <input type="number" name="quantity" value="{{ $details['quantity'] }}" min="1" class="quantity-input" readonly>
-                                    <button type="button" class="btn-quantity btn-increase">+</button>
+                        
+                        <div class="item-note-display">
+                            <i class="fas fa-sticky-note"></i>
+                            <span class="item-notes-text">{{ $details['notes'] ?: 'Tidak ada catatan' }}</span>
+                        </div>
+
+                        <div class="item-controls-cart">
+                            <div class="product-controls">
+                                <div class="cart-action-wrapper">
+                                    <div class="quantity-selector-inline" data-product-id="{{ $id }}">
+                                        <button class="btn-quantity-inline btn-decrease-inline">-</button>
+                                        <span class="quantity-inline-display">{{ $details['quantity'] }}</span>
+                                        <button class="btn-quantity-inline btn-increase-inline" @if($details['quantity'] >= $details['product']->stock) disabled @endif>+</button>
+                                    </div>
                                 </div>
-                                <div class="item-actions">
-                                    <button type="submit" class="btn-update-cart"><i class="fas fa-sync-alt"></i> Update</button>
-                                    <button type="button" class="btn-remove" onclick="document.getElementById('remove-form-{{ $id }}').submit();" title="Hapus item">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
+                                <button class="btn-edit-notes has-notes" 
+                                        data-product-id="{{ $id }}" 
+                                        data-notes="{{ $details['notes'] ?? '' }}">
+                                    <i class="fas fa-pen-to-square"></i>
+                                </button>
                             </div>
-                            <div class="stock-warning" style="color: #dc3545; font-size: 0.85rem; margin-top: 8px; display: none;"></div>
-                        </form>
-                        <form id="remove-form-{{ $id }}" action="{{ route('cart.remove', $id) }}" method="POST" style="display: none;">
-                            @csrf
-                            @method('DELETE')
-                        </form>
+                        </div>
+                        <div class="inline-stock-feedback"></div>
                     </div>
                 </div>
             @empty
-                <div class="empty-cart">
+                <div class="empty-cart" id="empty-cart-message">
                     <i class="fas fa-shopping-cart fa-3x"></i>
                     <p>Keranjang Anda masih kosong.</p>
                     <a href="{{ route('customer.menu.index') }}" class="btn-primary">Lihat Menu</a>

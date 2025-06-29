@@ -89,7 +89,20 @@
         </div>
     </div>
 
-    <!-- <script src="{{ asset('js/customer.js') }}"></script> -->
+    <div id="mini-cart-bar" 
+        class="mini-cart-bar">
+        <a href="{{ route('cart.index') }}" class="mini-cart-link">
+            <div class="mini-cart-info">
+                <i class="fas fa-shopping-basket"></i>
+                <span id="mini-cart-item-count">0 Item</span>
+            </div>
+            <div class="mini-cart-total">
+                <span id="mini-cart-total-price">Rp 0</span>
+                <span>Lihat Keranjang <i class="fas fa-arrow-right"></i></span>
+            </div>
+        </a>
+    </div>
+
     @stack('scripts')
 
     <div id="imageLightbox" class="lightbox-overlay">

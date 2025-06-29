@@ -20,7 +20,10 @@
         </div>
     </div>
 
-    <div class="menu-grid" id="menu-list">
+    <div class="menu-grid" 
+        id="menu-list"
+        data-cart-item-count="{{ $cartItemCount ?? 0 }}"
+        data-cart-total-price="{{ $cartTotalPrice ?? 0 }}">
         @forelse ($products as $product)
             @php
                 $final_price = $product->activeDiscount 
@@ -30,7 +33,7 @@
                 $full_image_url = $product->image ? Storage::url('products/' . $product->image) : 'https://via.placeholder.com/400';
             @endphp
 
-            <div id="product-card-{{ $product->id }}" class="product-card" data-product-id="{{ $product->id }}" data-category-id="{{ $product->category_id }}" data-product-name="{{ strtolower($product->name) }}" data-stock="{{ $product->stock }}">
+            <div id="product-card-{{ $product->id }}" class="product-card" data-product-id="{{ $product->id }}" data-category-id="{{ $product->category_id }}" data-product-name="{{ strtolower($product->name) }}" data-stock="{{ $product->stock }}" data-is-available="{{ $product->is_available ? 'true' : 'false' }}">
                 <div class="product-image-container zoom-trigger" data-image-url="{{ $full_image_url }}">
                     <img src="{{ $full_image_url }}" alt="{{ $product->name }}" class="product-image">
                     <button class="zoom-btn card-zoom-btn" title="Perbesar gambar" data-image-url="{{ $full_image_url }}">
@@ -92,4 +95,31 @@
         @endforelse
     </div>
 </div>
+    <div id="mini-cart-bar" class="mini-cart-bar">
+        <a href="{{ route('cart.index') }}" class="mini-cart-link">
+            <div class="mini-cart-info">
+                <i class="fas fa-shopping-basket"></i>
+                <span id="mini-cart-item-count">0 Item</span>
+            </div>
+            <div class="mini-cart-total">
+                <span id="mini-cart-total-price">Rp 0</span>
+                <span>Lihat Keranjang <i class="fas fa-arrow-right"></i></span>
+            </div>
+        </a>
+    </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const initialItemCount = {{ $cartItemCount ?? 0 }};
+            const initialTotalPrice = {{ $cartTotalPrice ?? 0 }};
+            
+
+            if (typeof updateMiniCartBar === 'function') {
+                updateMiniCartBar(initialItemCount, initialTotalPrice);
+            }
+        });
+    </script>
+    @endpush
+
 @endsection

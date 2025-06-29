@@ -32,7 +32,6 @@ class CartController extends Controller
         if (isset($cart[$productId])) {
             $cart[$productId]['quantity'] += (int)$request->quantity;
         } else {
-            // PERBAIKAN: Simpan juga product_id di dalam data detail
             $cart[$productId] = [
                 "product_id" => $productId,
                 "name" => $product->name,
@@ -44,11 +43,16 @@ class CartController extends Controller
         }
 
         session()->put('cart', $cart);
+        $grandTotal = 0;
+        foreach ($cart as $details) {
+            $grandTotal += $details['price'] * $details['quantity'];
+        }
 
         return response()->json([
             'success'   => true,
             'message' => $product->name . ' berhasil ditambahkan ke keranjang!',
-            'cartCount' => count($cart)
+            'cartCount' => count($cart),
+            'grandTotal' => $grandTotal,
         ]);
     }
 
@@ -59,25 +63,18 @@ class CartController extends Controller
     {
         $cart = session()->get('cart', []);
         $totalPrice = 0;
-
-        // Ambil ID semua produk dari keranjang
         $productIds = array_keys($cart);
-
-        // Ambil semua data produk dari database dalam satu query
         $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
 
-        // Lampirkan data produk (termasuk stok) ke setiap item di keranjang
-        foreach ($cart as $id => &$details) { // Gunakan '&' untuk referensi
+        foreach ($cart as $id => &$details) { 
             if (isset($products[$id])) {
-                $details['product'] = $products[$id]; // Data lengkap produk sekarang ada di sini
+                $details['product'] = $products[$id]; 
                 $totalPrice += $details['price'] * $details['quantity'];
             } else {
-                // Jika produk tidak ditemukan (misal sudah dihapus), hapus dari keranjang
                 unset($cart[$id]);
             }
         }
         
-        // Simpan kembali keranjang yang sudah bersih ke session
         session()->put('cart', $cart);
 
         return view('customer.cart.index', compact('cart', 'totalPrice'));
@@ -94,20 +91,16 @@ class CartController extends Controller
         ]);
 
         $cart = session()->get('cart', []);
-
         if (isset($cart[$productId])) {
-            // Update data di session
             $cart[$productId]['quantity'] = (int)$request->quantity;
             $cart[$productId]['notes'] = $request->notes;
             session()->put('cart', $cart);
 
-            // Hitung ulang total harga keseluruhan untuk dikirim kembali
             $grandTotal = 0;
             foreach ($cart as $details) {
                 $grandTotal += $details['price'] * $details['quantity'];
             }
 
-            // Kembalikan respon JSON
             return response()->json([
                 'success' => true,
                 'message' => 'Keranjang berhasil diperbarui.',
@@ -130,17 +123,20 @@ class CartController extends Controller
             unset($cart[$productId]);
             session()->put('cart', $cart);
 
-            // Cek apakah permintaan ini adalah AJAX?
             if ($request->wantsJson()) {
-                // Jika ya, kirim respons JSON
-                return response()->json([
-                    'success'   => true,
-                    'message'   => 'Item berhasil dihapus.',
-                    'cartCount' => count($cart)
-                ]);
-            }
+                    $grandTotal = 0;
+                    foreach ($cart as $details) {
+                        $grandTotal += $details['price'] * $details['quantity'];
+                    }
+                    
+                    return response()->json([
+                        'success'   => true,
+                        'message'   => 'Item berhasil dihapus.',
+                        'cartCount' => count($cart),
+                        'grandTotal' => $grandTotal
+                    ]);
+                }
 
-            // Jika tidak (form biasa), lakukan redirect
             return redirect()->route('cart.index')->with('success', 'Item berhasil dihapus dari keranjang.');
         }
 

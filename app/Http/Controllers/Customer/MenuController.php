@@ -30,8 +30,16 @@ class MenuController extends Controller
         ->with('activeDiscount')->get();
         
         $cart = session()->get('cart', []);
+        $cartItemCount = count($cart);
+        $cartTotalPrice = 0;
+        foreach ($cart as $details) {
+            if (isset($details['price']) && isset($details['quantity'])) {
+                $cartTotalPrice += $details['price'] * $details['quantity'];
+            }
+        }
+
         $currentOutlet = $outlet;
         
-        return view('customer.menu.index', compact('categories', 'products', 'currentOutlet', 'cart'));
+        return view('customer.menu.index', compact('categories', 'products', 'currentOutlet', 'cart', 'cartItemCount', 'cartTotalPrice'));
     }
 }
