@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
+
 class CartController extends Controller
 {
     /**
@@ -45,6 +46,7 @@ class CartController extends Controller
         session()->put('cart', $cart);
 
         return response()->json([
+            'success'   => true,
             'message' => $product->name . ' berhasil ditambahkan ke keranjang!',
             'cartCount' => count($cart)
         ]);
@@ -58,10 +60,25 @@ class CartController extends Controller
         $cart = session()->get('cart', []);
         $totalPrice = 0;
 
-        // Hitung total harga dari semua item di keranjang
-        foreach ($cart as $details) {
-            $totalPrice += $details['price'] * $details['quantity'];
+        // Ambil ID semua produk dari keranjang
+        $productIds = array_keys($cart);
+
+        // Ambil semua data produk dari database dalam satu query
+        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+
+        // Lampirkan data produk (termasuk stok) ke setiap item di keranjang
+        foreach ($cart as $id => &$details) { // Gunakan '&' untuk referensi
+            if (isset($products[$id])) {
+                $details['product'] = $products[$id]; // Data lengkap produk sekarang ada di sini
+                $totalPrice += $details['price'] * $details['quantity'];
+            } else {
+                // Jika produk tidak ditemukan (misal sudah dihapus), hapus dari keranjang
+                unset($cart[$id]);
+            }
         }
+        
+        // Simpan kembali keranjang yang sudah bersih ke session
+        session()->put('cart', $cart);
 
         return view('customer.cart.index', compact('cart', 'totalPrice'));
     }
@@ -105,14 +122,30 @@ class CartController extends Controller
     /**
      * Menghapus item dari keranjang.
      */
-    public function remove($productId)
+    public function remove(Request $request, $productId) // <-- Tambahkan Request $request
     {
         $cart = session()->get('cart', []);
 
         if (isset($cart[$productId])) {
-            unset($cart[$productId]); // Hapus item dari array
+            unset($cart[$productId]);
             session()->put('cart', $cart);
+
+            // Cek apakah permintaan ini adalah AJAX?
+            if ($request->wantsJson()) {
+                // Jika ya, kirim respons JSON
+                return response()->json([
+                    'success'   => true,
+                    'message'   => 'Item berhasil dihapus.',
+                    'cartCount' => count($cart)
+                ]);
+            }
+
+            // Jika tidak (form biasa), lakukan redirect
             return redirect()->route('cart.index')->with('success', 'Item berhasil dihapus dari keranjang.');
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => false, 'message' => 'Item tidak ditemukan.'], 404);
         }
 
         return redirect()->route('cart.index')->with('error', 'Item tidak ditemukan di keranjang.');

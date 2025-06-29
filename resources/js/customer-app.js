@@ -1,3 +1,5 @@
+import './bootstrap';
+
 document.addEventListener('DOMContentLoaded', function() {
     /**
      * =================================
@@ -60,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const notesModal = document.getElementById('notesModal');
         const notesForm = document.getElementById('notesForm');
         const closeNotesModalBtn = document.getElementById('closeNotesModalBtn');
-
+        
         const handleCartAction = (productId, quantity, notes = null, isAdding = false) => {
             const formData = new FormData();
             formData.append('product_id', productId);
@@ -81,7 +83,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: formData
             }).then(response => response.json());
         };
-
         const handleRemoveAction = (productId) => {
             const formData = new FormData();
             formData.append('_method', 'DELETE');
@@ -99,7 +100,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const notesButton = productCard.querySelector('.btn-edit-notes');
             const productData = productCard.dataset;
             const maxStock = parseInt(productData.stock);
-
             if (newQuantity > 0) {
                 const isMax = newQuantity >= maxStock;
                 actionWrapper.innerHTML = `
@@ -115,7 +115,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (notesButton) notesButton.style.display = 'none';
             }
         };
-
         const showStockFeedback = (productCard, message) => {
             const feedbackElement = productCard.querySelector('.inline-stock-feedback');
             if (!feedbackElement) return;
@@ -136,7 +135,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (initialAddBtn) {
                 const productId = initialAddBtn.dataset.productId;
+                const productCard = initialAddBtn.closest('.product-card');
+                const maxStock = parseInt(productCard.dataset.stock);
+
                 updateProductCardUI(productId, 1);
+
+                if (maxStock <= 1) {
+                    showStockFeedback(productCard, `Stok tersisa ${maxStock}`);
+                }
+
                 try {
                     const response = await handleCartAction(productId, 1, '', true);
                     if (response.success) {
@@ -158,6 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const selector = increaseBtn.closest('.quantity-selector-inline');
                 const display = selector.querySelector('.quantity-inline-display');
                 let currentQty = parseInt(display.textContent);
+
                 if (currentQty >= maxStock) {
                     selector.classList.add('shake');
                     setTimeout(() => selector.classList.remove('shake'), 500);
@@ -165,6 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     increaseBtn.disabled = true;
                     return;
                 }
+
                 let newQuantity = currentQty + 1;
                 display.textContent = '...';
                 const response = await handleCartAction(selector.dataset.productId, newQuantity);
@@ -176,8 +185,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         showStockFeedback(productCard, `Stok tersisa ${maxStock}`);
                     }
                 } else {
-                     display.textContent = currentQty;
-                     alert(response.message || 'Gagal memperbarui item.');
+                    display.textContent = currentQty;
+                    alert(response.message || 'Gagal memperbarui item.');
                 }
             }
             
@@ -547,8 +556,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(`Listening for logout signal on public channel: ${channelName}`);
         
         window.Echo.channel(channelName)
-            // PERUBAHAN HANYA DI SINI: Tambahkan titik di depan nama Event
-            .listen('.SessionCleared', (e) => {
+            .listen('SessionCleared', (e) => {
                 console.log('Logout signal received from admin!', e);
                 alert('Sesi Anda untuk meja ini telah dihentikan oleh admin. Anda akan dikembalikan ke halaman login.');
                 

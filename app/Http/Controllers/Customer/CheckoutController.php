@@ -6,7 +6,8 @@ use App\Events\NewOrderReceived;
 use App\Events\TableStatusUpdated;
 use App\Events\AvailableTablesUpdated;
 use App\Http\Controllers\Controller;
-use App\Models\DiningTable;
+use App\Events\ProductStockUpdated;
+use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
@@ -14,35 +15,41 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 
+
 class CheckoutController extends Controller
 {
-    /**
-     * Menyimpan pesanan dari keranjang ke database.
-     */
 
     public function store(Request $request)
     {
         $cart = session()->get('cart', []);
-
         if (empty($cart)) {
             return response()->json(['success' => false, 'message' => 'Keranjang Anda kosong.'], 400);
         }
-
-        // Ambil dining_table_id dari session untuk digunakan setelah transaksi
         $diningTableId = session('dining_table_id');
         if (!$diningTableId) {
             return response()->json(['success' => false, 'message' => 'Sesi meja tidak valid.'], 400);
         }
 
+        $order = null; // Definisikan di luar try-catch
+
         try {
             $order = DB::transaction(function () use ($cart, $diningTableId) {
-                // Hitung total harga
+                // --- 3. LOGIKA VALIDASI STOK (SEBELUM MEMBUAT ORDER) ---
+                foreach ($cart as $id => $details) {
+                    $product = Product::lockForUpdate()->find($id); // Kunci baris untuk mencegah race condition
+                    if (!$product || $product->stock < $details['quantity']) {
+                        // Throw exception untuk membatalkan transaksi & kirim error
+                        throw new \Exception("Stok untuk produk '{$details['name']}' tidak mencukupi.");
+                    }
+                }
+
+                // --- Kalkulasi Total Harga ---
                 $totalPrice = 0;
                 foreach ($cart as $item) {
                     $totalPrice += $item['price'] * $item['quantity'];
                 }
 
-                // Buat record order baru
+                // --- Membuat Order (Logika lama Anda, tetap di sini) ---
                 $newOrder = Order::create([
                     'dining_table_id' => $diningTableId,
                     'session_id'      => session()->getId(),
@@ -52,47 +59,54 @@ class CheckoutController extends Controller
                     'status'          => 'pending',
                 ]);
 
-                // Buat record untuk setiap item pesanan
+                // --- 4. MEMBUAT ORDER ITEM & MENGURANGI STOK ---
                 foreach ($cart as $id => $details) {
                     OrderItem::create([
-                        'order_id'    => $newOrder->id,
-                        'product_id'  => $id, // Menggunakan key dari array sebagai product_id
-                        'quantity'    => $details['quantity'],
-                        'price'       => $details['price'],
-                        'notes'       => $details['notes'] ?? null,
+                        'order_id'   => $newOrder->id,
+                        'product_id' => $id,
+                        'quantity'   => $details['quantity'],
+                        'price'      => $details['price'],
+                        'notes'      => $details['notes'] ?? null,
                     ]);
+
+                    // Mengurangi stok produk
+                    $product = Product::find($id); // Tidak perlu lock lagi karena sudah divalidasi
+                    $product->decrement('stock', $details['quantity']);
+
+                    // Update status is_available jika stok habis
+                    if ($product->stock <= 0) {
+                        $product->is_available = false;
+                        $product->save();
+                    }
                 }
 
                 return $newOrder;
-            });
+            }); // Akhir dari DB::transaction
 
-            // Setelah transaksi berhasil:
-
-            // 1. Picu event untuk notifikasi pesanan baru (global)
+            // --- 5. DISPATCH EVENT (SETELAH TRANSAKSI SUKSES) ---
             NewOrderReceived::dispatch($order);
-
-            // 2. Picu event untuk update dasbor meja (mengirim ID meja)
             TableStatusUpdated::dispatch($diningTableId);
-            
-            // 3. Picu event untuk update dropdown meja pelanggan lain
             AvailableTablesUpdated::dispatch();
 
-            // 4. Hapus keranjang dari sesi
-            session()->forget('cart');
+            // Dispatch event update stok untuk setiap item di keranjang
+            foreach ($cart as $id => $details) {
+                $product = Product::find($id);
+                ProductStockUpdated::dispatch($product->id, $product->stock, $product->is_available);
+            }
 
-            // 5. Kembalikan respon sukses untuk AJAX agar bisa redirect
+            session()->forget('cart');
             return response()->json([
                 'success' => true,
                 'message' => 'Pesanan berhasil dibuat!',
                 'redirect_url' => route('order.success', ['order' => $order->id])
             ]);
-
         } catch (\Exception $e) {
             Log::error("Gagal membuat pesanan: " . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal membuat pesanan: ' . $e->getMessage()
-            ], 500);
+                // Mengirim pesan error yang lebih spesifik ke pelanggan
+                'message' => $e->getMessage()
+            ], 422); // Gunakan status 422 untuk error validasi
         }
     }
 
@@ -100,4 +114,6 @@ class CheckoutController extends Controller
     {
         return view('customer.checkout.success', compact('order'));
     }
+
+
 }

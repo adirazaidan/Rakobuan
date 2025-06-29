@@ -30,7 +30,8 @@
             </thead>
             <tbody>
                 @forelse ($products as $product)
-                    <tr>
+                    {{-- 1. Tambahkan ID unik untuk setiap baris produk --}}
+                    <tr id="product-row-{{ $product->id }}">
                         <td data-label="Gambar">
                             <img src="{{ $product->image ? Storage::url('products/' . $product->image) : 'https://via.placeholder.com/80' }}" alt="{{ $product->name }}" width="80" style="border-radius: 8px;">
                         </td>
@@ -38,8 +39,12 @@
                         <td data-label="Kategori">{{ $product->category->name }}</td>
                         <td data-label="Outlet">{{ $product->category->outlet->name }}</td>
                         <td data-label="Harga">Rp {{ number_format($product->price, 0, ',', '.') }}</td>
-                        <td data-label="Stok">{{ $product->stock }}</td>
-                        <td data-label="Status">
+
+                        {{-- 2. Tambahkan class 'product-stock' untuk sel stok --}}
+                        <td data-label="Stok" class="product-stock">{{ $product->stock }}</td>
+
+                        {{-- 3. Tambahkan class 'product-status' untuk sel status --}}
+                        <td data-label="Status" class="product-status">
                             @if($product->is_available)
                                 <span style="color: green;">Tersedia</span>
                             @else

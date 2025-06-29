@@ -30,7 +30,7 @@
                 $full_image_url = $product->image ? Storage::url('products/' . $product->image) : 'https://via.placeholder.com/400';
             @endphp
 
-            <div class="product-card" data-category-id="{{ $product->category_id }}" data-product-name="{{ strtolower($product->name) }}">
+            <div id="product-card-{{ $product->id }}" class="product-card" data-product-id="{{ $product->id }}" data-category-id="{{ $product->category_id }}" data-product-name="{{ strtolower($product->name) }}" data-stock="{{ $product->stock }}">
                 <div class="product-image-container zoom-trigger" data-image-url="{{ $full_image_url }}">
                     <img src="{{ $full_image_url }}" alt="{{ $product->name }}" class="product-image">
                     <button class="zoom-btn card-zoom-btn" title="Perbesar gambar" data-image-url="{{ $full_image_url }}">
@@ -59,17 +59,31 @@
                                 <span class="product-price">Rp {{ number_format($final_price, 0, ',', '.') }}</span>
                             @endif
                         </div>
-                        <button class="btn-add-cart add-to-cart-btn"
-                            data-id="{{ $product->id }}"
-                            data-name="{{ $product->name }}"
-                            data-price="{{ $final_price }}"
-                            data-description="{{ $product->description }}"
-                            data-image="{{ $full_image_url }}"
-                            data-bestseller="{{ $product->is_bestseller ? '1' : '0' }}"
-                            data-discount-percent="{{ $discount_percent }}"
-                            @if(!$product->is_available) disabled @endif >
-                            <i class="fas fa-plus"></i>
-                        </button>
+                        <div class="product-controls">
+                            <div class="cart-action-wrapper">
+                                @if(isset($cart[$product->id]))
+                                    <div class="quantity-selector-inline" data-product-id="{{ $product->id }}">
+                                        <button class="btn-quantity-inline btn-decrease-inline">-</button>
+                                        <span class="quantity-inline-display">{{ $cart[$product->id]['quantity'] }}</span>
+                                        <button class="btn-quantity-inline btn-increase-inline" @if($cart[$product->id]['quantity'] >= $product->stock) disabled @endif>+</button>
+                                    </div>
+                                @else
+                                    <button class="btn-add-cart-initial" data-product-id="{{ $product->id }}" @if(!$product->is_available || $product->stock <= 0) disabled @endif>
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                @endif
+                            </div>
+                                @php
+                                    $hasNotes = isset($cart[$product->id]) && !empty($cart[$product->id]['notes']);
+                                @endphp
+                                <button class="btn-edit-notes {{ $hasNotes ? 'has-notes' : '' }}" 
+                                        data-product-id="{{ $product->id }}" 
+                                        data-notes="{{ $cart[$product->id]['notes'] ?? '' }}" 
+                                        style="display: {{ isset($cart[$product->id]) ? 'flex' : 'none' }};">
+                                    <i class="fas fa-pen-to-square"></i>
+                                </button>
+                        </div>
+                        <div class="inline-stock-feedback"></div>
                     </div>
                 </div>
             </div>

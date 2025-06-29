@@ -3,10 +3,7 @@
 @section('title', 'Keranjang Anda')
 
 @section('content')
-{{-- Kontainer utama ini sekarang hanya bertugas sebagai pemegang halaman --}}
 <div class="cart-page-container">
-
-    {{-- Wrapper baru ini yang akan mengatur padding dan lebar konten --}}
     <div class="cart-content-wrapper">
         <div class="cart-header">
             <a href="{{ route('customer.menu.index') }}" class="back-button" title="Kembali ke Menu"><i class="fas fa-arrow-left"></i></a>
@@ -26,10 +23,10 @@
 
         <div id="cart-items-list" class="cart-items-list">
             @forelse ($cart as $id => $details)
-                <div class="cart-item-card-new" data-id="{{ $id }}" data-price="{{ $details['price'] }}">
+                <div class="cart-item-card-new" data-id="{{ $id }}" data-price="{{ $details['price'] }}" data-stock="{{ $details['product']->stock }}">
                     <div class="cart-item-image-wrapper">
-                        <img src="{{ $details['image'] ? Storage::url('products/' . $details['image']) : 'https://via.placeholder.com/150' }}" alt="{{ $details['name'] }}" class="cart-item-image">
-                        <button class="zoom-btn card-zoom-btn" title="Perbesar gambar" data-image-url="{{ $details['image'] ? Storage::url('products/' . $details['image']) : 'https://via.placeholder.com/400' }}">
+                        <img src="{{ $details['product']->image ? Storage::url('products/' . $details['product']->image) : 'https://via.placeholder.com/150' }}" alt="{{ $details['name'] }}" class="cart-item-image">
+                        <button class="zoom-btn card-zoom-btn" title="Perbesar gambar" data-image-url="{{ $details['product']->image ? Storage::url('products/' . $details['product']->image) : 'https://via.placeholder.com/400' }}">
                             <i class="fas fa-expand"></i>
                         </button>
                     </div>
@@ -57,6 +54,7 @@
                                     </button>
                                 </div>
                             </div>
+                            <div class="stock-warning" style="color: #dc3545; font-size: 0.85rem; margin-top: 8px; display: none;"></div>
                         </form>
                         <form id="remove-form-{{ $id }}" action="{{ route('cart.remove', $id) }}" method="POST" style="display: none;">
                             @csrf
@@ -74,7 +72,6 @@
         </div>
     </div>
     
-    {{-- Footer sticky tetap berada di luar wrapper konten --}}
     @if (count($cart) > 0)
     <div class="cart-summary-sticky">
         <div class="total-price">
@@ -82,7 +79,7 @@
             <strong id="grand-total">Rp {{ number_format($totalPrice, 0, ',', '.') }}</strong>
         </div>
         <div class="checkout-action">
-            <form id="checkout-form" action="{{ route('checkout.store') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mengirim pesanan ini?');" style="margin: 0;">
+            <form id="checkout-form" action="{{ route('checkout.store') }}" method="POST" style="margin: 0;">
                 @csrf
                 <button type="submit" class="btn-checkout">Kirim Orderan ke Dapur</button>
             </form>

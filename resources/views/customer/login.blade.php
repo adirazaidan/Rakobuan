@@ -6,16 +6,13 @@
     <title>Selamat Datang - Rakobuan</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/common.css') }}">
-
-    @vite(['resources/js/app.js'])
+    
+    @vite(['resources/css/customer.css', 'resources/js/customer-app.js'])
 
     <script>
         const appConfig = {
             routes: {
-                cartAdd: "{{ route('cart.add') }}",
-                callWaiterStore: "{{ route('call.waiter.store') }}",
-                getAvailableTables: "{{ route('customer.get-tables') }}" // Tambahkan rute ini
+                getAvailableTables: "{{ route('customer.get-tables') }}"
             }
         };
     </script>
@@ -45,32 +42,32 @@
                 @csrf
 
                 @if($tablesByLocation->isNotEmpty())
-
-                <div class="form-group">
-                    <label for="dining_table_id">Pilih Meja</label>
-                    <select name="dining_table_id" id="dining_table_id" class="form-control" required>
-                        <option value="" disabled selected>-- Meja yang Tersedia --</option>
-                        @foreach ($tablesByLocation as $location => $tables)
-                            <optgroup label="{{ $location ?: 'Lainnya' }}">
-                                @foreach ($tables as $table)
-                                    <option value="{{ $table->id }}">{{ $table->name }}</option>
-                                @endforeach
-                            </optgroup>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="customer_name">Nama Anda</label>
-                    <input type="text" id="customer_name" name="customer_name" class="form-control" value="{{ old('customer_name') }}" placeholder="Contoh: Budi" required>
-                </div>
-                <button type="submit" class="btn-submit">Lihat Menu</button>
-                    @else
-                        <div class="no-tables-available">
-                            <i class="fas fa-info-circle fa-2x"></i>
-                            <p class="message-title">Mohon Maaf, Kami Sudah Tidak Menerima Orderan</p>
-                            <p class="message-subtitle">Semua meja sedang penuh atau tidak tersedia. Silakan hubungi staf kami untuk informasi lebih lanjut.</p>
-                        </div>
-                    @endif
+                    <div class="form-group">
+                        <label for="dining_table_id">Pilih Meja</label>
+                        <select name="dining_table_id" id="dining_table_id" class="form-control" required>
+                            {{-- Opsi meja akan diperbarui secara real-time oleh customer-app.js --}}
+                            <option value="" disabled selected>-- Meja yang Tersedia --</option>
+                            @foreach ($tablesByLocation as $location => $tables)
+                                <optgroup label="{{ $location ?: 'Lainnya' }}">
+                                    @foreach ($tables as $table)
+                                        <option value="{{ $table->id }}">{{ $table->name }}</option>
+                                    @endforeach
+                                </optgroup>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer_name">Nama Anda</label>
+                        <input type="text" id="customer_name" name="customer_name" class="form-control" value="{{ old('customer_name') }}" placeholder="Contoh: Budi" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Lihat Menu</button>
+                @else
+                    <div class="no-tables-available">
+                        <i class="fas fa-info-circle fa-2x"></i>
+                        <p class="message-title">Mohon Maaf, Kami Sudah Tidak Menerima Orderan</p>
+                        <p class="message-subtitle">Semua meja sedang penuh atau tidak tersedia. Silakan hubungi staf kami untuk informasi lebih lanjut.</p>
+                    </div>
+                @endif
             </form>
         </div>
         <div class="auth-footer" style="position: absolute; bottom: 20px; text-align: center;">
@@ -80,6 +77,6 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/customer.js') }}"></script>
+   
 </body>
 </html>

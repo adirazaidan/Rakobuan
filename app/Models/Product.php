@@ -35,4 +35,6 @@ class Product extends Model
     {
         return $this->hasOne(Discount::class)->where('is_active', true);
     }
+
+
 }

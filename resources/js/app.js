@@ -278,4 +278,51 @@ document.addEventListener('DOMContentLoaded', function() {
             fetchInitialCounts(); 
         });
     }
+
+    /**
+     * ==============================================================
+     * LOGIKA BARU: REAL-TIME UPDATE UNTUK HALAMAN MANAJEMEN MENU
+     * ==============================================================
+     */
+    // Cek apakah kita berada di halaman manajemen menu dengan mencari salah satu baris produk
+    const firstProductRow = document.querySelector('[id^="product-row-"]');
+
+    if (firstProductRow && typeof window.Echo !== 'undefined') {
+
+        console.log("Product management page detected. Listening for stock updates...");
+
+        // Dengarkan di channel 'products' (ini adalah PUBLIC channel, jadi gunakan .channel())
+        window.Echo.channel('products')
+            .listen('.StockUpdated', (e) => {
+                console.log('Admin received StockUpdated event:', e);
+
+                const productRow = document.getElementById(`product-row-${e.productId}`);
+
+                if (productRow) {
+                    // Temukan sel stok dan status
+                    const stockCell = productRow.querySelector('.product-stock');
+                    const statusCell = productRow.querySelector('.product-status');
+
+                    // 1. Update jumlah stok
+                    if (stockCell) {
+                        stockCell.textContent = e.newStock;
+                    }
+
+                    // 2. Update status (Tersedia/Habis)
+                    if (statusCell) {
+                        if (e.isAvailable) {
+                            statusCell.innerHTML = `<span style="color: green;">Tersedia</span>`;
+                        } else {
+                            statusCell.innerHTML = `<span style="color: red;">Habis</span>`;
+                        }
+                    }
+                    
+                    // 3. (Optional but recommended) Beri highlight visual pada baris yang terupdate
+                    productRow.classList.add('is-updated');
+                    setTimeout(() => {
+                        productRow.classList.remove('is-updated');
+                    }, 1500); // Hapus highlight setelah 1.5 detik
+                }
+            });
+    }
 });

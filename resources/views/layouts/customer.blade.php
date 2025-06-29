@@ -7,16 +7,15 @@
     <title>@yield('title', 'Rakobuan - Pemesanan Mandiri')</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/customer.css') }}">
 
-    {{-- Ini akan kita gunakan untuk URL di JS --}}
-    @vite(['resources/js/app.js'])
+    @vite(['resources/css/customer.css', 'resources/js/customer-app.js'])
+
     <script>
         const appConfig = {
             sessionId: "{{ session()->getId() }}",
             routes: {
                 cartAdd: "{{ route('cart.add') }}",
-                callWaiterStore: "{{ route('call.waiter.store') }}" // <-- TAMBAHKAN INI
+                callWaiterStore: "{{ route('call.waiter.store') }}"
             }
         };
     </script>
@@ -59,7 +58,6 @@
         </ul>
     </aside>
 
-        {{-- KONTEN UTAMA --}}
         <div class="content-wrapper">
             <header class="header-customer">
                 <button id="customerMenuToggle" class="menu-toggle">
@@ -74,12 +72,24 @@
             </main>
         </div>
     </div>
-
-    {{-- MODAL AKAN KITA PINDAHKAN KE SINI AGAR LEBIH RAPI --}}
-    @include('customer.partials.modal-add-to-cart')
     @include('customer.partials.modal-call-waiter')
+    <div class="modal-overlay" id="notesModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Catatan untuk <span id="notesModalProductName"></span></h4>
+                <button class="modal-close" id="closeNotesModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="notesForm">
+                    <input type="hidden" id="notesModalProductId">
+                    <textarea id="notesModalTextArea" class="form-control" rows="4" placeholder="Contoh: Tidak pedas, banyakin bawang, dll."></textarea>
+                    <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Simpan Catatan</button>
+                </form>
+            </div>
+        </div>
+    </div>
 
-    <script src="{{ asset('js/customer.js') }}"></script>
+    <!-- <script src="{{ asset('js/customer.js') }}"></script> -->
     @stack('scripts')
 
     <div id="imageLightbox" class="lightbox-overlay">
