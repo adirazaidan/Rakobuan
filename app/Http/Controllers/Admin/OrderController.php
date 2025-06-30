@@ -12,8 +12,8 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::whereIn('status', ['pending', 'processing'])
-                        ->with('orderItems.product') // Eager load untuk efisiensi
-                        ->latest() // Tampilkan yang terbaru di atas
+                        ->with('orderItems.product') 
+                        ->latest() 
                         ->get();
 
         return view('admin.orders.index', compact('orders'));
@@ -32,8 +32,6 @@ class OrderController extends Controller
     // Menghapus pesanan
     public function destroy(Order $order)
     {
-        // Karena ada onDelete('cascade') di migrasi order_items,
-        // semua item terkait akan ikut terhapus.
         $order->delete();
 
         return redirect()->back()->with('success', 'Pesanan berhasil dihapus.');
@@ -41,13 +39,11 @@ class OrderController extends Controller
 
     public function history()
     {
-        // Logikanya sama dengan index(), hanya beda filter status
         $orders = Order::where('status', 'completed')
                         ->with('orderItems.product')
                         ->latest()
                         ->get();
 
-        // Kita akan membuat view baru bernama 'history.blade.php'
         return view('admin.orders.history', compact('orders'));
     }
 }

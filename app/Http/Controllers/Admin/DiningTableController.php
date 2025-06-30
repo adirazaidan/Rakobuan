@@ -20,7 +20,6 @@ class DiningTableController extends Controller
         $locations = DiningTable::select('location')->whereNotNull('location')->distinct()->pluck('location');
         $selectedLocation = $request->input('location');
 
-        // Eager load relasi yang benar
         $query = DiningTable::with(['orders.orderItems.product', 'activeCalls']);
 
         if ($selectedLocation) {

@@ -38,7 +38,7 @@
                         
                         <div class="item-note-display">
                             <i class="fas fa-sticky-note"></i>
-                            <span class="item-notes-text">{{ $details['notes'] ?: 'Tidak ada catatan' }}</span>
+                            <span class="item-notes-text">{{ $details['notes'] ?: 'Tidak Ada Catatan' }}</span>
                         </div>
 
                         <div class="item-controls-cart">

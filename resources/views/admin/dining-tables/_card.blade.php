@@ -28,22 +28,44 @@
         </div>
     </div>
 
+    <div class="table-card-details">
+        <div class="table-card-info">
+            <span class="table-location">{{ $table->location }}</span>
+            <p class="table-notes">{{ $table->notes ?: 'Tidak ada catatan' }}</p>
+        </div>
+        <div class="table-card-actions">
+            <a href="{{ route('admin.dining-tables.edit', $table) }}" class="btn-action-edit" title="Edit Meja"><i class="fas fa-edit"></i></a>
+            <form action="{{ route('admin.dining-tables.destroy', $table) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus meja ini?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn-action-delete" title="Hapus Meja"><i class="fas fa-trash"></i></button>
+            </form>
+        </div>
+    </div>
+
     @if($table->activeOrders->isNotEmpty())
     <div class="table-card-order-details">
         @foreach($table->activeOrders as $order)
             <div class="order-group">
-                <h5>Pesanan Aktif: #{{ $order->id }}</h5>
+                <h5>Pesanan Aktif: </h5>
                 <ul class="order-item-list">
                     @foreach($order->orderItems as $item)
                     <li class="order-item-row {{ $item->quantity <= $item->quantity_delivered ? 'item-delivered' : 'item-pending' }}"data-created-at="{{ $item->created_at->toIso8601String() }}">
                         <div class="item-info">
                             <span class="item-quantity">{{ $item->quantity }}x</span>
                             <span class="item-name">{{ $item->product->name }}</span>
+                            
+                            @if($item->notes)
+                                <small class="item-note" title="{{ $item->notes }}">
+                                    <i class="fas fa-sticky-note"></i> {{ Str::limit($item->notes, 25) }}
+                                </small>
+                            @endif
+                            
                             @if($item->is_overdue)
                                 <span class="overdue-warning" title="Pesanan ini sudah lebih dari 15 menit!">
                                     <i class="fas fa-clock"></i> Terlambat
                                 </span>
-                            @endif                            
+                            @endif
                         </div>
                         <div class="item-delivery-status">
                             <form action="{{ route('admin.order-items.deliver', $item) }}" method="POST" class="deliver-form">
@@ -90,21 +112,6 @@
     </div>
     @endif
     
-    <div class="table-card-details">
-        <div class="table-card-info">
-            <span class="table-location">{{ $table->location }}</span>
-            <p class="table-notes">{{ $table->notes ?: 'Tidak ada catatan' }}</p>
-        </div>
-        <div class="table-card-actions">
-            <a href="{{ route('admin.dining-tables.edit', $table) }}" class="btn-action-edit" title="Edit Meja"><i class="fas fa-edit"></i></a>
-            <form action="{{ route('admin.dining-tables.destroy', $table) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus meja ini?');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn-action-delete" title="Hapus Meja"><i class="fas fa-trash"></i></button>
-            </form>
-        </div>
-    </div>
-
 
     @if($table->session_id)
     <div class="table-card-footer">

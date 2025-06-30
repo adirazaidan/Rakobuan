@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Outlet;
-use App\Models\Category; // <-- Import model Category
+use App\Models\Category; 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; // <-- Import Storage
+use Illuminate\Support\Facades\Storage; 
 
 class ProductController extends Controller
 {
@@ -18,7 +18,6 @@ class ProductController extends Controller
 
         $query = Product::query();
 
-        // Jika outlet dipilih, filter produk yang kategorinya milik outlet tersebut
         if ($selectedOutletId) {
             $query->whereHas('category', function ($q) use ($selectedOutletId) {
                 $q->where('outlet_id', $selectedOutletId);
@@ -32,7 +31,6 @@ class ProductController extends Controller
 
     public function create()
     {
-        // Ambil semua kategori untuk ditampilkan di form dropdown
         $categories = Category::with('outlet')->get();
         return view('admin.products.create', compact('categories'));
     }
@@ -47,12 +45,8 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
-        // Handle boolean values from switches/checkboxes
         $validated['is_bestseller'] = $request->has('is_bestseller');
         $validated['is_available'] = $request->has('is_available');
-
-        // Handle file upload
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('public/products');
             $validated['image'] = basename($path);
@@ -84,7 +78,6 @@ class ProductController extends Controller
         $validated['is_available'] = $request->has('is_available');
 
         if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
             if ($product->image) {
                 Storage::delete('public/products/' . $product->image);
             }
@@ -99,7 +92,6 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        // Hapus gambar dari storage jika ada
         if ($product->image) {
             Storage::delete('public/products/' . $product->image);
         }

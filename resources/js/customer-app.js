@@ -142,7 +142,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeNotes = () => {
         if (notesModal) notesModal.style.display = 'none';
     };
-
     if (closeNotesModalBtn) closeNotesModalBtn.addEventListener('click', closeNotes);
     if (notesModal) notesModal.addEventListener('click', (e) => {
         if (e.target === notesModal) closeNotes();
@@ -153,7 +152,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const productId = document.getElementById('notesModalProductId').value;
         const notes = document.getElementById('notesModalTextArea').value;
 
-        // Handles both menu page and cart page
         let productCard = document.getElementById(`product-card-${productId}`) || document.getElementById(`cart-item-${productId}`);
         if (!productCard) return;
 
@@ -178,8 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             const notesTextOnCartPage = productCard.querySelector('.item-notes-text');
-            if (notesTextOnCartPage) notesTextOnCartPage.textContent = notes || 'Tidak ada catatan';
-
+            if (notesTextOnCartPage) notesTextOnCartPage.textContent = notes || 'Tidak Ada Catatan';
             closeNotes();
         } else {
             alert('Gagal menyimpan catatan.');
@@ -611,22 +608,6 @@ document.addEventListener('DOMContentLoaded', function() {
      * =================================
      */
     if (typeof window.Echo !== 'undefined' && typeof appConfig !== 'undefined') {
-        // Listener untuk force logout
-        if (appConfig.sessionId) {
-            const logoutChannel = `customer-logout.${appConfig.sessionId}`;
-            console.log(`Listening for logout signal on channel: ${logoutChannel}`);
-            window.Echo.channel(logoutChannel)
-                .listen('.SessionCleared', (e) => {
-                    console.log('Logout signal received from admin!', e);
-                    alert('Sesi Anda untuk meja ini telah dihentikan oleh admin. Anda akan dikembalikan ke halaman login.');
-                    const logoutForm = document.getElementById('logout-form');
-                    if (logoutForm) {
-                        logoutForm.submit();
-                    } else {
-                        window.location.href = '/';
-                    }
-                });
-        }
 
         // Listener untuk update stok produk
         console.log("Listening for product stock updates...");
@@ -682,4 +663,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         }
     }
+
+    /**
+     * =================================
+     * LISTENER UNTUK FORCE LOGOUT DARI ADMIN
+     * =================================
+     */
+    if (typeof window.Echo !== 'undefined' && appConfig.sessionId) {
+        const channelName = `customer-logout.${appConfig.sessionId}`;
+        console.log(`Listening for logout signal on public channel: ${channelName}`);
+        
+        window.Echo.channel(channelName)
+            .listen('SessionCleared', (e) => {
+                console.log('Logout signal received from admin!', e);
+                alert('Sesi Anda untuk meja ini telah dihentikan oleh admin. Anda akan dikembalikan ke halaman login.');
+                
+                const logoutForm = document.getElementById('logout-form');
+                if (logoutForm) {
+                    logoutForm.submit();
+                } else {
+                    window.location.href = '/'; 
+                }
+            });
+    }
+
+
 });

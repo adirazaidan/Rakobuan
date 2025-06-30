@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const notificationSound = new Audio('/sounds/notification.mp3');
         
-        // Fungsi notifikasi yang bisa dipakai ulang
         const showNotification = (message, url = null) => {
             notificationSound.play().catch(error => console.error("Gagal memutar suara:", error));
             notificationBar.innerHTML = `<i class="fa-solid fa-bell fa-shake"></i> ${message}`;
@@ -33,8 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         console.log("Global listeners are now active on all admin pages.");
-
-        // 1. Listener Global untuk Pesanan Baru
         window.Echo.private('orders')
             .listen('.NewOrderReceived', (e) => {
                 console.log('Global event: NewOrderReceived', e.order);
@@ -44,8 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     showNotification(`Pesanan Baru dari Meja ${e.order.table_number}! Klik untuk melihat.`, '/admin/orders');
                 }
             });
-
-        // 2. Listener Global untuk Panggilan Baru
         window.Echo.private('calls')
             .listen('.NewCallReceived', (e) => {
                 console.log('Global event: NewCallReceived', e.call);
@@ -55,45 +50,45 @@ document.addEventListener('DOMContentLoaded', function() {
                     showNotification(`Panggilan Baru dari Meja ${e.call.table_number}! Klik untuk melihat.`, '/admin/calls');
                 }
             });
+            window.Echo.private('layout-tables').listen('.TableStatusUpdated', (e) => {
+                console.log('Global event: TableStatusUpdated diterima untuk Table ID:', e.tableId);
+                const tableId = e.tableId;
+                const tableGrid = document.querySelector('.table-visual-grid');
 
-        // 3. Listener Global untuk Perubahan Status Meja
-        window.Echo.private('layout-tables').listen('.TableStatusUpdated', (e) => {
-            console.log('Global event: TableStatusUpdated diterima untuk Table ID:', e.tableId);
-            const tableId = e.tableId;
-            const tableGrid = document.querySelector('.table-visual-grid');
+                if (tableGrid) {
+                    const oldCard = document.getElementById(`table-card-${tableId}`);
+                    const oldStatusIsOccupied = oldCard ? oldCard.classList.contains('is-occupied') : false;
 
-            // 1. Lakukan Update Visual JIKA kita berada di halaman Layout Meja
-            if (tableGrid) {
-                const cardToReplace = document.getElementById(`table-card-${tableId}`);
-                
-                // Sebelum me-refresh, kita simpan status lamanya untuk notifikasi
-                const oldStatusIsOccupied = cardToReplace ? cardToReplace.classList.contains('is-occupied') : false;
+                    fetch(`/admin/dining-tables/${tableId}/render`)
+                        .then(response => response.text())
+                        .then(html => {
+                            const cardToUpdate = document.getElementById(`table-card-${tableId}`);
 
-                fetch(`/admin/dining-tables/${tableId}/render`)
-                    .then(response => response.text())
-                    .then(html => {
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = html;
-                        const newCard = tempDiv.firstElementChild;
-                        const newStatusIsOccupied = newCard.classList.contains('is-occupied');
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = html;
+                            const newCard = tempDiv.firstElementChild;
+                            if (!newCard) {
+                                if (cardToUpdate) cardToUpdate.remove(); 
+                                return;
+                            }
 
-                        // 2. Tampilkan Notifikasi setelah mendapatkan status baru
-                        if (!oldStatusIsOccupied && newStatusIsOccupied) {
-                            showNotification(`Meja ${newCard.querySelector('.table-visual-name').textContent} sekarang Diduduki.`, '/admin/dining-tables');
-                        } else if (oldStatusIsOccupied && !newStatusIsOccupied) {
-                            showNotification(`Meja ${newCard.querySelector('.table-visual-name').textContent} sekarang Tersedia.`, '/admin/dining-tables');
-                        }
-                        
-                        // 3. Ganti kartu di halaman
-                        if (cardToReplace) {
-                            cardToReplace.outerHTML = html;
-                        } else {
-                            tableGrid.insertAdjacentHTML('beforeend', html);
-                        }
-                    })
-                    .catch(error => console.error('Error fetching new card HTML:', error));
-            }
-        });
+                            const newStatusIsOccupied = newCard.classList.contains('is-occupied');
+                            
+                            if (!oldStatusIsOccupied && newStatusIsOccupied) {
+                                showNotification(`Meja ${newCard.querySelector('.table-visual-name').textContent} sekarang Diduduki.`, '/admin/dining-tables');
+                            } else if (oldStatusIsOccupied && !newStatusIsOccupied) {
+                                showNotification(`Meja ${newCard.querySelector('.table-visual-name').textContent} sekarang Tersedia.`, '/admin/dining-tables');
+                            }
+                            
+                            if (cardToUpdate) {
+                                cardToUpdate.outerHTML = html;
+                            } else {
+                                tableGrid.insertAdjacentHTML('beforeend', html);
+                            }
+                        })
+                        .catch(error => console.error('Error fetching new card HTML:', error));
+                }
+            });
     }
 
     /**
@@ -104,8 +99,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const tableGrid = document.querySelector('.table-visual-grid');
     if (tableGrid) {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-        // Listener untuk semua aksi submit form (antar, clear session)
         tableGrid.addEventListener('submit', function(e) {
             const form = e.target;
             if (form.classList.contains('deliver-form') || form.classList.contains('clear-session-form')) {
@@ -125,19 +118,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
-        
-        // Listener untuk tombol 'Lihat Riwayat'
         tableGrid.addEventListener('click', function(e) {
             const historyButton = e.target.closest('.btn-view-history');
             if (historyButton) {
                 const historyData = JSON.parse(historyButton.dataset.history);
                 const customerName = historyButton.dataset.customerName;
                 const historyModal = document.getElementById('historyModal');
-                const historyBody = historyModal.querySelector('.modal-body'); // Ambil elemen dengan benar
+                const historyBody = historyModal.querySelector('.modal-body'); 
                 
                 let html = `<p><strong>Riwayat Sesi</strong> untuk <strong>${customerName}</strong></p>`;
-
-                // Bagian untuk Riwayat Pesanan
                 if (historyData.orders && historyData.orders.length > 0) {
                     html += '<h5>Riwayat Pesanan:</h5>';
                     historyData.orders.forEach(order => {
@@ -155,8 +144,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         html += '</ul></div>';
                     });
                 }
-
-                // Bagian untuk Riwayat Panggilan
                 if (historyData.calls && historyData.calls.length > 0) {
                     html += '<h5 style="margin-top: 1rem;">Riwayat Panggilan:</h5>';
                     html += '<ul class="call-item-list">';
@@ -222,8 +209,6 @@ document.addEventListener('DOMContentLoaded', function() {
         checkOverdueStatus();
         setInterval(checkOverdueStatus, 60000);
     }
-
-    // Listener untuk menutup modal riwayat
     const historyModal = document.getElementById('historyModal');
     if(historyModal) {
         const closeBtn = historyModal.querySelector('.modal-close');
@@ -238,7 +223,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // =======================================================
     const orderBadge = document.getElementById('order-badge');
     const callBadge = document.getElementById('call-badge');
-
     const updateBadges = (counts) => {
         if (orderBadge) {
             if (counts.pending_orders > 0) {
@@ -258,18 +242,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     };
-
-
     const fetchInitialCounts = () => {
         fetch('/admin/notifications/counts')
             .then(response => response.json())
             .then(data => updateBadges(data))
             .catch(error => console.error('Error fetching notification counts:', error));
     };
-
     fetchInitialCounts();
-    
-   
     if (typeof window.Echo !== 'undefined') {
         window.Echo.private('orders').listen('.NewOrderReceived', (e) => {
             fetchInitialCounts(); 
@@ -284,31 +263,21 @@ document.addEventListener('DOMContentLoaded', function() {
      * LOGIKA BARU: REAL-TIME UPDATE UNTUK HALAMAN MANAJEMEN MENU
      * ==============================================================
      */
-    // Cek apakah kita berada di halaman manajemen menu dengan mencari salah satu baris produk
     const firstProductRow = document.querySelector('[id^="product-row-"]');
 
     if (firstProductRow && typeof window.Echo !== 'undefined') {
 
         console.log("Product management page detected. Listening for stock updates...");
-
-        // Dengarkan di channel 'products' (ini adalah PUBLIC channel, jadi gunakan .channel())
         window.Echo.channel('products')
             .listen('.StockUpdated', (e) => {
                 console.log('Admin received StockUpdated event:', e);
-
                 const productRow = document.getElementById(`product-row-${e.productId}`);
-
                 if (productRow) {
-                    // Temukan sel stok dan status
                     const stockCell = productRow.querySelector('.product-stock');
                     const statusCell = productRow.querySelector('.product-status');
-
-                    // 1. Update jumlah stok
                     if (stockCell) {
                         stockCell.textContent = e.newStock;
                     }
-
-                    // 2. Update status (Tersedia/Habis)
                     if (statusCell) {
                         if (e.isAvailable) {
                             statusCell.innerHTML = `<span style="color: green;">Tersedia</span>`;
@@ -316,12 +285,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             statusCell.innerHTML = `<span style="color: red;">Habis</span>`;
                         }
                     }
-                    
-                    // 3. (Optional but recommended) Beri highlight visual pada baris yang terupdate
                     productRow.classList.add('is-updated');
                     setTimeout(() => {
                         productRow.classList.remove('is-updated');
-                    }, 1500); // Hapus highlight setelah 1.5 detik
+                    }, 1500); 
                 }
             });
     }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Discount;
-use App\Models\Product; // <-- Import Product
+use App\Models\Product; 
 use Illuminate\Http\Request;
 use App\Models\Outlet;
 
@@ -17,7 +17,6 @@ class DiscountController extends Controller
 
         $query = Discount::query();
 
-        // Jika outlet dipilih, filter diskon yang produknya milik outlet tersebut
         if ($selectedOutletId) {
             $query->whereHas('product.category', function ($q) use ($selectedOutletId) {
                 $q->where('outlet_id', $selectedOutletId);
@@ -31,7 +30,6 @@ class DiscountController extends Controller
 
     public function create()
     {
-        // Ambil semua produk untuk ditampilkan di dropdown
         $products = Product::where('is_available', true)->get();
         return view('admin.discounts.create', compact('products'));
     }

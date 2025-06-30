@@ -50,7 +50,6 @@ class OutletController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
             if ($outlet->image) {
                 Storage::delete('public/outlets/' . $outlet->image);
             }
@@ -65,7 +64,6 @@ class OutletController extends Controller
 
     public function destroy(Outlet $outlet)
     {
-        // Hapus gambar dari storage
         if ($outlet->image) {
             Storage::delete('public/outlets/' . $outlet->image);
         }

@@ -46,7 +46,7 @@ class OrderItem extends Model
         $isPending = $this->quantity > $this->quantity_delivered;
 
         // Kondisi 2: Sudah lebih dari 15 menit sejak item ini dibuat
-        $isLate = Carbon::now()->diffInMinutes($this->created_at) > 1;
+        $isLate = Carbon::now()->diffInMinutes($this->created_at) > 15;
 
         // Kembalikan true HANYA jika kedua kondisi terpenuhi
         return $isPending && $isLate;

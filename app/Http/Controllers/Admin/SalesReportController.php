@@ -19,7 +19,6 @@ class SalesReportController extends Controller
         $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : Carbon::now()->startOfMonth();
         $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date')) : Carbon::now();
 
-        // --- Query Utama untuk Pesanan ---
         $query = Order::where('status', 'completed')
                       ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()]);
 
@@ -33,7 +32,6 @@ class SalesReportController extends Controller
         $totalRevenue = $orders->sum('total_price');
         $totalOrders = $orders->count();
 
-        // --- Analisis: Menu Best Seller ---
         $bestSellerQuery = OrderItem::whereHas('order', function($q) use ($startDate, $endDate) {
             $q->where('status', 'completed')->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()]);
         });
@@ -48,13 +46,10 @@ class SalesReportController extends Controller
             ->select('product_id', DB::raw('SUM(quantity) as total_sold'))
             ->groupBy('product_id')
             ->orderByDesc('total_sold')
-            ->with('product') // Eager load detail produk
-            ->limit(5) // Ambil 5 teratas
+            ->with('product') 
+            ->limit(5) 
             ->get();
 
-
-        // --- Analisis: Pelanggan Teratas ---
-        // Kita gunakan query dasar yang sama dengan query utama untuk konsistensi filter
         $topCustomersQuery = Order::where('status', 'completed')
                                 ->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()]);
 
@@ -68,10 +63,9 @@ class SalesReportController extends Controller
             ->select('customer_name', DB::raw('COUNT(*) as total_orders'))
             ->groupBy('customer_name')
             ->orderByDesc('total_orders')
-            ->limit(5) // Ambil 5 teratas
+            ->limit(5) 
             ->get();
 
-        // Kirim semua data ke view
         return view('admin.sales_report.index', compact(
             'orders', 
             'totalRevenue', 
@@ -80,8 +74,8 @@ class SalesReportController extends Controller
             'endDate',
             'outlets',
             'selectedOutletId',
-            'bestSellingProducts', // <-- KIRIM DATA BEST SELLER
-            'topCustomers'         // <-- KIRIM DATA PELANGGAN TERATAS
+            'bestSellingProducts', 
+            'topCustomers'        
         ));
     }
 }
