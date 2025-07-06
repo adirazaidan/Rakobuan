@@ -412,6 +412,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let quantity = parseInt(display.textContent) - 1;
                 const increaseBtnReference = itemCard.querySelector('.btn-increase-inline');
                 if (increaseBtnReference) increaseBtnReference.disabled = false;
+                
                 if (quantity > 0) {
                     display.textContent = quantity;
                     updateCartPageTotals();
@@ -444,6 +445,44 @@ document.addEventListener('DOMContentLoaded', function() {
             if (zoomBtn) {
                 e.stopPropagation();
                 openLightbox(zoomBtn.dataset.imageUrl);
+            }
+        });
+
+        cartPage.addEventListener('change', async (e) => {
+            const target = e.target;
+            if (target.classList.contains('bungkus-checkbox')) {
+                const itemCard = target.closest('.cart-item-card-new');
+                if (!itemCard) return;
+
+                const productId = itemCard.dataset.id;
+                const quantity = itemCard.querySelector('.quantity-inline-display').textContent;
+                const notesButton = itemCard.querySelector('.btn-edit-notes');
+                let currentNotes = notesButton ? notesButton.dataset.notes : '';
+                const takeawayText = '(Bungkus)';
+                let newNotes = '';
+
+                currentNotes = currentNotes.replace(takeawayText, '').trim();
+
+                if (target.checked) {
+                    newNotes = currentNotes ? `${takeawayText} ${currentNotes}` : takeawayText;
+                } else {
+                    newNotes = currentNotes;
+                }
+
+                const response = await handleCartAction(productId, quantity, newNotes);
+
+                if (response.success) {
+                    const notesTextElement = itemCard.querySelector('.item-notes-text');
+                    if (notesTextElement) {
+                        notesTextElement.textContent = newNotes || 'Tidak Ada Catatan';
+                    }
+                    if (notesButton) {
+                        notesButton.dataset.notes = newNotes;
+                    }
+                } else {
+                    target.checked = !target.checked;
+                    alert('Gagal memperbarui opsi bungkus.');
+                }
             }
         });
 
@@ -603,6 +642,44 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
+     * ==========================================================
+     * BAGIAN REAL-TIME STATUS DI HALAMAN SUKSES 
+     * ==========================================================
+     */
+    const successCard = document.querySelector('.success-card[data-order-session-id]');
+    if (successCard && typeof window.Echo !== 'undefined') {
+        const sessionId = successCard.dataset.orderSessionId;
+        const channelName = `order-status.${sessionId}`;
+
+        console.log(`Listening for status updates on public channel: ${channelName}`);
+        window.Echo.channel(channelName)
+            .listen('OrderStatusUpdated', (e) => {
+                console.log('Order status updated!', e);
+
+                const statusBadge = document.getElementById('order-status-badge');
+                const successIcon = document.querySelector('.success-icon i');
+                const title = document.querySelector('.success-card h2');
+                const subtitle = document.querySelector('.success-card .subtitle');
+
+                if (statusBadge && e.order) {
+                statusBadge.textContent = e.order.translated_status;
+                    
+                    statusBadge.className = `status-badge status-${e.order.status}`;
+
+                    if (e.order.status === 'completed') {
+                        if (successIcon) {
+                            successIcon.classList.remove('fa-check-circle');
+                            successIcon.classList.add('fa-receipt');
+                            successIcon.style.color = '#0dcaf0'; 
+                        }
+                        if (title) title.textContent = 'Pesanan Anda Telah Selesai!';
+                        if (subtitle) subtitle.textContent = 'Terima kasih telah memesan. Silakan lakukan pembayaran di kasir.';
+                    }
+                }
+            });
+    }
+
+    /**
      * =================================
      * REAL-TIME LISTENERS (ECHO - GLOBAL)
      * =================================
@@ -612,8 +689,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Listener untuk update stok produk
         console.log("Listening for product stock updates...");
         window.Echo.channel('products')
-            .listen('.StockUpdated', (e) => {
-                console.log('StockUpdated event received!', e);
+            .listen('ProductStockUpdated', (e) => {
+                console.log('ProductStockUpdated event received!', e);
                 const productCard = document.querySelector(`.product-card[data-product-id="${e.productId}"]`);
 
                 if (productCard) {
@@ -657,7 +734,7 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             window.Echo.channel('tables-status')
-                .listen('.AvailableTablesUpdated', (e) => {
+                .listen('AvailableTablesUpdated', (e) => {
                     console.log('AvailableTablesUpdated event received!', e);
                     updateTableDropdown();
                 });
@@ -686,6 +763,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
     }
+
+    /**
+     * ==========================================================
+     * TIMER LOGOUT OTOMATIS SAAT SESI HABIS
+     * ==========================================================
+     */
+    if (typeof appConfig !== 'undefined' && appConfig.loginTimestamp !== null) {
+        
+        const sessionTimeoutInSeconds = appConfig.sessionLifetime;
+        const loginTime = appConfig.loginTimestamp;
+
+        const checkSession = () => {
+            const nowInSeconds = Math.floor(Date.now() / 1000);
+            const elapsedTimeInSeconds = nowInSeconds - loginTime;
+
+            if (elapsedTimeInSeconds >= sessionTimeoutInSeconds) {
+                clearInterval(sessionTimer);
+                
+                alert('Sesi Anda telah berakhir karena tidak ada aktivitas. Anda akan dikembalikan ke halaman login.');
+                window.location.href = '/'; 
+            }
+        };
+
+        const sessionTimer = setInterval(checkSession, 30000);
+    }
+
+    
 
 
 });

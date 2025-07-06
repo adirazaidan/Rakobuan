@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
-use Illuminate\Support\Facades\Auth; // Pastikan Auth di-import
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,5 +32,9 @@ Broadcast::channel('layout-tables', function ($user) {
 
 // === CHANNEL PUBLIK UNTUK PELANGGAN ===
 Broadcast::channel('customer-logout.{sessionId}', function ($user, $sessionId) {
+    return true;
+});
+
+Broadcast::channel('order-status.{sessionId}', function ($user, $sessionId) {
     return true;
 });

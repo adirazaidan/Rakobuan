@@ -14,6 +14,8 @@ class Order extends Model
      *
      * @var array<int, string>
      */
+    protected $appends = ['translated_status'];
+    
     protected $fillable = [
         'customer_name',
         'table_number',
@@ -35,5 +37,16 @@ class Order extends Model
     public function diningTable()
     {
         return $this->belongsTo(DiningTable::class);
+    }
+
+    public function getTranslatedStatusAttribute(): string
+    {
+        return match ($this->status) {
+            'pending' => 'Belum Diproses',
+            'processing' => 'Sedang Diproses',
+            'completed' => 'Selesai',
+            'cancelled' => 'Dibatalkan',
+            default => ucfirst($this->status),
+        };
     }
 }

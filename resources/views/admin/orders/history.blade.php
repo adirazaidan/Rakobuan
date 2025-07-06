@@ -20,7 +20,7 @@
                         <span>Pelanggan: {{ $order->customer_name }}</span>
                     </div>
                     <div class="order-status">
-                        <strong>{{ ucfirst($order->status) }}</strong>
+                        <strong>{{ $order->translated_status }}</strong>
                         <span>{{ $order->created_at->format('d M Y, H:i') }}</span>
                     </div>
                 </div>

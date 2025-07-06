@@ -7,9 +7,6 @@ use App\Models\DiningTable;
 use Illuminate\Http\Request;
 use App\Events\TableStatusUpdated;
 use App\Events\AvailableTablesUpdated;
-use App\Events\SessionCleared;
-use App\Events\TableOccupied;
-use App\Events\TableCleared;
 class CustomerSessionController extends Controller
 {
     public function create()
@@ -31,22 +28,26 @@ class CustomerSessionController extends Controller
             'dining_table_id' => 'required|exists:dining_tables,id',
             'customer_name'   => 'required|string|max:100',
         ]);
+
         $table = DiningTable::findOrFail($validated['dining_table_id']);
+
         if ($table->is_locked || !is_null($table->session_id)) {
             return back()->with('error', 'Meja yang Anda pilih tidak tersedia saat ini. Silakan pilih meja lain.');
         }
+
+        session()->regenerate(true);
         $table->update(['session_id' => session()->getId()]);
         
-        // PERBAIKAN: Hanya muat relasi yang benar-benar ada
         TableStatusUpdated::dispatch($table->id);
-        TableOccupied::dispatch($table);
         AvailableTablesUpdated::dispatch();
 
         session([
             'dining_table_id' => $table->id,
             'customer_name'   => $validated['customer_name'],
             'table_number'    => $table->name,
+            'login_timestamp' => now()->timestamp,
         ]);
+        
         return redirect()->route('customer.menu.index');
     }
 
@@ -56,7 +57,6 @@ class CustomerSessionController extends Controller
         if ($tableId) {
             $table = DiningTable::find($tableId);
             if ($table) {
-                // HANYA kosongkan session_id di meja, JANGAN batalkan order
                 $table->update(['session_id' => null]);
                 TableStatusUpdated::dispatch($tableId);
                 AvailableTablesUpdated::dispatch();
@@ -72,9 +72,10 @@ class CustomerSessionController extends Controller
     {
         $availableTables = DiningTable::where('is_locked', false)
                                       ->whereNull('session_id')
-                                      ->get()
-                                      ->sortBy('name', SORT_NATURAL);
+                                      ->orderBy('name', 'asc')
+                                      ->get();
+        
         $tablesByLocation = $availableTables->groupBy('location');
-        return view('customer.partials._tables_options', compact('tablesByLocation'));
+        return view('customer.partials._table_options', compact('tablesByLocation'));
     }
 }

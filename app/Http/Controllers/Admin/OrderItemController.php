@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use App\Events\TableStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Events\OrderStatusUpdated;
 
 class OrderItemController extends Controller
 {
@@ -21,10 +22,12 @@ class OrderItemController extends Controller
 
             $allItemsDelivered = $order->orderItems->every(fn($item) => $item->quantity <= $item->quantity_delivered);
 
-
             if ($allItemsDelivered) {
                 $order->update(['status' => 'completed']);
+                
+                OrderStatusUpdated::dispatch($order);
             }
+            
             if ($order->diningTable) {
                 TableStatusUpdated::dispatch($order->dining_table_id); 
             }

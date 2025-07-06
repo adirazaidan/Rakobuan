@@ -49,8 +49,8 @@ class ProductStockUpdated implements ShouldBroadcast
      *
      * @return string
      */
-    public function broadcastAs()
-    {
-        return 'StockUpdated';
-    }
+    // public function broadcastAs()
+    // {
+    //     return 'StockUpdated';
+    // }
 }

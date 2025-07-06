@@ -47,24 +47,28 @@
     <div class="table-card-order-details">
         @foreach($table->activeOrders as $order)
             <div class="order-group">
-                <h5>Pesanan Aktif: </h5>
+                <h5>Pesanan Aktif:</h5>
                 <ul class="order-item-list">
                     @foreach($order->orderItems as $item)
                     <li class="order-item-row {{ $item->quantity <= $item->quantity_delivered ? 'item-delivered' : 'item-pending' }}"data-created-at="{{ $item->created_at->toIso8601String() }}">
                         <div class="item-info">
-                            <span class="item-quantity">{{ $item->quantity }}x</span>
-                            <span class="item-name">{{ $item->product->name }}</span>
+                            <div>
+                                <span class="item-quantity">{{ $item->quantity }}x</span>
+                                <span class="item-name">
+                                    {{ $item->product->name }}
+
+                                    @if($item->is_overdue)
+                                        <span class="overdue-warning" title="Pesanan ini sudah lebih dari 15 menit!">
+                                            <i class="fas fa-clock"></i> Terlambat
+                                        </span>
+                                    @endif
+                                </span>
+                            </div>
                             
                             @if($item->notes)
                                 <small class="item-note" title="{{ $item->notes }}">
                                     <i class="fas fa-sticky-note"></i> {{ Str::limit($item->notes, 25) }}
                                 </small>
-                            @endif
-                            
-                            @if($item->is_overdue)
-                                <span class="overdue-warning" title="Pesanan ini sudah lebih dari 15 menit!">
-                                    <i class="fas fa-clock"></i> Terlambat
-                                </span>
                             @endif
                         </div>
                         <div class="item-delivery-status">

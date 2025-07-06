@@ -185,6 +185,163 @@ select.custom-select:focus {border-color: var(--primary-color); outline: 0; box-
 .product-footer,
 .product-controls {position: relative;}
 
+/* =================================================================== */
+/* 8. STYLE HALAMAN SUKSES & RINCIAN PESANAN
+/* =================================================================== */
+
+.success-page-container {
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: calc(100vh - 100px); /* Adjust based on your header height */
+}
+
+.success-card {
+    background: white;
+    padding: 2rem 2.5rem;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 700px;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+}
+
+.success-icon i {
+    font-size: 4rem;
+    color: var(--success-color, #198754);
+    animation: pop-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+@keyframes pop-in {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.success-card h2 {
+    margin: 1.5rem 0 0.5rem 0;
+    color: var(--primary-color);
+}
+
+.success-card .subtitle {
+    color: #666;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.receipt-details {
+    border: 1px solid var(--border-color);
+    background-color: #fdfdfd;
+    border-radius: 12px;
+    margin-top: 1.5rem;
+    text-align: left;
+    overflow: hidden; /* For border-radius on table */
+}
+
+.receipt-header {
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.receipt-header h3 {
+    text-align: center;
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+.receipt-customer-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.receipt-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.receipt-table th, .receipt-table td {
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+}
+
+.receipt-table thead {
+    background-color: #f1f5f9;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.receipt-table tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.receipt-table .item-name {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.receipt-item-notes {
+    font-size: 0.85rem;
+    color: #888;
+    padding-left: 0.5rem;
+    font-style: italic;
+}
+
+.receipt-item-notes i {
+    margin-right: 0.3rem;
+    color: #aaa;
+}
+
+.receipt-table tfoot {
+    border-top: 2px solid var(--border-color);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.receipt-table .text-center { text-align: center; }
+.receipt-table .text-right { text-align: right; }
+
+.success-actions {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Konsistensi Button Style */
+.success-actions .btn-primary, .success-actions .btn-secondary {
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.success-actions .btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+.success-actions .btn-primary:hover {
+    background-color: var(--secondary-color);
+}
+
+.success-actions .btn-secondary {
+    background-color: #e9ecef;
+    color: var(--text-color);
+}
+.success-actions .btn-secondary:hover {
+    background-color: #d8dde3;
+}
+
 /* --- Media Query untuk Responsifitas Kartu Keranjang --- */
 @media (max-width: 600px) {.cart-item-card-new {flex-direction: column; align-items: stretch; min-height: auto;} .cart-item-image-wrapper {width: 100%; height: 150px;} .cart-item-details .item-update-form {padding-top: 1rem;}}
 
@@ -205,3 +362,4 @@ select.custom-select:focus {border-color: var(--primary-color); outline: 0; box-
 
 @media (max-width: 992px) {.sidebar-customer {transform: translateX(-260px);} .sidebar-customer.open {transform: translateX(0);} .content-wrapper {margin-left: 0;} .menu-toggle {display: block;}}
 @media (max-width: 768px) {.modal-body-split {grid-template-columns: 1fr;} .modal-image-container img {aspect-ratio: 16 / 9; margin-bottom: 1rem;} .page-content, .success-page-container {padding: 1rem;}}
+

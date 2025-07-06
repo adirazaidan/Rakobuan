@@ -45,15 +45,7 @@
                     <div class="form-group">
                         <label for="dining_table_id">Pilih Meja</label>
                         <select name="dining_table_id" id="dining_table_id" class="form-control" required>
-                            {{-- Opsi meja akan diperbarui secara real-time oleh customer-app.js --}}
-                            <option value="" disabled selected>-- Meja yang Tersedia --</option>
-                            @foreach ($tablesByLocation as $location => $tables)
-                                <optgroup label="{{ $location ?: 'Lainnya' }}">
-                                    @foreach ($tables as $table)
-                                        <option value="{{ $table->id }}">{{ $table->name }}</option>
-                                    @endforeach
-                                </optgroup>
-                            @endforeach
+                            @include('customer.partials._table_options', ['tablesByLocation' => $tablesByLocation])
                         </select>
                     </div>
                     <div class="form-group">

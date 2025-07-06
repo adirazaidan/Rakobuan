@@ -40,7 +40,16 @@
                             <i class="fas fa-sticky-note"></i>
                             <span class="item-notes-text">{{ $details['notes'] ?: 'Tidak Ada Catatan' }}</span>
                         </div>
-
+                        <div class="form-check-wrapper">
+                            <div class="form-check">
+                                <input class="form-check-input bungkus-checkbox" type="checkbox" value="1" id="bungkus-{{ $id }}" 
+                                    data-product-id="{{ $id }}"
+                                    @if(str_contains($details['notes'] ?? '', '(Bungkus)')) checked @endif>
+                                <label class="form-check-label" for="bungkus-{{ $id }}">
+                                    Bungkus (Takeaway)
+                                </label>
+                            </div>
+                        </div>
                         <div class="item-controls-cart">
                             <div class="product-controls">
                                 <div class="cart-action-wrapper">
@@ -56,8 +65,8 @@
                                     <i class="fas fa-pen-to-square"></i>
                                 </button>
                             </div>
+                            <div class="inline-stock-feedback"></div>
                         </div>
-                        <div class="inline-stock-feedback"></div>
                     </div>
                 </div>
             @empty

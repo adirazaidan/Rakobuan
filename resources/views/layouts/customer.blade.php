@@ -13,6 +13,8 @@
     <script>
         const appConfig = {
             sessionId: "{{ session()->getId() }}",
+            loginTimestamp: {{ session('login_timestamp') ?? 'null' }},
+            sessionLifetime: {{ config('session.lifetime') * 60 }},
             routes: {
                 cartAdd: "{{ route('cart.add') }}",
                 callWaiterStore: "{{ route('call.waiter.store') }}"

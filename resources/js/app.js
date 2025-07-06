@@ -118,49 +118,61 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
-        tableGrid.addEventListener('click', function(e) {
-            const historyButton = e.target.closest('.btn-view-history');
-            if (historyButton) {
-                const historyData = JSON.parse(historyButton.dataset.history);
-                const customerName = historyButton.dataset.customerName;
-                const historyModal = document.getElementById('historyModal');
-                const historyBody = historyModal.querySelector('.modal-body'); 
-                
-                let html = `<p><strong>Riwayat Sesi</strong> untuk <strong>${customerName}</strong></p>`;
-                if (historyData.orders && historyData.orders.length > 0) {
-                    html += '<h5>Riwayat Pesanan:</h5>';
-                    historyData.orders.forEach(order => {
-                        html += `<div class="history-group">`;
-                        html += `<p><strong>Pesanan #${order.id}</strong> - Total: Rp ${parseInt(order.total_price).toLocaleString('id-ID')}</p>`;
-                        html += '<ul class="order-item-list">';
-                        order.order_items.forEach(item => {
-                            html += `<li class="order-item-row item-delivered">
-                                        <div class="item-info">
-                                            <span class="item-quantity">${item.quantity}x</span>
-                                            <span class="item-name">${item.product.name}</span>
-                                        </div>
-                                    </li>`;
-                        });
-                        html += '</ul></div>';
-                    });
-                }
-                if (historyData.calls && historyData.calls.length > 0) {
-                    html += '<h5 style="margin-top: 1rem;">Riwayat Panggilan:</h5>';
-                    html += '<ul class="call-item-list">';
-                    historyData.calls.forEach(call => {
-                        const callTime = new Date(call.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                        html += `<li class="call-item-row">
-                                    <span class="call-note"><i class="fas fa-comment-dots"></i> ${call.notes || 'Memanggil pelayan'}</span>
-                                    <span class="text-muted" style="font-size: 0.8em;">${callTime}</span>
+    tableGrid.addEventListener('click', function(e) {
+        const historyButton = e.target.closest('.btn-view-history');
+        if (historyButton) {
+            const historyData = JSON.parse(historyButton.dataset.history);
+            const customerName = historyButton.dataset.customerName;
+            const historyModal = document.getElementById('historyModal');
+            const historyBody = historyModal.querySelector('.modal-body'); 
+            
+            let html = `<p><strong>Riwayat Sesi</strong> untuk <strong>${customerName}</strong></p>`;
+            
+            if (historyData.orders && historyData.orders.length > 0) {
+                html += '<h5>Riwayat Pesanan:</h5>';
+                historyData.orders.forEach(order => {
+                    html += `<div class="history-group">`;
+                    html += `<p><strong>Pesanan #${order.id}</strong> - Total: Rp ${parseInt(order.total_price).toLocaleString('id-ID')}</p>`;
+                    html += '<ul class="order-item-list">';
+                    order.order_items.forEach(item => {
+                        html += `<li class="order-item-row item-delivered">
+                                    <div class="item-info">
+                                        <span class="item-quantity">${item.quantity}x</span>
+                                        <span class="item-name">${item.product.name}</span>
+                                        ${item.notes ? 
+                                            `<small class="item-note" title="${item.notes}">
+                                                <i class="fas fa-sticky-note"></i> ${item.notes}
+                                            </small>` 
+                                            : ''
+                                        }
+                                    </div>
                                 </li>`;
                     });
-                    html += '</ul>';
-                }
-
-                historyBody.innerHTML = html;
-                historyModal.style.display = 'flex';
+                    html += '</ul></div>';
+                });
             }
-        });
+
+            if (historyData.calls && historyData.calls.length > 0) {
+                html += '<h5 style="margin-top: 1rem;">Riwayat Panggilan:</h5>';
+                html += '<ul class="call-item-list">';
+                historyData.calls.forEach(call => {
+                    const callTime = new Date(call.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                    html += `<li class="call-item-row">
+                                <span class="call-note"><i class="fas fa-comment-dots"></i> ${call.notes || 'Memanggil pelayan'}</span>
+                                <span class="text-muted" style="font-size: 0.8em;">${callTime}</span>
+                            </li>`;
+                });
+                html += '</ul>';
+            }
+
+            if ((!historyData.orders || historyData.orders.length === 0) && (!historyData.calls || historyData.calls.length === 0)) {
+                html += '<p class="text-muted">Tidak ada riwayat pesanan atau panggilan untuk sesi ini.</p>';
+            }
+
+            historyBody.innerHTML = html;
+            historyModal.style.display = 'flex';
+        }
+    });
 
         /**
          * ==============================================================
