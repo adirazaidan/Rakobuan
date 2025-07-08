@@ -23,7 +23,7 @@ use App\Http\Controllers\Admin\NotificationController;
 // Controller untuk Customer
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\CustomerSessionController;
-use App\Http\Controllers\Customer\MenuController; // <-- USE INI SEBELUMNYA HILANG
+use App\Http\Controllers\Customer\MenuController; 
 
 /*
 |--------------------------------------------------------------------------
@@ -37,11 +37,11 @@ use App\Http\Controllers\Customer\MenuController; // <-- USE INI SEBELUMNYA HILA
 Route::get('/', [CustomerSessionController::class, 'create'])->name('customer.login.form');
 Route::post('/login', [CustomerSessionController::class, 'store'])->name('customer.login');
 Route::post('/logout', [CustomerSessionController::class, 'destroy'])->name('customer.logout');
+Route::get('/logout/{tableId}', [CustomerSessionController::class, 'destroy'])->name('customer.session.expired');
 
-// Grup rute yang memerlukan sesi pelanggan
 Route::middleware('customer.session')->group(function () {
     Route::get('/menu/{outlet?}', [MenuController::class, 'index'])->name('customer.menu.index');
-
+    
     // Rute Keranjang
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -66,13 +66,13 @@ Route::get('/get-available-tables', [CustomerSessionController::class, 'getAvail
 Route::prefix('admin')->name('admin.')->group(function () {
 
     // Rute Login Admin (hanya untuk tamu)
-    Route::middleware('guest')->group(function() {
+    Route::middleware('guest:admin')->group(function() {
         Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
         Route::post('/login', [AuthenticatedSessionController::class, 'store']);
     });
 
     // Rute Admin yang memerlukan autentikasi
-    Route::middleware('auth')->group(function() {
+    Route::middleware('auth:admin')->group(function() {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
@@ -96,7 +96,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     
         // Rute Laporan Penjualan
         Route::get('sales-report', [SalesReportController::class, 'index'])->name('sales.report.index');
-   
+
         Route::resource('dining-tables', DiningTableController::class);
         Route::post('dining-tables/lock-all', [DiningTableController::class, 'lockAll'])->name('dining-tables.lockAll');
         Route::post('dining-tables/unlock-all', [DiningTableController::class, 'unlockAll'])->name('dining-tables.unlockAll');
@@ -109,6 +109,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/notifications/counts', [NotificationController::class, 'getCounts'])->name('notifications.counts');
     });
 });
+
 
 Broadcast::channel('layout-tables', function ($user) {
     return Auth::check();

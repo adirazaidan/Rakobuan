@@ -766,13 +766,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /**
      * ==========================================================
-     * TIMER LOGOUT OTOMATIS SAAT SESI HABIS
+     * TIMER LOGOUT OTOMATIS (VERSI FINAL & ANDAL)
      * ==========================================================
      */
     if (typeof appConfig !== 'undefined' && appConfig.loginTimestamp !== null) {
-        
         const sessionTimeoutInSeconds = appConfig.sessionLifetime;
         const loginTime = appConfig.loginTimestamp;
+        const tableId = appConfig.tableId;
 
         const checkSession = () => {
             const nowInSeconds = Math.floor(Date.now() / 1000);
@@ -780,9 +780,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (elapsedTimeInSeconds >= sessionTimeoutInSeconds) {
                 clearInterval(sessionTimer);
+                alert('Sesi Anda telah berakhir. Anda akan di-logout.');
                 
-                alert('Sesi Anda telah berakhir karena tidak ada aktivitas. Anda akan dikembalikan ke halaman login.');
-                window.location.href = '/'; 
+                // Arahkan ke rute logout baru dengan menyertakan ID meja
+                if(tableId) {
+                    window.location.href = `/logout/${tableId}`;
+                } else {
+                    // Fallback jika tidak ada tableId
+                    window.location.href = "{{ route('customer.logout') }}";
+                }
             }
         };
 

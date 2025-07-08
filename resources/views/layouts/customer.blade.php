@@ -15,12 +15,10 @@
             sessionId: "{{ session()->getId() }}",
             loginTimestamp: {{ session('login_timestamp') ?? 'null' }},
             sessionLifetime: {{ config('session.lifetime') * 60 }},
-            routes: {
-                cartAdd: "{{ route('cart.add') }}",
-                callWaiterStore: "{{ route('call.waiter.store') }}"
-            }
+            tableId: {{ session('dining_table_id') ?? 'null' }} // <-- TAMBAHKAN INI
         };
     </script>
+
 </head>
 <body>
     <div class="customer-app-container">

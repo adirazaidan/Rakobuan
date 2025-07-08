@@ -32,6 +32,7 @@ class Kernel extends HttpKernel
         'web' => [
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \App\Http\Middleware\UseAdminSessionConfig::class,
             \App\Http\Middleware\SetAdminSessionLifetime::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
@@ -66,6 +67,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'customer.session' => \App\Http\Middleware\CustomerSession::class,
+        'admin.auth' => \App\Http\Middleware\AuthenticateAdmin::class,
     ];
 
     

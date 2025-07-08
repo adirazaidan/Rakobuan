@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Support\Facades\Log;
 
 use App\Http\Controllers\Controller;
 use App\Models\DiningTable;

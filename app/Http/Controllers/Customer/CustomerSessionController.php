@@ -7,6 +7,8 @@ use App\Models\DiningTable;
 use Illuminate\Http\Request;
 use App\Events\TableStatusUpdated;
 use App\Events\AvailableTablesUpdated;
+use Illuminate\Support\Facades\DB;
+
 class CustomerSessionController extends Controller
 {
     public function create()
@@ -51,23 +53,27 @@ class CustomerSessionController extends Controller
         return redirect()->route('customer.menu.index');
     }
 
-    public function destroy(Request $request)
+    public function destroy(Request $request, $tableId = null)
     {
-        $tableId = session('dining_table_id');
-        if ($tableId) {
-            $table = DiningTable::find($tableId);
+        // Jika logout dari timer, $tableId akan ada.
+        // Jika logout manual, ambil dari sesi.
+        $idToClear = $tableId ?? session('dining_table_id');
+
+        if ($idToClear) {
+            $table = DiningTable::find($idToClear);
             if ($table) {
                 $table->update(['session_id' => null]);
-                TableStatusUpdated::dispatch($tableId);
+                TableStatusUpdated::dispatch($table->id);
                 AvailableTablesUpdated::dispatch();
             }
         }
+
         $request->session()->flush();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+        
         return redirect()->route('customer.login.form');
     }
-
     public function getAvailableTables()
     {
         $availableTables = DiningTable::where('is_locked', false)
@@ -77,5 +83,18 @@ class CustomerSessionController extends Controller
         
         $tablesByLocation = $availableTables->groupBy('location');
         return view('customer.partials._table_options', compact('tablesByLocation'));
+    }
+
+    /**
+     * Membersihkan sesi meja saat ini tanpa me-logout.
+     * Ini dipanggil oleh JavaScript sesaat sebelum sesi benar-benar habis.
+     */
+    public function clearTableSession(Request $request)
+    {
+        // Gunakan method terpusat yang sudah kita buat sebelumnya
+        DiningTable::clearSessionFor($request->session()->getId());
+
+        // Beri respon sukses ke JavaScript
+        return response()->json(['success' => true]);
     }
 }

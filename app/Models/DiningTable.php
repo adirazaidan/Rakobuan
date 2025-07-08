@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\Events\TableStatusUpdated;
+use App\Events\AvailableTablesUpdated;
 
 class DiningTable extends Model
 {
@@ -67,5 +69,26 @@ class DiningTable extends Model
                     ->where('session_id', $this->session_id)
                     ->orderBy('created_at', 'asc')
                     ->get();
+    }
+
+     /**
+     * Method terpusat untuk membersihkan sesi dari sebuah meja.
+     *
+     * @param string|null $sessionId ID sesi yang akan dibersihkan.
+     * @return void
+     */
+    public static function clearSessionFor(?string $sessionId): void
+    {
+        if (!$sessionId) {
+            return;
+        }
+
+        $table = self::where('session_id', $sessionId)->first();
+
+        if ($table) {
+            $table->update(['session_id' => null]);
+            TableStatusUpdated::dispatch($table->id);
+            AvailableTablesUpdated::dispatch();
+        }
     }
 }

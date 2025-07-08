@@ -1,40 +1,25 @@
 <?php
 
-use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Auth;
-
-/*
-|--------------------------------------------------------------------------
-| Broadcast Channels
-|--------------------------------------------------------------------------
-|
-| Di sini Anda mendaftarkan semua channel siaran dan aturan otorisasi mereka.
-|
-*/
+use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+    return (int) $user->id === (int) $id && Auth::guard('admin')->check();
 });
 
-// === CHANNEL-CHANNEL PRIVAT UNTUK ADMIN ===
+// Secara eksplisit periksa menggunakan guard 'admin'
 Broadcast::channel('orders', function ($user) {
-    return Auth::check();
+    return Auth::guard('admin')->check();
 });
 
-Broadcast::channel('calls',function ($user) {
-    return Auth::check();
+Broadcast::channel('calls', function ($user) {
+    return Auth::guard('admin')->check();
 });
 
 Broadcast::channel('layout-tables', function ($user) {
-    return Auth::check();
+    return Auth::guard('admin')->check();
 });
 
-
-// === CHANNEL PUBLIK UNTUK PELANGGAN ===
-Broadcast::channel('customer-logout.{sessionId}', function ($user, $sessionId) {
-    return true;
-});
-
-Broadcast::channel('order-status.{sessionId}', function ($user, $sessionId) {
-    return true;
-});
+// Channel publik tidak berubah
+Broadcast::channel('customer-logout.{sessionId}', fn() => true);
+Broadcast::channel('order-status.{sessionId}', fn() => true);
