@@ -30,12 +30,4 @@ class OrderStatusUpdated implements ShouldBroadcast
             new Channel('order-status.' . $this->order->session_id),
         ];
     }
-
-    /**
-     * Beri nama alias untuk event ini agar mudah dipanggil di JS.
-     */
-    // public function broadcastAs()
-    // {
-    //     return 'status.updated';
-    // }
 }

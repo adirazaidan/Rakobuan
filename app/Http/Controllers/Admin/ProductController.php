@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Outlet;
 use App\Models\Category; 
 use Illuminate\Http\Request;
+use App\Events\ProductStockUpdated;
 use Illuminate\Support\Facades\Storage; 
 
 class ProductController extends Controller
@@ -86,6 +87,12 @@ class ProductController extends Controller
         }
 
         $product->update($validated);
+        
+        ProductStockUpdated::dispatch(
+            $product->id,
+            $product->stock,
+            $product->is_available
+        );
 
         return redirect()->route('admin.products.index')->with('success', 'Menu berhasil diperbarui.');
     }

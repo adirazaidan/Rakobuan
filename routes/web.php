@@ -54,6 +54,10 @@ Route::middleware('customer.session')->group(function () {
     
     // Rute Panggil Pelayan (Dengan path controller yang sudah diperbaiki)
     Route::post('/call-waiter', [\App\Http\Controllers\Customer\CallController::class, 'store'])->name('call.waiter.store');
+
+    Route::get('/status-pesanan', [\App\Http\Controllers\Customer\OrderController::class, 'status'])->name('order.status');
+
+    Route::get('/calls/{call}/render-card', [\App\Http\Controllers\Customer\CallController::class, 'renderCard'])->name('call.render_card');
 });
 
 Route::get('/get-available-tables', [CustomerSessionController::class, 'getAvailableTables'])->name('customer.get-tables');
@@ -107,6 +111,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         
         // Route baru untuk mengambil jumlah notifikasi
         Route::get('/notifications/counts', [NotificationController::class, 'getCounts'])->name('notifications.counts');
+    
+        Route::get('orders/{order}/print', [OrderController::class, 'print'])->name('orders.print');
+        Route::get('calls/{call}/print', [CallController::class, 'print'])->name('calls.print');
     });
 });
 

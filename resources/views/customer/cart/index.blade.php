@@ -79,19 +79,27 @@
         </div>
     </div>
     
-    @if (count($cart) > 0)
+@if (count($cart) > 0)
+    {{-- Menggunakan struktur dan class yang terinspirasi dari status-page-actions --}}
     <div class="cart-summary-sticky">
-        <div class="total-price">
+        
+        {{-- Bagian Kiri: Total Harga (dibuat agar terlihat seperti tombol info) --}}
+        <div class="summary-info">
             <span>Total Harga</span>
             <strong id="grand-total">Rp {{ number_format($totalPrice, 0, ',', '.') }}</strong>
         </div>
-        <div class="checkout-action">
+
+        {{-- Bagian Kanan: Tombol Aksi Checkout --}}
+        <div class="summary-action">
             <form id="checkout-form" action="{{ route('checkout.store') }}" method="POST" style="margin: 0;">
                 @csrf
-                <button type="submit" class="btn-checkout">Kirim Orderan ke Dapur</button>
+                <button type="submit" class="btn-checkout">
+                    Kirim Orderan <i class="fas fa-arrow-right"></i>
+                </button>
             </form>
         </div>
+        
     </div>
-    @endif
+@endif
 </div>
 @endsection

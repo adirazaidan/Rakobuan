@@ -16,28 +16,24 @@ class DiningTable extends Model
         'name', 'location', 'notes', 'is_locked', 'session_id',
     ];
 
-    // Relasi dasar ke SEMUA order milik meja ini
     public function orders()
     {
         return $this->hasMany(Order::class);
     }
     
-    // Relasi dasar ke SEMUA panggilan milik meja ini
     public function calls()
     {
         return $this->hasMany(Call::class);
     }
 
-    // Relasi turunan: Mengambil SEMUA pesanan yang sedang aktif
     public function activeOrders()
     {
         return $this->hasMany(Order::class)->whereNotIn('status', ['completed', 'cancelled'])->latest();
     }
 
-    // Relasi turunan: Mengambil SEMUA panggilan yang sedang aktif
     public function activeCalls()
     {
-        return $this->hasMany(Call::class)->where('status', '!=', 'completed');
+        return $this->hasMany(Call::class)->where('status', 'pending'); 
     }
 
     /**
@@ -90,5 +86,10 @@ class DiningTable extends Model
             TableStatusUpdated::dispatch($table->id);
             AvailableTablesUpdated::dispatch();
         }
+    }
+
+    public function outlet()
+    {
+        return $this->belongsTo(Outlet::class);
     }
 }

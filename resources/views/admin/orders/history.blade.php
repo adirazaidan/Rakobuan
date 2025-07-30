@@ -1,61 +1,79 @@
 @extends('layouts.admin')
-@section('title', 'Riwayat Orderan') {{-- <-- UBAH JUDUL --}}
+@section('title', 'Riwayat Orderan') 
 
 @section('content')
-<div class="container">
-    <h1>@yield('title')</h1>
-    <p>Daftar semua pesanan yang telah selesai.</p> {{-- <-- UBAH DESKRIPSI --}}
+<div class="container-fluid"> 
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1>@yield('title')</h1>
+            <p class="mb-0">Daftar semua pesanan yang telah selesai atau dibatalkan.</p> 
+        </div>
+    </div>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    <div class="order-container">
-        @forelse ($orders as $order)
-            {{-- Bagian card ini tidak perlu diubah sama sekali --}}
-            <div class="order-card status-completed"> {{-- Statusnya pasti completed --}}
-                <div class="order-header">
-                    <div>
-                        <h3>Meja: {{ $order->table_number }}</h3>
-                        <span>Pelanggan: {{ $order->customer_name }}</span>
-                    </div>
-                    <div class="order-status">
-                        <strong>{{ $order->translated_status }}</strong>
-                        <span>{{ $order->created_at->format('d M Y, H:i') }}</span>
-                    </div>
-                </div>
-                <div class="order-body">
-                    <h4>Item Pesanan:</h4>
-                    <ul>
-                        @foreach ($order->orderItems as $item)
-                            <li>
-                                <span>{{ $item->quantity }}x {{ $item->product->name }}</span>
-                                <span>Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</span>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
-                <div class="order-footer">
-                    <div class="total-price">
-                        <strong>Total: Rp {{ number_format($order->total_price, 0, ',', '.') }}</strong>
-                    </div>
-                    <div class="order-actions">
-                        {{-- HAPUS SEMUA TOMBOL KECUALI HAPUS --}}
-                        <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus riwayat pesanan ini secara permanen?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Hapus</button>
-                        </form>
-                    </div>
-                </div>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover table-orders align-middle">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Meja</th>
+                            <th>Pelanggan</th>
+                            <th>Item Pesanan</th>
+                            <th class="text-right">Total</th>
+                            <th class="text-center">Status</th>
+                            <th>Waktu Selesai / Dibatalkan</th> 
+                            <th class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($orders as $order)
+                            <tr>
+                                <td data-label="ID"><strong>#{{ $order->order_number }}</strong></td>
+                                <td data-label="Meja" class="text-nowrap">{{ $order->table_number }}</td>
+                                <td data-label="Pelanggan" class="text-nowrap">{{ $order->customer_name }}</td>
+                                <td data-label="Item Pesanan">
+                                    <ul class="order-item-list-condensed">
+                                        @foreach ($order->orderItems as $item)
+                                            <li>
+                                                {{ $item->quantity }}x {{ $item->product->name }}
+                                                @if($item->notes)
+                                                    <small class="item-note d-block" title="{{ $item->notes }}">
+                                                        <i class="fas fa-sticky-note"></i> {{ Str::limit($item->notes, 30) }}
+                                                    </small>
+                                                @endif
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </td>
+                                <td data-label="Total" class="text-right text-nowrap">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
+                                <td data-label="Status" class="text-center"><span class="status-badge status-{{ $order->status }}">{{ $order->translated_status }}</span></td>
+                                <td data-label="Waktu Selesai / Dibatalkan" class="text-nowrap" title="{{ $order->updated_at->format('d M Y, H:i:s') }}">{{ $order->updated_at->diffForHumans() }}</td> 
+                                <td data-label="Aksi">
+                                    <div class="d-flex justify-content-end align-items-center gap-2 actions-wrapper">
+                                        <a href="{{ route('admin.orders.print', $order) }}" target="_blank" class="custom-action-btn custom-action-btn-info" title="Cetak Struk"><i class="fas fa-print"></i> <span>Cetak</span></a>
+
+                                        <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus riwayat pesanan ini secara permanen?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="custom-action-btn custom-action-btn-danger" title="Hapus Permanen"><i class="fas fa-trash"></i> <span>Hapus</span></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="text-center py-4">Tidak ada riwayat pesanan yang tersedia.</td> 
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-        @empty
-            <div class="card" style="padding: 2rem; text-align:center;">
-                <p>Tidak ada riwayat pesanan.</p> {{-- <-- UBAH PESAN KOSONG --}}
-            </div>
-        @endforelse
+        </div>
     </div>
 </div>
 @endsection
-
-{{-- Kita tidak perlu push style lagi karena sudah ada di index dan bisa kita pindah ke admin.css nanti --}}

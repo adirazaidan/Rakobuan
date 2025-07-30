@@ -7,10 +7,12 @@ use App\Http\Controllers\Controller;
 use App\Models\DiningTable;
 use App\Models\Order;
 use App\Models\Call;
+use App\Models\Outlet;
 use Illuminate\Http\Request;
 use App\Events\TableStatusUpdated; 
 use App\Events\SessionCleared;     
 use App\Events\AvailableTablesUpdated;
+use App\Models\Setting;
 
 class DiningTableController extends Controller
 {
@@ -19,7 +21,7 @@ class DiningTableController extends Controller
         $locations = DiningTable::select('location')->whereNotNull('location')->distinct()->pluck('location');
         $selectedLocation = $request->input('location');
 
-        $query = DiningTable::with(['orders.orderItems.product', 'activeCalls']);
+         $query = DiningTable::with(['orders.orderItems.product', 'calls']);
 
         if ($selectedLocation) {
             $query->where('location', $selectedLocation);
@@ -77,13 +79,15 @@ class DiningTableController extends Controller
     public function lockAll()
     {
         DiningTable::query()->update(['is_locked' => true]);
-        return redirect()->route('admin.dining-tables.index')->with('success', 'Semua meja berhasil dikunci.');
+        Setting::updateOrCreate(['key' => 'accepting_orders'], ['value' => 'false']);
+        return redirect()->route('admin.dining-tables.index')->with('success', 'Semua meja dikunci dan pesanan ditutup.');
     }
 
     public function unlockAll()
     {
         DiningTable::query()->update(['is_locked' => false]);
-        return redirect()->route('admin.dining-tables.index')->with('success', 'Semua meja berhasil dibuka.');
+        Setting::updateOrCreate(['key' => 'accepting_orders'], ['value' => 'true']);
+        return redirect()->route('admin.dining-tables.index')->with('success', 'Semua meja dibuka dan pesanan dibuka kembali.');
     }
 
     public function clearSession(DiningTable $diningTable)
@@ -101,6 +105,8 @@ class DiningTableController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Sesi berhasil dibersihkan.']);
     }
+
+
 
     public function renderCard(DiningTable $diningTable)
     {

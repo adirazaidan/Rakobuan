@@ -23,6 +23,7 @@ class Order extends Model
         'total_price',
         'dining_table_id',
         'session_id',
+        'order_number',
     ];
 
     /**
@@ -49,4 +50,19 @@ class Order extends Model
             default => ucfirst($this->status),
         };
     }
+
+protected static function boot()
+{
+    parent::boot();
+
+    static::creating(function ($order) {
+        // Format: YYDDD-NN (Tahun, Hari ke-, Nomor urut)
+        // Contoh: 25211-01 (Pesanan pertama di hari ke-211 tahun 2025)
+        $datePart = now()->format('yz'); // y = tahun (2 digit), z = hari ke- (0-365)
+        $todayOrderCount = Order::whereDate('created_at', today())->count();
+        $sequence = str_pad($todayOrderCount + 1, 2, '0', STR_PAD_LEFT);
+        
+        $order->order_number = 'OD' . $datePart . $sequence;
+    });
+}
 }

@@ -59,26 +59,29 @@ class CartController extends Controller
     /**
      * Menampilkan halaman keranjang belanja.
      */
-    public function index()
-    {
-        $cart = session()->get('cart', []);
-        $totalPrice = 0;
-        $productIds = array_keys($cart);
-        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+public function index()
+{
+    $cart = session()->get('cart', []);
+    $totalPrice = 0;
+    $productIds = array_keys($cart);
+    $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
 
-        foreach ($cart as $id => &$details) { 
-            if (isset($products[$id])) {
-                $details['product'] = $products[$id]; 
-                $totalPrice += $details['price'] * $details['quantity'];
-            } else {
-                unset($cart[$id]);
-            }
+    foreach ($cart as $id => &$details) { 
+        if (isset($products[$id])) {
+            $details['product'] = $products[$id]; 
+            $totalPrice += $details['price'] * $details['quantity'];
+        } else {
+            unset($cart[$id]);
         }
-        
-        session()->put('cart', $cart);
-
-        return view('customer.cart.index', compact('cart', 'totalPrice'));
     }
+    
+    session()->put('cart', $cart);
+
+    // Ganti baris return Anda dengan ini
+    return response()
+        ->view('customer.cart.index', compact('cart', 'totalPrice'))
+        ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+}
 
     /**
      * Memperbarui item di dalam keranjang (jumlah & catatan).

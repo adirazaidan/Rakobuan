@@ -15,7 +15,12 @@
             sessionId: "{{ session()->getId() }}",
             loginTimestamp: {{ session('login_timestamp') ?? 'null' }},
             sessionLifetime: {{ config('session.lifetime') * 60 }},
-            tableId: {{ session('dining_table_id') ?? 'null' }} // <-- TAMBAHKAN INI
+            tableId: {{ session('dining_table_id') ?? 'null' }},
+
+            routes: {
+                cartAdd: "{{ route('cart.add') }}",
+                callWaiterStore: "{{ route('call.waiter.store') }}",
+            }
         };
     </script>
 
@@ -28,6 +33,7 @@
             <span>{{ $currentOutlet->name ?? 'Pilih Outlet' }}</span>
         </div>
         <ul class="sidebar-menu">
+
             @foreach ($outletsForSidebar as $outlet)
                 <li class="{{ isset($currentOutlet) && $currentOutlet->id == $outlet->id ? 'active' : '' }}">
                     <a href="{{ route('customer.menu.index', $outlet) }}">
@@ -46,6 +52,14 @@
                     <span class="badge" id="sidebar-cart-count">{{ count((array) session('cart')) }}</span>
                 </a>
             </li>
+
+            <li class="{{ request()->routeIs('order.status') ? 'active' : '' }}">
+                <a href="{{ route('order.status') }}">
+                    <i class="fas fa-receipt"></i>
+                    <span>Aktivitas</span>
+                </a>
+            </li>
+
             <li>
                 <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <i class="fas fa-sign-out-alt"></i>

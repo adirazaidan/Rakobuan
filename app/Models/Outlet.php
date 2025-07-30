@@ -17,6 +17,7 @@ class Outlet extends Model
     protected $fillable = [
         'name',
         'image',
+        'is_accepting_orders',
     ];
 
     public function categories()

@@ -21,7 +21,7 @@ return [
     | Durasi sesi dalam menit. Ini akan menjadi durasi default untuk pelanggan.
     |
     */
-    'lifetime' => 1, // Durasi 30 menit untuk pelanggan
+    'lifetime' => 120, // Pelanggan
 
     'expire_on_close' => false,
 
@@ -123,7 +123,7 @@ return [
     */
     'admin' => [
         'driver'   => env('SESSION_DRIVER', 'database'),
-        'lifetime' => 1440, // Durasi 24 jam untuk admin
+        'lifetime' => 1440, // Admin
         'cookie'   => 'rakobuan_admin_session',
     ],
 

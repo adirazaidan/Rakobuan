@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class Call extends Model
 {
@@ -17,7 +18,9 @@ class Call extends Model
         'status',
         'dining_table_id',
         'session_id',
+        'call_number',
     ];
+
 
     public function diningTable()
     {
@@ -26,13 +29,38 @@ class Call extends Model
 
         public function getIsOverdueAttribute(): bool
     {
-        // Kondisi 1: Item belum selesai diantar
         $isPending = $this->quantity > $this->quantity_delivered;
-
-        // Kondisi 2: Sudah lebih dari 15 menit sejak item ini dibuat
         $isLate = Carbon::now()->diffInMinutes($this->created_at) > 1;
 
-        // Kembalikan true HANYA jika kedua kondisi terpenuhi
         return $isPending && $isLate;
+    }
+
+    /**
+     * Mendapatkan status panggilan yang sudah diterjemahkan.
+     */
+    public function getTranslatedStatusAttribute(): string
+    {
+        return match ($this->status) {
+            'pending' => 'Belum Diproses',
+            'completed' => 'Selesai',
+            'handled' => 'Ditangani',
+            'cancelled' => 'Dibatalkan',
+            default => ucfirst($this->status),
+        };
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($call) {
+            // Format: CALL-YYDDD-NN 
+            // Contoh: CALL-25211-01
+            $datePart = now()->format('yz');
+            $todayCallCount = Call::whereDate('created_at', today())->count();
+            $sequence = str_pad($todayCallCount + 1, 2, '0', STR_PAD_LEFT);
+            
+            $call->call_number = 'CL' . $datePart . $sequence;
+        });
     }
 }

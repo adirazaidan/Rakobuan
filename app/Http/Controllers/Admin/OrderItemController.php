@@ -24,9 +24,9 @@ class OrderItemController extends Controller
 
             if ($allItemsDelivered) {
                 $order->update(['status' => 'completed']);
-                
-                OrderStatusUpdated::dispatch($order);
             }
+            
+            OrderStatusUpdated::dispatch($order);
             
             if ($order->diningTable) {
                 TableStatusUpdated::dispatch($order->dining_table_id); 

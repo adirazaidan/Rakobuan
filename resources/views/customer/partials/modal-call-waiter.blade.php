@@ -2,7 +2,6 @@
     <div class="modal-content">
         <button class="modal-close" id="closeCallModalBtn">&times;</button>
         <h3>Panggil Pelayan</h3>
-        <p>Beritahu kami apa yang Anda butuhkan.</p>
         <form id="callWaiterForm" class="modal-form">
             <div class="form-group">
                 <label for="call_notes">Catatan (Opsional)</label>

@@ -497,34 +497,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 showStockFeedback(itemCard, `Stok tersisa ${maxStock}`);
             }
         });
+
+        window.addEventListener('pageshow', function (event) {
+            // event.persisted bernilai true jika halaman dimuat dari cache
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+        
     }
 
     /**
      * =================================
-     * BAGIAN MODAL PANGGIL PELAYAN
+     * BAGIAN MODAL PANGGIL PELAYAN (REVISI DENGAN EVENT DELEGATION)
      * =================================
      */
     const callWaiterModal = document.getElementById('callWaiterModal');
     if (callWaiterModal) {
-        const closeCallModalBtn = document.getElementById('closeCallModalBtn');
+        const closeCallModalBtn = callWaiterModal.querySelector('.modal-close');
         const callWaiterForm = document.getElementById('callWaiterForm');
-        const callWaiterButtons = document.querySelectorAll('.call-waiter-btn');
-
-        const openCallModal = () => callWaiterModal.style.display = 'flex';
+        
+        const openCallModal = () => {
+            callWaiterModal.style.display = 'flex';
+        };
+        
         const closeCallModal = () => {
-            callWaiterForm.reset();
+            if (callWaiterForm) callWaiterForm.reset();
             callWaiterModal.style.display = 'none';
         };
 
-        callWaiterButtons.forEach(button => button.addEventListener('click', openCallModal));
-        closeCallModalBtn.addEventListener('click', closeCallModal);
+        document.body.addEventListener('click', function(e) {
+            if (e.target.matches('.call-waiter-btn') || e.target.closest('.call-waiter-btn')) {
+                e.preventDefault();
+                openCallModal();
+            }
+        });
+
+        if(closeCallModalBtn) closeCallModalBtn.addEventListener('click', closeCallModal);
+        
         callWaiterModal.addEventListener('click', (e) => {
             if (e.target === callWaiterModal) closeCallModal();
         });
 
-        callWaiterForm.addEventListener('submit', function(e) {
+        if(callWaiterForm) callWaiterForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(this);
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
             fetch(appConfig.routes.callWaiterStore, {
                 method: 'POST',
@@ -599,6 +617,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
+     * ========================================================
+     * FIX STICKY ACTIONS OVERLAP (HALAMAN STATUS PESANAN)
+     * ========================================================
+     */
+    const stickyStatusActions = document.querySelector('.status-page-actions');
+    const statusPageContainer = document.querySelector('.order-status-page-container');
+
+    if (stickyStatusActions && statusPageContainer) {
+        const actionsHeight = stickyStatusActions.offsetHeight;
+        statusPageContainer.style.paddingBottom = `${actionsHeight + 20}px`;
+    }
+
+    /**
      * =================================
      * LOGIKA UNTUK PROSES CHECKOUT VIA AJAX
      * =================================
@@ -628,55 +659,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.location.href = data.redirect_url;
                 } else {
                     alert(data.message || 'Terjadi kesalahan saat memproses pesanan.');
-                    button.textContent = 'Kirim Orderan ke Dapur';
+                    button.textContent = 'Kirim Orderan';
                     button.disabled = false;
                 }
             })
             .catch(error => {
                 console.error('Checkout Error:', error);
                 alert('Terjadi kesalahan teknis. Silakan coba lagi.');
-                button.textContent = 'Kirim Orderan ke Dapur';
+                button.textContent = 'Kirim Orderan';
                 button.disabled = false;
             });
         });
-    }
-
-    /**
-     * ==========================================================
-     * BAGIAN REAL-TIME STATUS DI HALAMAN SUKSES 
-     * ==========================================================
-     */
-    const successCard = document.querySelector('.success-card[data-order-session-id]');
-    if (successCard && typeof window.Echo !== 'undefined') {
-        const sessionId = successCard.dataset.orderSessionId;
-        const channelName = `order-status.${sessionId}`;
-
-        console.log(`Listening for status updates on public channel: ${channelName}`);
-        window.Echo.channel(channelName)
-            .listen('OrderStatusUpdated', (e) => {
-                console.log('Order status updated!', e);
-
-                const statusBadge = document.getElementById('order-status-badge');
-                const successIcon = document.querySelector('.success-icon i');
-                const title = document.querySelector('.success-card h2');
-                const subtitle = document.querySelector('.success-card .subtitle');
-
-                if (statusBadge && e.order) {
-                statusBadge.textContent = e.order.translated_status;
-                    
-                    statusBadge.className = `status-badge status-${e.order.status}`;
-
-                    if (e.order.status === 'completed') {
-                        if (successIcon) {
-                            successIcon.classList.remove('fa-check-circle');
-                            successIcon.classList.add('fa-receipt');
-                            successIcon.style.color = '#0dcaf0'; 
-                        }
-                        if (title) title.textContent = 'Pesanan Anda Telah Selesai!';
-                        if (subtitle) subtitle.textContent = 'Terima kasih telah memesan. Silakan lakukan pembayaran di kasir.';
-                    }
-                }
-            });
     }
 
     /**
@@ -686,41 +679,42 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     if (typeof window.Echo !== 'undefined' && typeof appConfig !== 'undefined') {
 
-        // Listener untuk update stok produk
         console.log("Listening for product stock updates...");
         window.Echo.channel('products')
             .listen('ProductStockUpdated', (e) => {
                 console.log('ProductStockUpdated event received!', e);
-                const productCard = document.querySelector(`.product-card[data-product-id="${e.productId}"]`);
+                
+                const productCard = document.getElementById(`product-card-${e.productId}`);
+                if (!productCard) return;
 
-                if (productCard) {
-                    console.log(`Updating UI for product ID: ${e.productId}`);
-                    productCard.dataset.stock = e.newStock; // Update stok di dataset
+                productCard.dataset.stock = e.newStock;
+                productCard.dataset.isAvailable = e.isAvailable;
 
-                    const isAvailable = e.newStock > 0;
-                    const outOfStockOverlay = productCard.querySelector('.out-of-stock-overlay');
-                    const actionWrapper = productCard.querySelector('.cart-action-wrapper');
-                    const quantityDisplay = productCard.querySelector('.quantity-inline-display');
+                const outOfStockOverlay = productCard.querySelector('.out-of-stock-overlay');
+                const quantityDisplay = productCard.querySelector('.quantity-inline-display');
+                const increaseBtn = productCard.querySelector('.btn-increase-inline');
+                const initialAddBtn = productCard.querySelector('.btn-add-cart-initial');
 
-                    if (!isAvailable) {
-                        if (outOfStockOverlay) outOfStockOverlay.style.display = 'flex';
-                        // Jika produk sedang ada di keranjang, kembalikan ke tombol add
-                        updateProductCardUI(e.productId, 0);
-                    } else {
-                        if (outOfStockOverlay) outOfStockOverlay.style.display = 'none';
-                        // Jika ada quantity selector, periksa apakah perlu di-enable/disable tombolnya
-                        if (quantityDisplay) {
-                           const increaseBtn = productCard.querySelector('.btn-increase-inline');
-                           if(increaseBtn) increaseBtn.disabled = false;
-                        } else {
-                           const initialAddBtn = actionWrapper.querySelector('.btn-add-cart-initial');
-                           if(initialAddBtn) initialAddBtn.disabled = false;
+                if (!e.isAvailable) {
+                    if (outOfStockOverlay) outOfStockOverlay.style.display = 'flex';
+
+                    if (increaseBtn) increaseBtn.disabled = true;
+                    if (initialAddBtn) initialAddBtn.disabled = true;
+
+                } else {
+                    if (outOfStockOverlay) outOfStockOverlay.style.display = 'none';
+
+                    if (quantityDisplay) {
+                        const currentQty = parseInt(quantityDisplay.textContent);
+                        if (increaseBtn && currentQty < e.newStock) {
+                            increaseBtn.disabled = false;
                         }
+                    } else if (initialAddBtn) {
+                        initialAddBtn.disabled = false;
                     }
                 }
             });
 
-        // Listener untuk update meja yang tersedia (di halaman login)
         const tableDropdown = document.getElementById('dining_table_id');
         if (tableDropdown) {
             console.log("Login page detected. Listening for table status updates...");
@@ -782,11 +776,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearInterval(sessionTimer);
                 alert('Sesi Anda telah berakhir. Anda akan di-logout.');
                 
-                // Arahkan ke rute logout baru dengan menyertakan ID meja
                 if(tableId) {
                     window.location.href = `/logout/${tableId}`;
                 } else {
-                    // Fallback jika tidak ada tableId
                     window.location.href = "{{ route('customer.logout') }}";
                 }
             }
@@ -795,7 +787,103 @@ document.addEventListener('DOMContentLoaded', function() {
         const sessionTimer = setInterval(checkSession, 30000);
     }
 
-    
+
+    /**
+     * ==========================================================
+     * BAGIAN REAL-TIME STATUS DI HALAMAN STATUS PESANAN (FINAL)
+     * ==========================================================
+     */
+    const statusPage = document.querySelector('.order-status-page-container');
+    if (statusPage && typeof window.Echo !== 'undefined') {
+
+        const anyCardWithSession = document.querySelector('[data-order-session-id], [data-call-session-id]');
+
+        if (anyCardWithSession) {
+            const sessionId = anyCardWithSession.dataset.orderSessionId || anyCardWithSession.dataset.callSessionId;
+
+            const orderChannelName = `order-status.${sessionId}`;
+            console.log(`Listening for order events on: ${orderChannelName}`);
+            window.Echo.channel(orderChannelName)
+                .listen('OrderStatusUpdated', (e) => { 
+                    console.log('Order status updated!', e.order);
+                    const statusBadge = document.getElementById(`order-status-badge-${e.order.id}`);
+                    if (statusBadge) {
+                        statusBadge.textContent = e.order.translated_status;
+                        statusBadge.className = `status-badge status-${e.order.status}`;
+                    }
+                });
+            const callChannelName = `customer-session.${sessionId}`; 
+            console.log(`Listening for call events on: ${callChannelName}`);
+            window.Echo.channel(callChannelName)
+                .listen('.call-received', (e) => { 
+                    console.log('New call data received (CallReceived event)!', e.call);
+                    const orderList = document.querySelector('.order-list');
+                    const emptyStatus = document.querySelector('.empty-status');
+                    if (orderList) {
+                        if (emptyStatus) emptyStatus.style.display = 'none';
+
+                        const callCard = document.createElement('div');
+                        callCard.className = 'status-card call-card';
+                        callCard.dataset.callSessionId = e.call.session_id;
+
+                        const callTime = new Date(e.call.created_at).toLocaleString('id-ID', {
+                            day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                        });
+
+                        const callStatus = e.call.translated_status || (e.call.status === 'pending' ? 'Menunggu' : (e.call.status === 'handled' ? 'Ditangani' : 'Selesai'));
+
+                        callCard.innerHTML = `
+                            <div class="receipt-details">
+                                <div class="receipt-header">
+                                    <h3>Rincian Panggilan #${e.call.call_number}</h3>
+                                    <div class="receipt-customer-info">
+                                        <span><strong>Waktu:</strong> ${callTime}</span>
+                                        <p class="receipt-status">
+                                            <strong>Status:</strong>
+                                            <span id="call-status-badge-${e.call.call_number}" class="status-badge status-${e.call.status}">
+                                                ${callStatus}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <table class="receipt-table">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="item-name">
+                                                    <i class="fas fa-comment-dots" style="margin-right: 0.5rem; color: var(--text-muted);"></i>
+                                                    Catatan Panggilan
+                                                </div>
+                                                <div class="receipt-item-notes">
+                                                    ${e.call.notes || 'Tidak ada catatan khusus.'}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                        orderList.prepend(callCard);
+                    }
+                })
+                .listen('.call-status-updated', (e) => { 
+                    console.log('Call status updated received (CallStatusUpdated event)!', e);
+                    const callNumber = e.callNumber;
+                    const newStatus = e.newStatus;
+                    const translatedStatus = e.translatedStatus;
+                    const statusBadge = document.getElementById(`call-status-badge-${callNumber}`);
+                    if (statusBadge) {
+                        statusBadge.textContent = translatedStatus;
+                        statusBadge.classList.remove('status-pending', 'status-handled', 'status-completed');
+                        statusBadge.classList.add(`status-${newStatus}`);
+                        statusBadge.classList.add('status-updated-highlight');
+                        setTimeout(() => {
+                            statusBadge.classList.remove('status-updated-highlight');
+                        }, 2000);
+                    }
+                });
+        }
+    }
 
 
 });

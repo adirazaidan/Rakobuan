@@ -47,7 +47,7 @@
     <div class="table-card-order-details">
         @foreach($table->activeOrders as $order)
             <div class="order-group">
-                <h5>Pesanan Aktif:</h5>
+                <h5>Pesanan Aktif: #{{ $order->order_number }}</h5>
                 <ul class="order-item-list">
                     @foreach($order->orderItems as $item)
                     <li class="order-item-row {{ $item->quantity <= $item->quantity_delivered ? 'item-delivered' : 'item-pending' }}"data-created-at="{{ $item->created_at->toIso8601String() }}">
@@ -137,7 +137,7 @@
         @if($isOccupied && $table->activeOrders->isEmpty())
             <form action="{{ route('admin.dining-tables.clearSession', $table) }}" method="POST" onsubmit="return confirm('Yakin ingin membersihkan sesi ini?');" class="clear-session-form">
                 @csrf
-                <button type="submit" class="btn btn-sm btn-info w-100">Clear Session</button>
+                <button type="submit" class="btn btn-sm btn-info w-100">Bersihkan Meja</button>
             </form>
         @endif
     </div>

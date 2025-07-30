@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\Call;
 use Illuminate\Http\Request;
-use App\Models\DiningTable;
 use App\Events\NewCallReceived;
 use App\Events\TableStatusUpdated;
+use App\Events\CallReceived;
 
 class CallController extends Controller
 {
@@ -37,6 +37,11 @@ class CallController extends Controller
         NewCallReceived::dispatch($call);
         TableStatusUpdated::dispatch($diningTableId);
 
+        CallReceived::dispatch($call);
+        
         return response()->json(['message' => 'Panggilan telah terkirim! Pelayan akan segera datang.']);
     }
+    
+
+    
 }

@@ -1,5 +1,5 @@
 /* =================================================================== */
-/* =     RAKOBUAN - CUSTOMER STYLESHEET (FINAL V3)                   = */
+/* =     RAKOBUAN - CUSTOMER STYLESHEET     = */
 /* =================================================================== */
 
 :root {--primary-color: #0A2647; --secondary-color: #144272; --accent-color: #FFB100; --bg-color: #f8f9fa; --text-color: #343a40; --text-muted: #6c757d; --white-color: #fff; --border-color: #dee2e6; --success-color: #198754; --danger-color: #dc3545;}
@@ -37,9 +37,27 @@ body, html {font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI
 .sidebar-outlet-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-color); }
 .sidebar-menu li a .badge { margin-left: auto; background-color: var(--accent-color); color: var(--primary-color); font-weight: bold; border-radius: 50%; width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; font-size: 0.8rem; }
 .content-wrapper { flex-grow: 1; transition: margin-left 0.3s ease-in-out; margin-left: 260px; }
-.header-customer { display: flex; align-items: center; gap: 1rem; background-color: var(--white-color); padding: 1rem 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-.menu-toggle { display: none; }
+.header-customer { display: flex; align-items: center; gap: 1rem; background-color: var(--white-color); padding: 2rem 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 .page-content { padding: 1.2rem; } 
+.header-info {font-size: large;}
+.menu-toggle {display: none;}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
 
 /* --- 3. HALAMAN MENU --- */
 .search-wrapper { background-color: var(--white-color); padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-color); }
@@ -103,8 +121,15 @@ select.custom-select:focus {border-color: var(--primary-color); outline: 0; box-
 .cart-item-card-new { position: relative; z-index: 1; transition: z-index 0s 0.3s;}
 .product-card.is-active-feedback,
 .cart-item-card-new.is-active-feedback { z-index: 101; transition: z-index 0s;}
-
-
+.cart-summary-sticky { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 95%; max-width: 600px; background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); color: white; border-radius: 12px 12px 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,.2); z-index: 100; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; transition: transform .4s cubic-bezier(.16,1,.3,1); }
+.cart-summary-sticky .summary-info { text-align: left; }
+.cart-summary-sticky .summary-info span { font-size: 0.9rem; opacity: 0.9; display: block; }
+.cart-summary-sticky .summary-info strong { font-size: 1.4rem; font-weight: 700; }
+.cart-summary-sticky .summary-action form { margin: 0; }
+.cart-summary-sticky .btn-checkout { padding: 0.9rem 1.5rem; border-radius: 8px; font-size: 1.1rem; font-family: inherit; font-weight: 700; border: none; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all .2s ease; background-color: white; color: #144272; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.cart-summary-sticky .btn-checkout:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+.empty-cart { text-align: center; padding: 3rem; background: white; border-radius: 12px; }
+.empty-cart i { color: #ccc; margin-bottom: 1rem; }
 .mini-cart-bar {position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(120%);width:95%;max-width:600px;background:linear-gradient(45deg, var(--primary-color), var(--secondary-color));color:white;border-radius:12px 12px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.15);z-index:999;transition:transform .4s cubic-bezier(.16,1,.3,1);padding:.8rem 1.2rem;}
 .mini-cart-bar.show {transform:translateX(-50%) translateY(0);}
 .mini-cart-link {display:flex;justify-content:space-between;align-items:center;text-decoration:none;color:white;}
@@ -114,6 +139,7 @@ select.custom-select:focus {border-color: var(--primary-color); outline: 0; box-
 .mini-cart-total {text-align:right;}
 .mini-cart-total span:first-child {display:block;font-weight:700;font-size:1.1rem;}
 .mini-cart-total span:last-child {font-size:.85rem;opacity:.9;}
+
 /* --- 4. MODAL --- */
 .modal-overlay {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1002; display: none; justify-content: center; align-items: center; padding: 1rem; box-sizing: border-box;}
 
@@ -126,9 +152,18 @@ select.custom-select:focus {border-color: var(--primary-color); outline: 0; box-
 #notesModal #notesModalTextArea:focus {border-color: var(--primary-color); outline: 0; box-shadow: 0 0 0 0.2rem rgba(10, 38, 71, 0.25);}
 #notesModal .btn-primary {background-color: var(--primary-color); border-radius: 8px; padding: 0.75rem; font-size: 1rem; font-weight: 600; transition: background-color 0.2s ease; border: none; color: var(--white-color); width: 100%;}
 #notesModal .btn-primary:hover {background-color: var(--secondary-color);}
-.modal-content {background: white; border-radius: 16px; width: 90%; max-width: 450px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.2); overflow: hidden; padding: 0;}
-.modal-header-visual {position: relative; width: 100%; height: 220px;}
-.modal-header-visual img {width: 100%; height: 100%; object-fit: cover; display: block;}
+#callWaiterModal.modal-overlay { display: none; justify-content: center; align-items: center; padding: 1rem; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1050; }
+#callWaiterModal .modal-content { max-width: 450px; width: 90%; border-radius: 12px; background: var(--white-color); position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.2); overflow: hidden; padding: 0; }
+#callWaiterModal .modal-close { position: absolute; top: 1rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 1; color: var(--text-color); }
+#callWaiterModal h3 { margin: 0; font-size: 1.2rem; color: var(--text-color); padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); }
+#callWaiterModal p { padding: 0 1.5rem 1rem 1.5rem; margin: 0; color: var(--text-color); font-size: 0.95rem; }
+#callWaiterModal .modal-form { padding: 0 1.5rem 1.5rem 1.5rem; }
+#callWaiterModal .form-group { margin-bottom: 1rem; }
+#callWaiterModal label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-color); }
+#callWaiterModal #call_notes { min-height: 100px; border-radius: 8px; border: 1px solid var(--border-color); transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out; width: 100%; padding: 0.75rem 1rem; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 1rem; resize: vertical; }
+#callWaiterModal #call_notes:focus { border-color: var(--primary-color); outline: 0; box-shadow: 0 0 0 0.2rem rgba(10, 38, 71, 0.25); }
+#callWaiterModal .btn-submit { background-color: var(--primary-color); border-radius: 8px; padding: 0.75rem; font-size: 1rem; font-weight: 600; transition: background-color 0.2s ease; border: none; color: var(--white-color); width: 100%; cursor: pointer; }
+#callWaiterModal .btn-submit:hover { background-color: var(--secondary-color); }
 .zoom-btn {position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.4); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; z-index: 6; display: flex; justify-content: center; align-items: center; transition: background-color 0.2s;}
 .zoom-btn:hover {background: rgba(0,0,0,0.7);}
 .lightbox-overlay {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: none; justify-content: center; align-items: center; cursor: pointer;}
@@ -186,180 +221,110 @@ select.custom-select:focus {border-color: var(--primary-color); outline: 0; box-
 .product-controls {position: relative;}
 
 /* =================================================================== */
-/* 8. STYLE HALAMAN SUKSES & RINCIAN PESANAN
+/* 8. STYLE HALAMAN STATUS PESANAN */
 /* =================================================================== */
 
-.success-page-container {
-    padding: 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: calc(100vh - 100px); /* Adjust based on your header height */
-}
-
-.success-card {
-    background: white;
-    padding: 2rem 2.5rem;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 700px;
-    text-align: center;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
-}
-
-.success-icon i {
-    font-size: 4rem;
-    color: var(--success-color, #198754);
-    animation: pop-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-}
-
-@keyframes pop-in {
-    0% { transform: scale(0.5); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.success-card h2 {
-    margin: 1.5rem 0 0.5rem 0;
-    color: var(--primary-color);
-}
-
-.success-card .subtitle {
-    color: #666;
-    margin-bottom: 2rem;
-    font-size: 1.1rem;
-}
-
-.receipt-details {
-    border: 1px solid var(--border-color);
-    background-color: #fdfdfd;
-    border-radius: 12px;
-    margin-top: 1.5rem;
-    text-align: left;
-    overflow: hidden; /* For border-radius on table */
-}
-
-.receipt-header {
-    padding: 1rem 1.5rem;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.receipt-header h3 {
-    text-align: center;
-    margin: 0 0 1rem 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--secondary-color);
-}
-
-.receipt-customer-info {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-}
-
-.receipt-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.receipt-table th, .receipt-table td {
-    padding: 0.8rem 1rem;
-    font-size: 0.95rem;
-}
-
-.receipt-table thead {
-    background-color: #f1f5f9;
-    color: var(--text-muted);
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.receipt-table tbody tr:nth-child(even) {
-    background-color: #f8f9fa;
-}
-
-.receipt-table .item-name {
-    font-weight: 500;
-    color: var(--text-color);
-}
-
-.receipt-item-notes {
-    font-size: 0.85rem;
-    color: #888;
-    padding-left: 0.5rem;
-    font-style: italic;
-}
-
-.receipt-item-notes i {
-    margin-right: 0.3rem;
-    color: #aaa;
-}
-
-.receipt-table tfoot {
-    border-top: 2px solid var(--border-color);
-    font-weight: bold;
-    font-size: 1.1rem;
-}
-
+.order-status-page-container { width: 100%; padding: 2rem 1.5rem; box-sizing: border-box; padding-bottom: 100px; }
+.status-header { text-align: center; margin-bottom: 2.5rem; }
+.status-header h1 { margin-bottom: 0.5rem; color: var(--primary-color); }
+.status-header p { font-size: 1.1rem; color: var(--text-muted); }
+.order-list { display: flex; flex-direction: column; gap: 1.5rem; max-width: 750px; margin: 0 auto; }
+.receipt-header { padding: 1rem 1.5rem; background-color: #f8f9fa; border-bottom: 1px solid var(--border-color, #eee); }
+.receipt-header h3 { text-align: center; margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--secondary-color); }
+.receipt-customer-info { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
+.receipt-status { text-align: center; margin-top: 1rem; }
+.receipt-table { width: 100%; border-collapse: collapse; }
+.receipt-table th, .receipt-table td { padding: 0.8rem 1.2rem; font-size: 0.95rem; border-bottom: 1px solid var(--border-color, #eee); }
+.receipt-table thead th { background-color: #fdfdfd; color: var(--text-muted); font-weight: 500; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; text-align: left; }
+.receipt-table tbody tr:last-child td { border-bottom: none; }
+.receipt-table .item-name { font-weight: 600; color: var(--text-color); }
+.receipt-item-notes { font-size: 0.85rem; color: var(--primary-color); padding-left: 0; font-style: italic; opacity: 0.8; }
+.receipt-item-notes i { margin-right: 0.3rem; }
+.receipt-table tfoot { border-top: 2px solid var(--border-color, #ddd); font-weight: bold; font-size: 1.15rem; }
 .receipt-table .text-center { text-align: center; }
 .receipt-table .text-right { text-align: right; }
+.empty-status { text-align: center; padding: 3rem; background: var(--white-color); border: 1px dashed var(--border-color); border-radius: 12px; }
+.status-card { width: 100%; box-sizing: border-box; background-color: var(--white-color); border-radius: 4px; box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08); border: 1px solid var(--border-color, #eee); overflow: hidden; }
+.status-card .receipt-details { padding: 0.4em; border: none; background-color: transparent; box-shadow: none; margin-top: 0; }
+.status-actions-sticky { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%) translateY(0); width: 95%; max-width: 600px; background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); color: white; border-radius: 12px 12px 0 0; box-shadow: 0 -4px 20px rgba(0, 0, 0, .2); z-index: 100; padding: 1rem 1.5rem; display: flex; justify-content: space-around; align-items: stretch; gap: 1.5rem; transition: transform .4s cubic-bezier(.16, 1, .3, 1), opacity .4s ease-in-out; }
+.status-actions-sticky .btn-secondary, .status-actions-sticky .btn-primary { flex: 1; text-align: center; padding: 0.9rem 1.5rem; min-height: 50px; height: auto; border-radius: 8px; font-size: 1.1rem; font-family: inherit; font-weight: 700; border: none; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: background-color .3s ease, transform .2s ease, box-shadow .3s ease; background-color: white; color: #144272; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+.status-actions-sticky .btn-secondary:hover, .status-actions-sticky .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+.status-actions-sticky .btn-secondary i, .status-actions-sticky .btn-primary i { font-size: 1.2rem; color: #0A2647; }
+.status-badge { display: inline-block; padding: 0.3rem 0.7rem; font-size: 0.8rem; font-weight: 600; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: 1rem; }
+.status-badge.status-pending { color: #856404; background-color: #fff3cd; }
+.status-badge.status-processing { color: #0f5132; background-color: #d1e7dd; }
+.status-badge.status-completed { color: #055160; background-color: #cff4fc; }
+.status-badge.status-cancelled { color: #842029; background-color: #f8d7da; }
+.status-badge.status-handled { color: #055160; background-color: #cff4fc; }
+/* =================================================================== */
+/* 10. STYLE KARTU PANGGILAN PELAYAN (CALL CARD)
+/* =================================================================== */
 
-.success-actions {
-    margin-top: 2.5rem;
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
+
+.call-card-container .receipt-header { padding: 1rem 1.5rem; background-color: #f8f9fa; border-bottom: 1px solid var(--border-color, #eee); }
+.call-card-container .receipt-customer-info { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
+.call-card-container .receipt-customer-info strong { color: var(--primary-color); font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+.call-card-body { display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 1.5rem; gap: 1rem; }
+.call-card-notes { margin: 0; font-style: italic; color: var(--text-color); flex-grow: 1; }
+.call-card-notes.is-muted { color: var(--text-muted); }
+.call-card-body .receipt-status { margin: 0; text-align: right; white-space: nowrap; }
+
+/* --- Media Query untuk Responsifitas --- */
+@media (max-width: 768px) {
+    .modal-body-split {
+        grid-template-columns: 1fr;
+    }
+    .modal-image-container img {
+        aspect-ratio: 16 / 9;
+        margin-bottom: 1rem;
+    }
+    .page-content,
+    .success-page-container { 
+        padding: 1rem;
+    }
+    .menu-toggle { display: block; background: none; border: none; font-size: 1.5rem;cursor: pointer;color: var(--primary-color);}
 }
 
-/* Konsistensi Button Style */
-.success-actions .btn-primary, .success-actions .btn-secondary {
-    padding: 0.8rem 1.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s ease;
+
+@media (max-width: 600px) {
+    .cart-item-card-new {
+        flex-direction: column;
+        align-items: stretch;
+        min-height: auto;
+    }
+    .cart-item-image-wrapper {
+        width: 100%;
+        height: 150px;
+    }
+    .cart-item-details .item-update-form {
+        padding-top: 1rem;
+    }
+    .menu-toggle { display: block; background: none; border: none; font-size: 1.5rem;cursor: pointer;color: var(--primary-color);}
+    .receipt-customer-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .receipt-table th, .receipt-table td {
+        padding: 0.7rem 0.8rem; 
+    }
+    .success-actions .btn-primary,
+    .success-actions .btn-secondary {
+        max-width: none; 
+        width: 100%;
+    }
 }
 
-.success-actions .btn-primary {
-    background-color: var(--primary-color);
-    color: white;
+
+
+@media (max-width: 992px) {
+    .sidebar-customer {
+        transform: translateX(-260px);
+    }
+    .sidebar-customer.open {
+        transform: translateX(0);
+    }
+    .content-wrapper {
+        margin-left: 0;
+    }
+    .menu-toggle { display: block; background: none; border: none; font-size: 1.5rem;cursor: pointer;color: var(--primary-color);}
 }
-.success-actions .btn-primary:hover {
-    background-color: var(--secondary-color);
-}
-
-.success-actions .btn-secondary {
-    background-color: #e9ecef;
-    color: var(--text-color);
-}
-.success-actions .btn-secondary:hover {
-    background-color: #d8dde3;
-}
-
-/* --- Media Query untuk Responsifitas Kartu Keranjang --- */
-@media (max-width: 600px) {.cart-item-card-new {flex-direction: column; align-items: stretch; min-height: auto;} .cart-item-image-wrapper {width: 100%; height: 150px;} .cart-item-details .item-update-form {padding-top: 1rem;}}
-
-.cart-summary-sticky {position: fixed; bottom: 0; left: 0; width: 100%; background: var(--white-color); padding: 1rem 2rem; box-shadow: 0 -4px 15px rgba(0,0,0,0.08); border-top: 1px solid var(--border-color); z-index: 100;}
-.total-price {display: flex; justify-content: space-between; align-items: center; font-size: 1.2rem; margin-bottom: 1rem;}
-.btn-checkout {width: 100%; padding: 1rem; border: none; background-color: var(--accent-color); color: var(--primary-color); border-radius: 8px; font-size: 1.2rem; font-weight: bold; cursor: pointer;}
-
-.empty-cart {text-align: center; padding: 3rem; background: white; border-radius: 12px;}
-.empty-cart i {color: #ccc; margin-bottom: 1rem;}
-.success-page-container {max-width: 800px; margin: auto; padding: 2rem;}
-.success-card {background: white; padding: 2.5rem; border-radius: 12px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1);}
-.receipt-details {border: 1px solid #eee; background-color: #f8f9fa; border-radius: 8px; margin-top: 1.5rem; padding: 1.5rem; text-align: left;}
-.success-actions {margin-top: 2rem; display: flex; justify-content: center; gap: 1rem;}
-
-/* --- 6. OVERLAY & RESPONSIVE --- */
-.sidebar-overlay {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s;}
-.sidebar-overlay.active {opacity: 1; visibility: visible;}
-
-@media (max-width: 992px) {.sidebar-customer {transform: translateX(-260px);} .sidebar-customer.open {transform: translateX(0);} .content-wrapper {margin-left: 0;} .menu-toggle {display: block;}}
-@media (max-width: 768px) {.modal-body-split {grid-template-columns: 1fr;} .modal-image-container img {aspect-ratio: 16 / 9; margin-bottom: 1rem;} .page-content, .success-page-container {padding: 1rem;}}
-
