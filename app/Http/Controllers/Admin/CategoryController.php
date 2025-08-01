@@ -4,23 +4,33 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Models\Outlet; 
+use App\Models\Outlet;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function index(Request $request)
+     public function index(Request $request)
     {
+        // Ambil semua outlet untuk filter dropdown
         $outlets = Outlet::all();
         $selectedOutletId = $request->input('outlet_id');
+        $searchTerm = $request->input('search');
+
         $query = Category::query();
+
         if ($selectedOutletId) {
             $query->where('outlet_id', $selectedOutletId);
         }
 
+        if ($searchTerm) {
+            $query->where('name', 'like', '%' . $searchTerm . '%');
+        }
+
         $categories = $query->with('outlet')->latest()->paginate(10);
-        return view('admin.categories.index', compact('categories', 'outlets', 'selectedOutletId'));
-}
+
+        return view('admin.categories.index', compact('categories', 'outlets', 'selectedOutletId', 'searchTerm'));
+    }
+
 
     public function create()
     {

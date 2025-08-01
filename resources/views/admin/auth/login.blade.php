@@ -42,7 +42,7 @@
         </div>
         <div class="auth-footer" style="position: absolute; bottom: 20px; text-align: center;">
             <a href="{{ route('customer.login.form') }}" style="color: #888; font-size: 14px; text-decoration: none;">
-                Login sebagai Customer
+                Login sebagai Pelanggan
             </a>
         </div>
     </div>

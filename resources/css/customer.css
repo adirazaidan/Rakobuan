@@ -8,6 +8,8 @@ body, html {font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI
 .form-control {width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; font-family: inherit; font-size: 1rem; transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;}
 .form-control:focus {border-color: var(--primary-color); outline: 0; box-shadow: 0 0 0 0.2rem rgba(10, 38, 71, 0.25);}
 
+
+
 /* --- 1. HALAMAN LOGIN --- */
 .auth-page { display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Poppins', sans-serif; }
 .auth-card { background-color: var(--white-color); padding: 2.5rem; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.1); width: 100%; max-width: 420px; text-align: center; }
@@ -16,7 +18,7 @@ body, html {font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI
 .auth-subtitle { color: var(--text-muted); font-size: 1rem; }
 .auth-form .form-group { margin-bottom: 1.5rem; text-align: left; }
 .auth-form label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-color); }
-.btn-submit { width: 100%; padding: 1rem; border: none; background-color: var(--primary-color); color: white; border-radius: 8px; font-size: 1.1rem; font-weight: 500; cursor: pointer; transition: background-color 0.3s; }
+.btn-submit { width: 100%; padding: 1rem; border: none; background-color: var(--primary-color); color: white; border-radius: 8px; font-size: 1.1rem; font-weight: 500; cursor: pointer; transition: background-color 0.3s; font-family: Poppins;}
 .btn-submit:hover { background-color: var(--secondary-color); }
 .alert { padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: left; border: 1px solid transparent; }
 .alert-danger { background-color: #f8d7da; color: #721c24; border-color: #f5c2c7;}
@@ -24,6 +26,9 @@ body, html {font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI
 .no-tables-available i {color: var(--accent-color); margin-bottom: 1rem;}
 .no-tables-available .message-title {font-size: 1.1rem; font-weight: 600; color: var(--text-color); margin: 0 0 0.5rem 0;}
 .no-tables-available .message-subtitle {font-size: 0.9rem; color: var(--text-muted); margin: 0;}
+.select2-container .select2-selection--single {height:44px !important;padding:0.375rem 1rem !important;border:1px solid var(--border-color) !important;border-radius:8px !important;line-height:2.5 !important;display:flex !important;align-items:center !important;}
+.select2-container--default .select2-selection--single .select2-selection__arrow {height:42px !important;right:1px !important;display:flex !important;align-items:center !important;}
+.select2-container--default .select2-selection--single .select2-selection__rendered {color:var(--text-color) !important;line-height:42px !important;padding-left:15px !important;}
 
 /* --- 2. LAYOUT UTAMA (SETELAH LOGIN) --- */
 .customer-app-container { display: flex; }
@@ -72,12 +77,12 @@ select.custom-select:focus {border-color: var(--primary-color); outline: 0; box-
 .custom-select-wrapper::after {content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; top: 50%; right: 20px; transform: translateY(-50%); pointer-events: none; color: var(--text-muted); transition: transform 0.2s ease-in-out;}
 .custom-select-wrapper select:focus + ::after {transform: translateY(-50%) rotate(180deg);}
 .menu-grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;}
-.product-card {background: var(--white-color); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; position: relative; z-index: 1; transition: z-index 0s 0.3s;}
+.product-card {overflow: hidden; background: var(--white-color); border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.10); display: flex; flex-direction: column; position: relative; z-index: 1; transition: z-index 0s 0.3s;}
 .product-card.is-active-feedback {z-index: 10; transition: z-index 0s;}
 .product-image {width: 100%; height: 210px; object-fit: cover;}
-.bestseller-badge {position: absolute; top: 1rem; left: 1rem; background: var(--accent-color); color: var(--primary-color);}
-.discount-badge {position: absolute; top: 1rem; right: 1rem; background: var(--danger-color); color: white;}
-.bestseller-badge, .discount-badge {padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; z-index: 2;}
+.bestseller-badge { position: absolute; top: 1rem; left: 1rem; background: var(--accent-color); color: var(--primary-color); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+.discount-badge { position: absolute; top: 1rem; right: 1rem; background: var(--danger-color); color: white; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+.bestseller-badge, .discount-badge { padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600; z-index: 2; }
 .product-info {padding: 1rem; flex-grow: 1; display: flex; flex-direction: column; position: relative;}
 .product-name {margin: 0 0 0.5rem 0; font-size: 1.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
 .product-description {font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; min-height: 44px;}
@@ -109,8 +114,8 @@ select.custom-select:focus {border-color: var(--primary-color); outline: 0; box-
 .out-of-stock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); display: flex; justify-content: center; align-items: center; z-index: 1; }
 .out-of-stock-text { background: var(--danger-color); color: white; padding: 0.5rem 1rem; border-radius: 6px; font-weight: bold; }
 .product-image-container {position: relative; cursor: zoom-in; overflow: hidden;}
-.inline-stock-feedback { position: absolute; top: 100%; right: 0; margin-top: 4px; color: #dc3545; font-size: 0.8rem; font-weight: 500; white-space: nowrap; opacity: 0; transform: translateY(-5px); visibility: hidden; pointer-events: none; transition: all 0.2s ease-in-out; z-index: 5; }
-.inline-stock-feedback.show {opacity: 1; transform: translateY(0); visibility: visible;}
+.inline-stock-feedback { position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%); background-color: var(--danger-color); color: white; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500; white-space: nowrap; z-index: 100; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease; --arrow-size: 6px; }
+.inline-stock-feedback.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-5px); }
 @keyframes shake {10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}}
 .shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97) both;}
 .btn-add-cart-initial {width:44px;height:44px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;background-color:var(--primary-color);color:var(--white-color);border:none;cursor:pointer;transition:background-color .2s ease,transform .2s ease;font-size:1.1rem;}
@@ -152,18 +157,18 @@ select.custom-select:focus {border-color: var(--primary-color); outline: 0; box-
 #notesModal #notesModalTextArea:focus {border-color: var(--primary-color); outline: 0; box-shadow: 0 0 0 0.2rem rgba(10, 38, 71, 0.25);}
 #notesModal .btn-primary {background-color: var(--primary-color); border-radius: 8px; padding: 0.75rem; font-size: 1rem; font-weight: 600; transition: background-color 0.2s ease; border: none; color: var(--white-color); width: 100%;}
 #notesModal .btn-primary:hover {background-color: var(--secondary-color);}
-#callWaiterModal.modal-overlay { display: none; justify-content: center; align-items: center; padding: 1rem; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1050; }
-#callWaiterModal .modal-content { max-width: 450px; width: 90%; border-radius: 12px; background: var(--white-color); position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.2); overflow: hidden; padding: 0; }
-#callWaiterModal .modal-close { position: absolute; top: 1rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 1; color: var(--text-color); }
-#callWaiterModal h3 { margin: 0; font-size: 1.2rem; color: var(--text-color); padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); }
-#callWaiterModal p { padding: 0 1.5rem 1rem 1.5rem; margin: 0; color: var(--text-color); font-size: 0.95rem; }
-#callWaiterModal .modal-form { padding: 0 1.5rem 1.5rem 1.5rem; }
-#callWaiterModal .form-group { margin-bottom: 1rem; }
-#callWaiterModal label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-color); }
-#callWaiterModal #call_notes { min-height: 100px; border-radius: 8px; border: 1px solid var(--border-color); transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out; width: 100%; padding: 0.75rem 1rem; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 1rem; resize: vertical; }
-#callWaiterModal #call_notes:focus { border-color: var(--primary-color); outline: 0; box-shadow: 0 0 0 0.2rem rgba(10, 38, 71, 0.25); }
-#callWaiterModal .btn-submit { background-color: var(--primary-color); border-radius: 8px; padding: 0.75rem; font-size: 1rem; font-weight: 600; transition: background-color 0.2s ease; border: none; color: var(--white-color); width: 100%; cursor: pointer; }
-#callWaiterModal .btn-submit:hover { background-color: var(--secondary-color); }
+#callWaiterModal.modal-overlay {display: none; justify-content: center; align-items: center; padding: 1rem; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1050;}
+#callWaiterModal .modal-content {max-width: 450px; width: 90%; border-radius: 12px; background: var(--white-color); position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.2); overflow: hidden; padding: 0;}
+#callWaiterModal .modal-close {position: absolute; top: 1rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; padding: 0; line-height: 1; color: var(--text-color);}
+#callWaiterModal h3 {margin: 0; font-size: 1.2rem; color: var(--text-color); padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color);}
+#callWaiterModal p {padding: 0 1.5rem 1rem 1.5rem; margin: 0; color: var(--text-color); font-size: 0.95rem;}
+#callWaiterModal .modal-form {padding: 0 1.5rem 1.5rem 1.5rem;}
+#callWaiterModal .form-group {margin-bottom: 1rem;}
+#callWaiterModal label {display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-color);}
+#callWaiterModal #call_notes {min-height: 100px; border-radius: 8px; border: 1px solid var(--border-color); transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out; width: 100%; padding: 0.75rem 1rem; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 1rem; resize: vertical;}
+#callWaiterModal #call_notes:focus {border-color: var(--primary-color); outline: 0; box-shadow: 0 0 0 0.2rem rgba(10, 38, 71, 0.25);}
+#callWaiterModal .btn-submit {background-color: var(--primary-color); border-radius: 8px; padding: 0.75rem; font-size: 1rem; font-weight: 600; transition: background-color 0.2s ease; border: none; color: var(--white-color); width: 100%; cursor: pointer;}
+#callWaiterModal .btn-submit:hover {background-color: var(--secondary-color);}
 .zoom-btn {position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.4); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; z-index: 6; display: flex; justify-content: center; align-items: center; transition: background-color 0.2s;}
 .zoom-btn:hover {background: rgba(0,0,0,0.7);}
 .lightbox-overlay {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: none; justify-content: center; align-items: center; cursor: pointer;}
@@ -187,13 +192,31 @@ select.custom-select:focus {border-color: var(--primary-color); outline: 0; box-
 .modal-badge {position: absolute; z-index: 5; font-size: 0.8rem !important; padding: 0.3rem 0.6rem !important; border-radius: 6px; font-weight: 600;}
 .modal-badge.bestseller-badge {top: 1rem; left: 1rem; color: var(--primary-color); background-color: var(--accent-color);}
 .modal-badge.discount-badge {top: 1rem; right: 1rem; color: white; background-color: var(--danger-color);}
+.btn-read-more {background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.9rem; padding: 0; margin-top: -0.5rem; margin-bottom: 0.5rem; text-align: left; display: block; width: fit-content; font-family: 'Poppins', sans-serif;}
+.btn-read-more:hover {text-decoration: underline;}
+#descriptionModal .modal-content {max-width: 500px; width: 90%; border-radius: 12px; background: var(--white-color); position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.2); overflow: hidden; padding: 0;}
+#descriptionModal .modal-header {border-bottom: 1px solid var(--border-color); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center;}
+#descriptionModal .modal-header h4 {margin: 0; font-size: 1.2rem; color: var(--text-color);}
+#descriptionModal .modal-body {padding: 1.2rem; line-height: 1.6; color: var(--text-color); max-height: 70vh; overflow-y: auto;}
 
+/* Style untuk modal pembatalan pesanan yang impresif */
+#cancelOrderModal.modal-overlay {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 9999; animation: fadeIn 0.3s ease-out;}
+#cancelOrderModal .modal-content {background: var(--white-color, #fff); border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); width: 90%; max-width: 450px; transform: translateY(-20px); animation: slideIn 0.3s ease-out forwards;}
+#cancelOrderModal .modal-header {padding: 1.5rem; border-bottom: 1px solid var(--border-color, #ddd); display: flex; justify-content: space-between; align-items: center;}
+#cancelOrderModal .modal-header h4 {margin: 0; font-size: 1.2rem; color: var(--text-color);}
+#cancelOrderModal .modal-close {background: none; border: none; font-size: 2rem; color: var(--text-muted, #999); cursor: pointer; line-height: 1; transition: color 0.2s ease-in-out;}
+#cancelOrderModal .modal-close:hover {color: var(--danger-color, #dc3545);}
+#cancelOrderModal .modal-body {padding: 1.2rem; text-align: start;}
+#cancelOrderModal .modal-body p {margin-bottom: 0.85rem; font-size: 1rem; line-height: 1.5; color: var(--text-color, #333);}
+#cancelOrderModal .modal-body strong {font-size: 1rem; color: var(--primary-color, #144272);}
+@keyframes fadeIn {from {opacity: 0;} to {opacity: 1;}}
+@keyframes slideIn {from {transform: translateY(-30px); opacity: 0;} to {transform: translateY(0); opacity: 1;}}
 /* --- 5. HALAMAN KERANJANG & SUKSES --- */
-.cart-page-container {padding: 0;}
-.cart-header {display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding: 0rem 2rem 0 2rem;}
+.cart-page-container {width: 100%; box-sizing: border-box; padding-bottom: 100px;}
+.cart-header {display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
 .back-button {font-size: 1.5rem; color: var(--text-color); text-decoration: none;}
 .cart-header h1 {margin: 0; font-size: 1.2rem;}
-.customer-details-box {background: #e9ecef; padding: 1rem; border-radius: 8px; margin: 0 2rem 1.5rem 2rem; text-align: center; font-size: 1rem;}
+.customer-details-box {background: #e9ecef; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; text-align: center; font-size: 1rem;}
 .cart-items-list {padding: 0 ;}
 .cart-item-card-new {display: flex; gap: 1rem; background: var(--white-color); padding: 1rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 1rem; min-height: 140px; align-items: stretch;}
 .cart-item-image-wrapper {position: relative; width: 120px; flex-shrink: 0;}
@@ -223,13 +246,12 @@ select.custom-select:focus {border-color: var(--primary-color); outline: 0; box-
 /* =================================================================== */
 /* 8. STYLE HALAMAN STATUS PESANAN */
 /* =================================================================== */
-
-.order-status-page-container { width: 100%; padding: 2rem 1.5rem; box-sizing: border-box; padding-bottom: 100px; }
+.order-status-page-container { width: 100%; box-sizing: border-box; padding-bottom: 100px; }
 .status-header { text-align: center; margin-bottom: 2.5rem; }
 .status-header h1 { margin-bottom: 0.5rem; color: var(--primary-color); }
 .status-header p { font-size: 1.1rem; color: var(--text-muted); }
 .order-list { display: flex; flex-direction: column; gap: 1.5rem; max-width: 750px; margin: 0 auto; }
-.receipt-header { padding: 1rem 1.5rem; background-color: #f8f9fa; border-bottom: 1px solid var(--border-color, #eee); }
+.receipt-header { position: relative; padding: 1rem 1.5rem; padding-right: 3rem; background-color: #f8f9fa; border-bottom: 1px solid var(--border-color, #eee); }
 .receipt-header h3 { text-align: center; margin: 0 0 1rem 0; font-size: 1.1rem; font-weight: 600; color: var(--secondary-color); }
 .receipt-customer-info { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
 .receipt-status { text-align: center; margin-top: 1rem; }
@@ -243,7 +265,6 @@ select.custom-select:focus {border-color: var(--primary-color); outline: 0; box-
 .receipt-table tfoot { border-top: 2px solid var(--border-color, #ddd); font-weight: bold; font-size: 1.15rem; }
 .receipt-table .text-center { text-align: center; }
 .receipt-table .text-right { text-align: right; }
-.empty-status { text-align: center; padding: 3rem; background: var(--white-color); border: 1px dashed var(--border-color); border-radius: 12px; }
 .status-card { width: 100%; box-sizing: border-box; background-color: var(--white-color); border-radius: 4px; box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08); border: 1px solid var(--border-color, #eee); overflow: hidden; }
 .status-card .receipt-details { padding: 0.4em; border: none; background-color: transparent; box-shadow: none; margin-top: 0; }
 .status-actions-sticky { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%) translateY(0); width: 95%; max-width: 600px; background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); color: white; border-radius: 12px 12px 0 0; box-shadow: 0 -4px 20px rgba(0, 0, 0, .2); z-index: 100; padding: 1rem 1.5rem; display: flex; justify-content: space-around; align-items: stretch; gap: 1.5rem; transition: transform .4s cubic-bezier(.16, 1, .3, 1), opacity .4s ease-in-out; }
@@ -256,11 +277,12 @@ select.custom-select:focus {border-color: var(--primary-color); outline: 0; box-
 .status-badge.status-completed { color: #055160; background-color: #cff4fc; }
 .status-badge.status-cancelled { color: #842029; background-color: #f8d7da; }
 .status-badge.status-handled { color: #055160; background-color: #cff4fc; }
+.btn-cancel-top-right { position: absolute; top: 1rem; right: 1.5rem; background-color: transparent; border: none; color: var(--danger-color, #dc3545); font-size: 1.25rem; padding: 0; cursor: pointer; transition: color 0.3s ease; }
+.btn-cancel-top-right:hover { color: #a71d2a; }
+
 /* =================================================================== */
 /* 10. STYLE KARTU PANGGILAN PELAYAN (CALL CARD)
 /* =================================================================== */
-
-
 .call-card-container .receipt-header { padding: 1rem 1.5rem; background-color: #f8f9fa; border-bottom: 1px solid var(--border-color, #eee); }
 .call-card-container .receipt-customer-info { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }
 .call-card-container .receipt-customer-info strong { color: var(--primary-color); font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
@@ -268,6 +290,29 @@ select.custom-select:focus {border-color: var(--primary-color); outline: 0; box-
 .call-card-notes { margin: 0; font-style: italic; color: var(--text-color); flex-grow: 1; }
 .call-card-notes.is-muted { color: var(--text-muted); }
 .call-card-body .receipt-status { margin: 0; text-align: right; white-space: nowrap; }
+
+
+/* =================================================================== */
+/* STYLE HALAMAN KERANJANG KOSONG (IMPRESIF)
+/* =================================================================== */
+.empty-cart { text-align: center; padding: 3rem 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; color: #495057; transition: all 0.3s ease; }
+.empty-cart:hover { background-color: #f8f9fa; }
+.empty-cart i.fas.fa-shopping-cart { font-size: 5rem; color: #e9ecef; margin-bottom: 1.5rem; transition: color 0.3s ease, transform 0.3s ease; }
+.empty-cart:hover i.fas.fa-shopping-cart { color: #ced4da; transform: scale(1.1); }
+.empty-cart p { font-size: 1.25rem; font-weight: 500; margin-bottom: 2rem; color: var(--secondary-color); }
+.empty-cart a.btn-primary { display: inline-block; padding: 0.75rem 2rem; border-radius: 50px; background-color: var(--primary-color); color: #fff; font-weight: 600; text-decoration: none; transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease; }
+.empty-cart a.btn-primary:hover { background-color: var(--accent-color); transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+
+/* =================================================================== */
+/* STYLE HALAMAN STATUS KOSONG (IMPRESIF)
+/* =================================================================== */
+.empty-status { text-align: center; padding: 3rem 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; color: #495057; border-radius: 12px; background-color: #fff; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; }
+.empty-status:hover { background-color: #f8f9fa; }
+.empty-status i.fas.fa-receipt { font-size: 5rem; color: #e9ecef; margin-bottom: 1.5rem; transition: color 0.3s ease, transform 0.3s ease; }
+.empty-status:hover i.fas.fa-receipt { color: #ced4da; transform: scale(1.1); }
+.empty-status p { font-size: 1.25rem; font-weight: 500; margin-bottom: 2rem; color: var(--secondary-color); }
+.empty-status a.btn-primary { display: inline-block; padding: 0.75rem 2rem; border-radius: 50px; background-color: var(--primary-color); color: #fff; font-weight: 600; text-decoration: none; transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease; }
+.empty-status a.btn-primary:hover { background-color: var(--accent-color); transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
 
 /* --- Media Query untuk Responsifitas --- */
 @media (max-width: 768px) {

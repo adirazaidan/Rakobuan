@@ -14,6 +14,7 @@ class DiscountController extends Controller
     {
         $outlets = Outlet::all();
         $selectedOutletId = $request->input('outlet_id');
+        $searchTerm = $request->input('search');
 
         $query = Discount::query();
 
@@ -22,15 +23,19 @@ class DiscountController extends Controller
                 $q->where('outlet_id', $selectedOutletId);
             });
         }
+        
+        if ($searchTerm) {
+            $query->where('name', 'like', '%' . $searchTerm . '%');
+        }
 
         $discounts = $query->with('product')->latest()->paginate(10);
 
-        return view('admin.discounts.index', compact('discounts', 'outlets', 'selectedOutletId'));
+        return view('admin.discounts.index', compact('discounts', 'outlets', 'selectedOutletId', 'searchTerm'));
     }
 
     public function create()
     {
-        $products = Product::where('is_available', true)->get();
+        $products = Product::where('is_available', true)->get(); // Masih diperlukan jika ada fallback atau untuk debugging
         return view('admin.discounts.create', compact('products'));
     }
 
@@ -38,7 +43,7 @@ class DiscountController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'product_id' => 'required|exists:products,id',
+            'product_id' => 'required|exists:products,id', // product_id sekarang dari hidden input
             'percentage' => 'required|numeric|min:0|max:100',
         ]);
 
@@ -50,7 +55,7 @@ class DiscountController extends Controller
 
     public function edit(Discount $discount)
     {
-        $products = Product::where('is_available', true)->get();
+        $products = Product::where('is_available', true)->get(); // Masih diperlukan jika ada fallback atau untuk debugging
         return view('admin.discounts.edit', compact('discount', 'products'));
     }
 
@@ -58,7 +63,7 @@ class DiscountController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'product_id' => 'required|exists:products,id',
+            'product_id' => 'required|exists:products,id', // product_id sekarang dari hidden input
             'percentage' => 'required|numeric|min:0|max:100',
         ]);
 
@@ -72,5 +77,23 @@ class DiscountController extends Controller
     {
         $discount->delete();
         return redirect()->route('admin.discounts.index')->with('success', 'Diskon berhasil dihapus.');
+    }
+
+    /**
+     * Handle AJAX request to search for products.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function searchProducts(Request $request)
+    {
+        $query = $request->input('query');
+        $products = Product::where('name', 'like', '%' . $query . '%')
+                            ->where('is_available', true) // Hanya tampilkan produk yang tersedia
+                            ->select('id', 'name') // Hanya ambil id dan nama
+                            ->limit(10) // Batasi jumlah hasil
+                            ->get();
+
+        return response()->json($products);
     }
 }

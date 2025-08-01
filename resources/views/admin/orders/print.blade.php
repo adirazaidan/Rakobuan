@@ -10,13 +10,13 @@
             color: #000;
             margin: 0;
             padding: 0;
-            font-size: 12px; /* Ukuran font standar untuk struk */
+            font-size: 12px;
         }
         .receipt {
-            width: 300px; /* Lebar struk, umumnya 80mm atau sekitar 300px */
+            width: 300px; /* Lebar umum 80mm */
             margin: 0 auto;
-            padding: 15px; /* Sedikit padding dari tepi */
-            box-sizing: border-box; /* Padding termasuk dalam lebar total */
+            padding: 15px;
+            box-sizing: border-box;
         }
         .header {
             text-align: center;
@@ -42,14 +42,14 @@
             margin: 2px 0;
             font-size: 12px;
             display: flex;
-            justify-content: space-between; /* Untuk meratakan teks kunci dan nilai */
+            justify-content: space-between;
         }
         .details p strong {
-            flex-basis: 45%; /* Menyesuaikan lebar untuk label */
+            flex-basis: 45%;
             text-align: left;
         }
         .details p span {
-            flex-basis: 55%; /* Menyesuaikan lebar untuk nilai */
+            flex-basis: 55%;
             text-align: right;
         }
         .items {
@@ -63,16 +63,16 @@
         }
         th, td {
             padding: 5px 0;
-            vertical-align: top; /* Agar catatan tidak terlalu jauh dari item */
+            vertical-align: top;
         }
         thead th {
             border-bottom: 1px dashed #000;
             padding-bottom: 8px;
         }
         tbody tr:not(:last-child) td {
-            padding-bottom: 8px; /* Jarak antar item */
+            padding-bottom: 8px;
         }
-        .item-col { text-align: left; width: 50%; } /* Atur lebar kolom */
+        .item-col { text-align: left; width: 50%; }
         .qty-col { text-align: center; width: 15%; }
         .price-col { text-align: right; width: 35%; }
         .notes {
@@ -80,17 +80,14 @@
             font-style: italic;
             color: #555;
             padding-top: 2px;
-            padding-left: 10px; /* Indentasi catatan */
+            padding-left: 10px;
             text-align: left;
         }
-        .total-section {
+        .total-item-row td,
+        .total-row td {
             border-top: 1px dashed #000;
-            padding-top: 10px;
-            margin-top: 10px;
-            font-size: 14px;
+            padding-top: 8px;
             font-weight: bold;
-            display: flex;
-            justify-content: space-between;
         }
         .footer {
             text-align: center;
@@ -102,14 +99,20 @@
 
         /* Print specific styles */
         @media print {
+            /* Aturan ini sangat penting untuk kertas resi kecil */
+            @page {
+                size: 80mm auto; /* Lebar 80mm, tinggi otomatis */
+                margin: 0;
+            }
             body {
+                width: 80mm;
                 margin: 0;
                 padding: 0;
             }
             .receipt {
                 width: 100%;
                 margin: 0;
-                padding: 5mm; /* Sesuaikan margin cetak */
+                padding: 5mm; /* Sesuaikan padding cetak jika perlu */
                 box-shadow: none;
             }
             .no-print {
@@ -118,11 +121,11 @@
         }
     </style>
 </head>
-<body onload="window.print();">
+<body>
     <div class="receipt">
         <div class="header">
             <h1>Warung Tekko Ramenten10 Lelabuan</h1>
-            <p>Jalan S. Parman No. 2, Benua Melayu Darat,Pontianak</p>
+            <p>Jalan S. Parman No. 2, Benua Melayu Darat, Pontianak</p>
             <p>Telp: 0811-826-008</p>
             <p>===============================</p>
             <p>STRUK PESANAN</p>
@@ -159,9 +162,13 @@
                     @endforeach
                 </tbody>
                 <tfoot>
-                    <tr>
-                        <td colspan="2" class="item-col total">TOTAL</td>
-                        <td class="price-col total">Rp{{ number_format($order->total_price, 0, ',', '.') }}</td>
+                    <tr class="total-item-row">
+                        <td colspan="2" class="item-col">Total Item</td>
+                        <td class="qty-col">{{ $order->orderItems->sum('quantity') }}</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="2" class="item-col">TOTAL</td>
+                        <td class="price-col">Rp{{ number_format($order->total_price, 0, ',', '.') }}</td>
                     </tr>
                 </tfoot>
             </table>

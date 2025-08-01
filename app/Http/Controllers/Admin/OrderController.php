@@ -10,12 +10,27 @@ use App\Events\OrderStatusUpdated;
 class OrderController extends Controller
 {
     // Menampilkan pesanan yang sedang berjalan (pending & processing)
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::whereIn('status', ['pending', 'processing'])
-                        ->with('orderItems.product') 
-                        ->latest() 
-                        ->get();
+        $query = Order::with('orderItems.product');
+
+        if ($search = $request->input('search')) {
+            $query->where('order_number', 'LIKE', '%' . $search . '%');
+        }
+        $status = $request->input('status', 'current');
+        if ($status === 'pending' || $status === 'processing' || $status === 'completed' || $status === 'cancelled') {
+            $query->where('status', $status);
+        } elseif ($status === 'current') {
+            $query->whereIn('status', ['pending', 'processing']);
+        }
+        if ($startDate = $request->input('start_date')) {
+            $query->whereDate('created_at', '>=', $startDate);
+        }
+        if ($endDate = $request->input('end_date')) {
+            $query->whereDate('created_at', '<=', $endDate);
+        }
+
+        $orders = $query->latest()->paginate(10);
 
         return view('admin.orders.index', compact('orders'));
     }
@@ -29,26 +44,43 @@ class OrderController extends Controller
 
         OrderStatusUpdated::dispatch($order);
 
-        return redirect()->route('admin.orders.index')->with('success', 'Status pesanan berhasil diperbarui.');
+        return redirect()->route('admin.orders.index', $request->query())->with('success', 'Status pesanan berhasil diperbarui.');
     }
 
     // Menghapus pesanan
-    public function destroy(Order $order)
+    public function destroy(Order $order, Request $request)
     {
         $order->delete();
 
-        return redirect()->back()->with('success', 'Pesanan berhasil dihapus.');
+        return redirect()->route('admin.orders.index', $request->query())->with('success', 'Pesanan berhasil dihapus.');
     }
 
-    public function history()
+    public function history(Request $request)
     {
-        $orders = Order::whereIn('status', ['completed', 'cancelled'])
-                        ->with('orderItems.product')
-                        ->latest()
-                        ->get();
+        $query = Order::with('orderItems.product');
+
+        if ($search = $request->input('search')) {
+            $query->where('order_number', 'LIKE', '%' . $search . '%');
+        }
+
+        $status = $request->input('status');
+        if ($status === 'completed' || $status === 'cancelled') {
+            $query->where('status', $status);
+        } elseif ($status === 'all' || is_null($status)) {
+            $query->whereIn('status', ['completed', 'cancelled']);
+        }
+        
+        if ($startDate = $request->input('start_date')) {
+            $query->whereDate('updated_at', '>=', $startDate);
+        }
+        if ($endDate = $request->input('end_date')) {
+            $query->whereDate('updated_at', '<=', $endDate);
+        }
+        $orders = $query->latest()->paginate(10);
 
         return view('admin.orders.history', compact('orders'));
     }
+
     public function print(Order $order)
     {
         return view('admin.orders.print', compact('order'));

@@ -46,11 +46,62 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    const descriptionModal = document.getElementById('descriptionModal');
+    const descriptionModalTitle = document.getElementById('descriptionModalTitle');
+    const descriptionModalText = document.getElementById('descriptionModalText');
+    const closeDescriptionModalBtn = document.getElementById('closeDescriptionModalBtn');
+
+    const openDescriptionModal = (productName, fullDescription) => {
+        if (!descriptionModal) return;
+        descriptionModalTitle.textContent = productName;
+        descriptionModalText.textContent = fullDescription;
+        descriptionModal.style.display = 'flex';
+    };
+
+    const closeDescriptionModal = () => {
+        if (descriptionModal) descriptionModal.style.display = 'none';
+    };
+
+    if (closeDescriptionModalBtn) {
+        closeDescriptionModalBtn.addEventListener('click', closeDescriptionModal);
+    }
+    if (descriptionModal) {
+        descriptionModal.addEventListener('click', (e) => {
+            if (e.target === descriptionModal) {
+                closeDescriptionModal();
+            }
+        });
+    }
+
     /**
      * ==========================================================
      * FUNGSI-FUNGSI PEMBANTU (HELPERS) GLOBAL
      * ==========================================================
      */
+
+    const cancelOrderModal = document.getElementById('cancelOrderModal');
+    const modalOrderNumber = document.getElementById('modalOrderNumber');
+    document.querySelectorAll('.btn-cancel-top-right').forEach(button => {
+        button.addEventListener('click', function() {
+            const orderNumber = this.dataset.orderNumber;
+            modalOrderNumber.textContent = orderNumber;
+            cancelOrderModal.style.display = 'flex';
+        });
+    });
+
+    document.querySelectorAll('.modal-close').forEach(button => {
+        button.addEventListener('click', function() {
+            cancelOrderModal.style.display = 'none';
+        });
+    });
+    if (cancelOrderModal) {
+        cancelOrderModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+    };
+
     const updateMiniCartBar = (count, total) => {
         const miniCartBar = document.getElementById('mini-cart-bar');
         const countElement = document.getElementById('mini-cart-item-count');
@@ -82,12 +133,16 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     const handleCartAction = (productId, quantity, notes = null, isAdding = false) => {
+        const finalNotes = (notes === null || notes.trim() === '') ? '-' : notes;
+
         const formData = new FormData();
         formData.append('product_id', productId);
         formData.append('quantity', quantity);
-        if (notes !== null) {
-            formData.append('notes', notes);
+        
+        if (finalNotes !== null) {
+            formData.append('notes', finalNotes);
         }
+        
         let url = `/cart/update/${productId}`;
         let method = 'POST';
         formData.append('_method', 'PATCH');
@@ -176,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             const notesTextOnCartPage = productCard.querySelector('.item-notes-text');
-            if (notesTextOnCartPage) notesTextOnCartPage.textContent = notes || 'Tidak Ada Catatan';
+            if (notesTextOnCartPage) notesTextOnCartPage.textContent = notes || '-';
             closeNotes();
         } else {
             alert('Gagal menyimpan catatan.');
@@ -192,7 +247,6 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     const menuGrid = document.getElementById('menu-list');
     if (menuGrid) {
-
         const updateProductCardUI = (productId, newQuantity) => {
             const productCard = document.getElementById(`product-card-${productId}`);
             if (!productCard) return;
@@ -200,15 +254,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const notesButton = productCard.querySelector('.btn-edit-notes');
             const productData = productCard.dataset;
             const maxStock = parseInt(productData.stock);
-
             if (newQuantity > 0) {
                 const isMax = newQuantity >= maxStock;
-                actionWrapper.innerHTML = `
-                    <div class="quantity-selector-inline" data-product-id="${productId}">
-                        <button class="btn-quantity-inline btn-decrease-inline">-</button>
-                        <span class="quantity-inline-display">${newQuantity}</span>
-                        <button class="btn-quantity-inline btn-increase-inline" ${isMax ? 'disabled' : ''}>+</button>
-                    </div>`;
+                actionWrapper.innerHTML = `<div class="quantity-selector-inline" data-product-id="${productId}"><button class="btn-quantity-inline btn-decrease-inline">-</button><span class="quantity-inline-display">${newQuantity}</span><button class="btn-quantity-inline btn-increase-inline" ${isMax ? 'disabled' : ''}>+</button></div>`;
                 if (notesButton) notesButton.style.display = 'block';
             } else {
                 const isGenerallyAvailable = productData.isAvailable === 'true';
@@ -220,105 +268,144 @@ document.addEventListener('DOMContentLoaded', function() {
 
         menuGrid.addEventListener('click', async (e) => {
             const target = e.target;
+            const readMoreBtn = target.closest('.btn-read-more');
             const initialAddBtn = target.closest('.btn-add-cart-initial');
             const increaseBtn = target.closest('.btn-increase-inline');
             const decreaseBtn = target.closest('.btn-decrease-inline');
             const notesBtn = target.closest('.btn-edit-notes');
             const zoomBtn = target.closest('.card-zoom-btn');
 
-            if (initialAddBtn) {
+            if (readMoreBtn) {
+                const productId = readMoreBtn.dataset.productId;
+                const productCard = document.getElementById(`product-card-${productId}`);
+                if (productCard) {
+                    const productName = productCard.querySelector('.product-name').textContent;
+                    const fullDescription = productCard.querySelector('.product-description').dataset.fullDescription;
+                    openDescriptionModal(productName, fullDescription);
+                }
+            } else if (initialAddBtn) {
+                initialAddBtn.disabled = true;
+                initialAddBtn.textContent = '...'; 
+                
                 const productId = initialAddBtn.dataset.productId;
                 const productCard = initialAddBtn.closest('.product-card');
                 const maxStock = parseInt(productCard.dataset.stock);
-                updateProductCardUI(productId, 1);
-                if (maxStock <= 1) {
-                    showStockFeedback(productCard, `Stok tersisa ${maxStock}`);
-                }
+                
                 try {
                     const response = await handleCartAction(productId, 1, '', true);
                     if (response.success) {
+                        updateProductCardUI(productId, 1); 
                         updateMiniCartBar(response.cartCount, response.grandTotal);
+                        if (maxStock <= 1) { 
+                            showStockFeedback(productCard, `Stok tersisa ${maxStock}`);
+                        }
                     } else {
                         alert(response.message || 'Gagal menambahkan item.');
-                        updateProductCardUI(productId, 0);
+                        updateProductCardUI(productId, 0); 
                     }
                 } catch (error) {
                     console.error("Cart action failed:", error);
                     alert('Terjadi kesalahan jaringan. Gagal menambahkan item.');
-                    updateProductCardUI(productId, 0);
+                    updateProductCardUI(productId, 0); 
+                } finally {
+                    initialAddBtn.disabled = false;
+                    initialAddBtn.innerHTML = '<i class="fas fa-shopping-cart"></i>'; 
                 }
-            }
-
-            if (increaseBtn) {
+            } else if (increaseBtn) {
+                increaseBtn.disabled = true; 
+                
                 const productCard = increaseBtn.closest('.product-card');
                 const maxStock = parseInt(productCard.dataset.stock);
                 const selector = increaseBtn.closest('.quantity-selector-inline');
                 const display = selector.querySelector('.quantity-inline-display');
-                let currentQty = parseInt(display.textContent);
+                let currentQty = parseInt(display.textContent); 
+
                 if (currentQty >= maxStock) {
                     selector.classList.add('shake');
                     setTimeout(() => selector.classList.remove('shake'), 500);
                     showStockFeedback(productCard, `Stok tersisa ${maxStock}`);
-                    increaseBtn.disabled = true;
+                    increaseBtn.disabled = true; 
                     return;
                 }
+                
                 let newQuantity = currentQty + 1;
-                display.textContent = '...';
-                const response = await handleCartAction(selector.dataset.productId, newQuantity);
-                if (response.success) {
-                    display.textContent = newQuantity;
-                    updateMiniCartBar(response.cartCount, response.grandTotal);
-                    if (newQuantity >= maxStock) {
-                        increaseBtn.disabled = true;
-                        showStockFeedback(productCard, `Stok tersisa ${maxStock}`);
+                display.textContent = '...'; 
+                
+                try {
+                    const response = await handleCartAction(selector.dataset.productId, newQuantity);
+                    if (response.success) {
+                        display.textContent = newQuantity; 
+                        updateMiniCartBar(response.cartCount, response.grandTotal);
+                        if (newQuantity >= maxStock) {
+                            increaseBtn.disabled = true;
+                            showStockFeedback(productCard, `Stok tersisa ${maxStock}`);
+                        }
+                    } else {
+                        display.textContent = currentQty; 
+                        alert(response.message || 'Gagal memperbarui item.');
                     }
-                } else {
-                    display.textContent = currentQty;
-                    alert(response.message || 'Gagal memperbarui item.');
+                } catch (error) {
+                    console.error("Cart action failed:", error);
+                    display.textContent = currentQty; 
+                    alert('Terjadi kesalahan jaringan. Gagal memperbarui item.');
+                } finally {
+                    if (parseInt(display.textContent) < maxStock) {
+                        increaseBtn.disabled = false;
+                    }
                 }
-            }
 
-            if (decreaseBtn) {
+            } else if (decreaseBtn) {
+                decreaseBtn.disabled = true; 
+                
                 const productCard = decreaseBtn.closest('.product-card');
                 const feedbackElement = productCard.querySelector('.inline-stock-feedback');
                 if (feedbackElement) feedbackElement.classList.remove('show');
                 const selector = decreaseBtn.closest('.quantity-selector-inline');
                 const productId = selector.dataset.productId;
                 const display = selector.querySelector('.quantity-inline-display');
-                let quantity = parseInt(display.textContent) - 1;
-                const increaseBtnReference = selector.querySelector('.btn-increase-inline');
-                if (increaseBtnReference) increaseBtnReference.disabled = false;
+                let currentQty = parseInt(display.textContent); 
 
-                display.textContent = '...';
-                if (quantity > 0) {
-                    const response = await handleCartAction(productId, quantity);
-                    if (response.success) {
-                        display.textContent = quantity;
-                        updateMiniCartBar(response.cartCount, response.grandTotal);
-                    } else {
-                        display.textContent = quantity + 1;
-                        alert(response.message || 'Gagal memperbarui item.');
+                const increaseBtnReference = selector.querySelector('.btn-increase-inline');
+                if (increaseBtnReference) increaseBtnReference.disabled = false; 
+
+                let newQuantity = currentQty - 1;
+                display.textContent = '...'; 
+
+                try {
+                    if (newQuantity > 0) {
+                        const response = await handleCartAction(productId, newQuantity);
+                        if (response.success) {
+                            display.textContent = newQuantity; 
+                            updateMiniCartBar(response.cartCount, response.grandTotal);
+                        } else {
+                            display.textContent = currentQty; 
+                            alert(response.message || 'Gagal memperbarui item.');
+                        }
+                    } else { 
+                        const response = await handleRemoveAction(productId);
+                        if (response.success) {
+                            updateProductCardUI(productId, 0); 
+                            updateMiniCartBar(response.cartCount, response.grandTotal);
+                        } else {
+                            display.textContent = currentQty; 
+                            alert(response.message || 'Gagal menghapus item.');
+                        }
                     }
-                } else {
-                    const response = await handleRemoveAction(productId);
-                    if (response.success) {
-                        updateProductCardUI(productId, 0);
-                        updateMiniCartBar(response.cartCount, response.grandTotal);
-                    } else {
-                        display.textContent = 1;
-                        alert(response.message || 'Gagal menghapus item.');
+                } catch (error) {
+                    console.error("Cart action failed:", error);
+                    display.textContent = currentQty; 
+                    alert('Terjadi kesalahan jaringan. Gagal memperbarui item.');
+                } finally {
+                    if (parseInt(display.textContent) > 0) {
+                        decreaseBtn.disabled = false;
                     }
                 }
-            }
-
-            if (notesBtn) {
+            } else if (notesBtn) {
                 const productId = notesBtn.dataset.productId;
                 const productCard = document.getElementById(`product-card-${productId}`);
                 const productName = productCard.querySelector('.product-name').textContent;
                 openNotesModal(productId, productName, notesBtn.dataset.notes);
-            }
-
-            if (zoomBtn) {
+            } else if (zoomBtn) {
                 e.stopPropagation();
                 openLightbox(zoomBtn.dataset.imageUrl);
             }
@@ -335,6 +422,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const currentQty = parseInt(display.textContent);
                 const maxStock = parseInt(productCard.dataset.stock);
                 if (currentQty >= maxStock) {
+                    const increaseBtn = productCard.querySelector('.btn-increase-inline');
+                    if (increaseBtn) increaseBtn.disabled = true;
                     showStockFeedback(productCard, `Stok tersisa ${maxStock}`);
                 }
             }
@@ -402,9 +491,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     updateCartPageTotals();
                     alert('Gagal memperbarui keranjang.');
                 }
-            }
-
-            if (decreaseBtn) {
+            } else if (decreaseBtn) {
                 const itemCard = decreaseBtn.closest('.cart-item-card-new');
                 const feedbackElement = itemCard.querySelector('.inline-stock-feedback');
                 if (feedbackElement) feedbackElement.classList.remove('show');
@@ -412,7 +499,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 let quantity = parseInt(display.textContent) - 1;
                 const increaseBtnReference = itemCard.querySelector('.btn-increase-inline');
                 if (increaseBtnReference) increaseBtnReference.disabled = false;
-                
+
+                display.textContent = '...';
                 if (quantity > 0) {
                     display.textContent = quantity;
                     updateCartPageTotals();
@@ -433,16 +521,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         alert('Gagal menghapus item.');
                     }
                 }
-            }
-
-            if (notesBtn) {
+            } else if (notesBtn) {
                 const productId = notesBtn.dataset.productId;
                 const itemCard = document.getElementById(`cart-item-${productId}`);
                 const productName = itemCard.querySelector('.item-name').textContent;
                 openNotesModal(productId, productName, notesBtn.dataset.notes);
-            }
-
-            if (zoomBtn) {
+            } else if (zoomBtn) {
                 e.stopPropagation();
                 openLightbox(zoomBtn.dataset.imageUrl);
             }
@@ -499,12 +583,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         window.addEventListener('pageshow', function (event) {
-            // event.persisted bernilai true jika halaman dimuat dari cache
             if (event.persisted) {
                 window.location.reload();
             }
         });
-        
+
     }
 
     /**
@@ -516,11 +599,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (callWaiterModal) {
         const closeCallModalBtn = callWaiterModal.querySelector('.modal-close');
         const callWaiterForm = document.getElementById('callWaiterForm');
-        
+
         const openCallModal = () => {
             callWaiterModal.style.display = 'flex';
         };
-        
+
         const closeCallModal = () => {
             if (callWaiterForm) callWaiterForm.reset();
             callWaiterModal.style.display = 'none';
@@ -534,7 +617,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         if(closeCallModalBtn) closeCallModalBtn.addEventListener('click', closeCallModal);
-        
+
         callWaiterModal.addEventListener('click', (e) => {
             if (e.target === callWaiterModal) closeCallModal();
         });

@@ -1,4 +1,5 @@
 import './bootstrap';
+import 'bootstrap';
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -338,5 +339,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
     }
-});
+
+    /**
+     * ==============================================================
+     * LOGIKA STOK KOSONG
+     * ==============================================================
+     */
+    const stockInput = document.getElementById('stock');
+        const isAvailableCheckbox = document.getElementById('is_available');
+
+        // Fungsi untuk memeriksa stok dan memperbarui checkbox
+        function updateAvailability() {
+            const currentStock = parseInt(stockInput.value, 10);
+
+            if (currentStock > 0) {
+                isAvailableCheckbox.checked = true;
+            } else {
+                isAvailableCheckbox.checked = false;
+            }
+        }
+
+        updateAvailability();
+
+        stockInput.addEventListener('input', updateAvailability);
+
+});   
 

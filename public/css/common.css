@@ -76,21 +76,9 @@
     box-shadow: 0 0 0 0.2rem rgba(10, 38, 71, 0.25);
 }
 
-.btn-submit {
-    width: 100%;
-    padding: 1rem;
-    border: none;
-    background-color: var(--primary-color);
-    color: white;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-.btn-submit:hover {
-    background-color: var(--secondary-color);
-}
+.btn-submit { width: 100%; padding: 1rem; border: none; background-color: var(--primary-color); color: white; border-radius: 8px; font-size: 1.1rem; font-weight: 500; cursor: pointer; transition: background-color 0.3s; font-family: Poppins;}
+.btn-submit:hover { background-color: var(--secondary-color); }
+
 
 .alert {
     padding: 1rem;

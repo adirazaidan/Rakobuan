@@ -6,7 +6,8 @@
     <title>Selamat Datang - Rakobuan</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
     @vite(['resources/css/customer.css', 'resources/js/customer-app.js'])
 
     <script>
@@ -28,7 +29,7 @@
             @if(session('error'))
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
-             @if ($errors->any())
+            @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul>
                         @foreach ($errors->all() as $error)
@@ -68,7 +69,18 @@
             </a>
         </div>
     </div>
+    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-   
+    <script>
+        $(document).ready(function() {
+            $('#dining_table_id').select2({
+                placeholder: "-- Pilih atau Cari Meja --",
+                allowClear: true,
+                dropdownParent: $('#dining_table_id').parent()
+            });
+        });
+    </script>
 </body>
 </html>

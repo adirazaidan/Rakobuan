@@ -3,13 +3,18 @@
 
 @section('content')
 <div class="order-status-page-container">
-    <div class="status-header">
+    <div class="cart-header">
+        <a href="{{ route('customer.menu.index') }}" class="back-button" title="Kembali ke Menu"><i class="fas fa-arrow-left"></i></a>
         <h1>Aktivitas Anda</h1>
-        <p>Semua pesanan dan panggilan Anda dalam sesi ini.</p>
+    </div>
+
+    <div class="customer-details-box">
+        Semua pesanan dan panggilan <strong>{{ session('customer_name') }}</strong> di Meja <strong>{{ session('table_number') }}</strong>
     </div>
 
     @if($activities->isEmpty())
         <div class="empty-status">
+            <i class="fas fa-receipt"></i>
             <p>Anda belum memiliki aktivitas.</p>
             <a href="{{ route('customer.menu.index') }}" class="btn-primary">Pesan Sekarang</a>
         </div>

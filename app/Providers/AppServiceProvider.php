@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\View\Composers\OutletComposer;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +26,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-         View::composer('layouts.customer', OutletComposer::class);
+        // Paginator::useBootstrapFour();
+        Paginator::useBootstrapFive(); // Jika Anda menggunakan Bootstrap 5
+        View::composer('layouts.customer', OutletComposer::class);
     }
 }

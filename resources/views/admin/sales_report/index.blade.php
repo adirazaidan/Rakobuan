@@ -7,7 +7,7 @@
     <p>Analisis penjualan berdasarkan rentang tanggal yang dipilih.</p>
 
     {{-- Filter Form --}}
-    <div class="card mb-4" style="padding: 1.5rem;">
+    <div class="card mb-4 " style="padding: 1.5rem;">
         <form action="{{ route('admin.sales.report.index') }}" method="GET" class="sales-filter-form" >
             <div style="display: flex; gap: 1rem; align-items: flex-end;">
                 {{-- Form Tanggal Mulai (tidak berubah) --}}

@@ -86,6 +86,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('products', ProductController::class);
         Route::resource('discounts', DiscountController::class);
     
+        // Rute Pencarian Produk untuk Diskon (TAMBAHAN)
+        Route::get('discounts/search-products', [DiscountController::class, 'searchProducts'])->name('discounts.searchProducts');
+        Route::resource('discounts', DiscountController::class);
+
         // Rute Order
         Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
         Route::get('orders/history', [OrderController::class, 'history'])->name('orders.history');

@@ -31,7 +31,7 @@
     <div class="table-card-details">
         <div class="table-card-info">
             <span class="table-location">{{ $table->location }}</span>
-            <p class="table-notes">{{ $table->notes ?: 'Tidak ada catatan' }}</p>
+            <p class="table-notes">{{ $table->notes ?: 'Catatan Meja: -' }}</p>
         </div>
         <div class="table-card-actions">
             <a href="{{ route('admin.dining-tables.edit', $table) }}" class="btn-action-edit" title="Edit Meja"><i class="fas fa-edit"></i></a>
@@ -137,7 +137,7 @@
         @if($isOccupied && $table->activeOrders->isEmpty())
             <form action="{{ route('admin.dining-tables.clearSession', $table) }}" method="POST" onsubmit="return confirm('Yakin ingin membersihkan sesi ini?');" class="clear-session-form">
                 @csrf
-                <button type="submit" class="btn btn-sm btn-info w-100">Bersihkan Meja</button>
+                <button type="submit" class="btn btn-sm btn-danger w-100">Bersihkan Meja</button>
             </form>
         @endif
     </div>

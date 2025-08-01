@@ -1,5 +1,5 @@
 @extends('layouts.admin')
-@section('title', 'Layout Meja')
+@section('title', 'Manajemen Meja')
 
 @section('content')
 
@@ -10,21 +10,29 @@
     <a href="{{ route('admin.dining-tables.create') }}" class="btn btn-primary">Tambah Meja</a>
 </div>
 
-<div class="card mb-4">
+<div class="card mb-4 filter-card">
     <div class="card-body">
-        <form action="{{ route('admin.dining-tables.index') }}" method="GET" class="d-flex align-items-center gap-2">
-            <div class="form-group mb-0 flex-grow-1" style="max-width: 300px;">
-                <label for="location" class="visually-hidden">Filter Lokasi</label>
-                <select name="location" id="location" class="form-control">
-                    <option value="">Semua Lokasi</option>
-                    @foreach ($locations as $location)
-                        <option value="{{ $location }}" {{ $selectedLocation == $location ? 'selected' : '' }}>
-                            {{ $location }}
-                        </option>
-                    @endforeach
-                </select>
+        <form action="{{ route('admin.dining-tables.index') }}" method="GET">
+            <div class="row g-3 align-items-end">
+                {{-- Filter Lokasi --}}
+                <div class="col-md-4">
+                    <label for="location" class="form-label">Filter Lokasi</label>
+                    <select name="location" id="location" class="form-control">
+                        <option value="">Semua Lokasi</option>
+                        @foreach ($locations as $location)
+                            <option value="{{ $location }}" {{ $selectedLocation == $location ? 'selected' : '' }}>
+                                {{ $location }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                
+                {{-- Tombol Filter --}}
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Cari</button>
+                    <a href="{{ route('admin.dining-tables.index') }}" class="btn btn-secondary mt-2 w-100">Reset</a>
+                </div>
             </div>
-            <button type="submit" class="btn btn-secondary">Filter</button>
         </form>
     </div>
 </div>
@@ -33,7 +41,8 @@
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 
-<div class="mb-4 d-flex gap-2">
+{{-- Tombol Kunci/Buka Semua --}}
+<div class="mb-4 d-flex align-items-center gap-2 action-buttons-group">
     <form action="{{ route('admin.dining-tables.lockAll') }}" method="POST" onsubmit="return confirm('Yakin ingin mengunci SEMUA meja?');">
         @csrf
         <button type="submit" class="btn btn-danger btn-sm">Kunci Semua</button>

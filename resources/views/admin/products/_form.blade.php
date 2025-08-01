@@ -46,7 +46,7 @@
             <label>Opsi</label>
             <div class="form-check">
                 <input type="checkbox" name="is_bestseller" id="is_bestseller" value="1" {{ old('is_bestseller', $product->is_bestseller ?? false) ? 'checked' : '' }}>
-                <label for="is_bestseller">Best Seller</label>
+                <label for="is_bestseller">Terlaris</label>
             </div>
             <div class="form-check">
                 <input type="checkbox" name="is_available" id="is_available" value="1" {{ old('is_available', $product->is_available ?? true) ? 'checked' : '' }}>
@@ -58,3 +58,11 @@
 <hr>
 <button type="submit" class="btn btn-primary">{{ isset($product) ? 'Perbarui Menu' : 'Simpan Menu' }}</button>
 <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Batal</a>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+    });
+</script>
+@endpush

@@ -5,7 +5,7 @@
 
 <div class="form-group">
     <label for="product_id">Pilih Menu untuk Diberi Diskon</label>
-    <select name="product_id" id="product_id" class="form-control" required>
+    <select name="product_id" id="product_id" class="form-control select2" required>
         <option value="" disabled selected>-- Pilih Menu --</option>
         @foreach ($products as $product)
             <option value="{{ $product->id }}" {{ old('product_id', $discount->product_id ?? '') == $product->id ? 'selected' : '' }}>
@@ -29,3 +29,14 @@
 
 <button type="submit" class="btn btn-primary">{{ isset($discount) ? 'Perbarui' : 'Simpan' }}</button>
 <a href="{{ route('admin.discounts.index') }}" class="btn btn-secondary">Batal</a>
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: '-- Pilih Menu --',
+            allowClear: true
+        });
+    });
+</script>
+@endpush
