@@ -119,25 +119,13 @@ ul { list-style: none; padding: 0; margin: 0; }
 .table-responsive-wrapper { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
 /* --- Forms --- */
-.form-group { margin-bottom: 1.5rem; }
+.filter-container { display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap; /* Menambahkan ini agar responsif di layar kecil */ }
+.form-group { margin-bottom: 0; /* Menghapus margin-bottom default */ }
 .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-.form-control { display: block; width: 100%; padding: 0.75rem 1rem; font-size: 1rem; font-family: 'Poppins', sans-serif; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out; }
+.form-control { display: block; width: 100%; padding: 0.75rem 1rem; font-size: 1rem; font-family: 'Poppins', sans-serif; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out; }
 .form-control:focus { border-color: var(--primary-color); outline: 0; box-shadow: 0 0 0 0.2rem rgba(10, 38, 71, 0.25); }
-.form-check { display: flex; align-items: center; gap: 0.5rem; }
-
-/* Pastikan tombol-tombol di dalam grup aksi ditampilkan dalam satu baris */
-.action-buttons-group {
-    display: flex;
-    gap: 0.5rem; /* Menjaga jarak antar tombol */
-    align-items: center;
-}
-
-.action-buttons-group form {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-}
-
+.filter-buttons { display: flex; gap: 0.5rem; }
+.action-buttons-group { display: flex; gap: 0.5rem; }
 /* --- Alerts --- */
 .alert { padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid transparent; }
 .alert-success { background-color: #d1e7dd; color: #0f5132; border-color: #badbcc; }
@@ -258,6 +246,8 @@ tr.is-updated { transition: background-color 0.5s ease-in-out; background-color:
     .custom-action-btn span { display: none; }
     .custom-action-btn i { margin-right: 0; }
     .menu-toggle { display: block; background: none; border: none; font-size: 1.5rem;cursor: pointer;color: var(--primary-color);}
+    .filter-container {flex-direction: column;align-items: stretch;}
+    .form-group {width: 100%;}
 }
 
 @media (max-width: 992px) {

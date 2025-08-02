@@ -9,38 +9,35 @@
     </div>
 
     {{-- Filter Outlet dan Pencarian Diskon (Hardcoded) --}}
-    <div class="card mb-4 filter-card">
-        <div class="card-body">
-            <form action="{{ route('admin.discounts.index') }}" method="GET">
-                <div class="row g-2 align-items-end">
-                    
-                    {{-- Filter Outlet --}}
-                    <div class="col-md-4">
-                        <label for="outlet_id" class="form-label">Filter Outlet</label>
-                        <select name="outlet_id" id="outlet_id" class="form-control">
-                            <option value="">Semua Outlet</option>
-                            @foreach ($outlets as $outlet)
-                                <option value="{{ $outlet->id }}" {{ $selectedOutletId == $outlet->id ? 'selected' : '' }}>
-                                    {{ $outlet->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    {{-- Kolom Pencarian Diskon --}}
-                    <div class="col-md-4">
-                        <label for="search" class="form-label">Cari Diskon</label>
-                        <input type="text" name="search" id="search" class="form-control" placeholder="Masukkan nama diskon..." value="{{ request('search') }}">
-                    </div>
-
-                    {{-- Tombol Filter --}}
-                    <div class="col-md-2">
-                        <button type="submit" class="btn btn-primary w-100">Cari</button>
-                    </div>
-
+    <div class="card mb-4 filter-card" style="padding: 1.5rem;">
+        <form action="{{ route('admin.discounts.index') }}" method="GET" class="filter-form">
+            <div class="filter-container">
+                {{-- Filter Outlet --}}
+                <div class="form-group" style="flex: 1;">
+                    <label for="outlet_id">Filter Outlet</label>
+                    <select name="outlet_id" id="outlet_id" class="form-control">
+                        <option value="">Semua Outlet</option>
+                        @foreach ($outlets as $outlet)
+                            <option value="{{ $outlet->id }}" {{ $selectedOutletId == $outlet->id ? 'selected' : '' }}>
+                                {{ $outlet->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
-            </form>
-        </div>
+
+                {{-- Kolom Pencarian Diskon --}}
+                <div class="form-group" style="flex: 1;">
+                    <label for="search">Cari Diskon</label>
+                    <input type="text" name="search" id="search" class="form-control" placeholder="Masukkan nama diskon..." value="{{ request('search') }}">
+                </div>
+
+                {{-- Tombol Filter --}}
+                <div class="form-group filter-buttons">
+                    <button type="submit" class="btn btn-primary w-100">Cari</button>
+                    <a href="{{ route('admin.discounts.index') }}" class="btn btn-secondary w-100 mt-2">Reset</a>
+                </div>
+            </div>
+        </form>
     </div>
     {{-- End Filter --}}
 

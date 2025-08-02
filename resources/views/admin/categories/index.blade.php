@@ -9,14 +9,12 @@
     </div>
 
     {{-- Form Filter --}}
-    <div class="card mb-4 filter-card">
-        <div class="card-body">
-            <form action="{{ route('admin.categories.index') }}" method="GET">
-                <div class="row g-2 align-items-end">
-                    
+    <div class="card mb-4 filter-card" style="padding: 1.5rem;">
+            <form action="{{ route('admin.categories.index') }}" method="GET" class="filter-form">
+                <div class="filter-container">
                     {{-- Filter Outlet --}}
-                    <div class="col-md-4">
-                        <label for="outlet_id" class="form-label">Filter Outlet</label>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="outlet_id">Filter Outlet</label>
                         <select name="outlet_id" id="outlet_id" class="form-control">
                             <option value="">Semua Outlet</option>
                             @foreach ($outlets as $outlet)
@@ -28,21 +26,19 @@
                     </div>
 
                     {{-- Kolom Pencarian Kategori --}}
-                    <div class="col-md-4">
-                        <label for="search" class="form-label">Cari Kategori</label>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="search">Cari Kategori</label>
                         <input type="text" name="search" id="search" class="form-control" placeholder="Masukkan nama kategori..." value="{{ request('search') }}">
                     </div>
 
                     {{-- Tombol Filter --}}
-                    <div class="col-md-2">
+                    <div class="form-group filter-buttons">
                         <button type="submit" class="btn btn-primary w-100">Cari</button>
-                        <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">Reset</a>
+                        <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary w-100 mt-2">Reset</a>
                     </div>
-
                 </div>
             </form>
-        </div>
-    </div>
+    </div>  
     {{-- End Form Filter --}}
 
     @if(session('success'))

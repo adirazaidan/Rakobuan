@@ -10,31 +10,29 @@
     <a href="{{ route('admin.dining-tables.create') }}" class="btn btn-primary">Tambah Meja</a>
 </div>
 
-<div class="card mb-4 filter-card">
-    <div class="card-body">
-        <form action="{{ route('admin.dining-tables.index') }}" method="GET">
-            <div class="row g-3 align-items-end">
-                {{-- Filter Lokasi --}}
-                <div class="col-md-4">
-                    <label for="location" class="form-label">Filter Lokasi</label>
-                    <select name="location" id="location" class="form-control">
-                        <option value="">Semua Lokasi</option>
-                        @foreach ($locations as $location)
-                            <option value="{{ $location }}" {{ $selectedLocation == $location ? 'selected' : '' }}>
-                                {{ $location }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                
-                {{-- Tombol Filter --}}
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">Cari</button>
-                    <a href="{{ route('admin.dining-tables.index') }}" class="btn btn-secondary mt-2 w-100">Reset</a>
-                </div>
+<div class="card mb-4 filter-card" style="padding: 1.5rem;">
+    <form action="{{ route('admin.dining-tables.index') }}" method="GET" class="filter-form">
+        <div class="filter-container">
+            {{-- Filter Lokasi --}}
+            <div class="form-group" style="flex: 1;">
+                <label for="location">Filter Lokasi</label>
+                <select name="location" id="location" class="form-control">
+                    <option value="">Semua Lokasi</option>
+                    @foreach ($locations as $location)
+                        <option value="{{ $location }}" {{ $selectedLocation == $location ? 'selected' : '' }}>
+                            {{ $location }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
-        </form>
-    </div>
+            
+            {{-- Tombol Filter --}}
+            <div class="form-group filter-buttons">
+                <button type="submit" class="btn btn-primary w-100">Cari</button>
+                <a href="{{ route('admin.dining-tables.index') }}" class="btn btn-secondary w-100 mt-2">Reset</a>
+            </div>
+        </div>
+    </form>
 </div>
 
 @if(session('success'))

@@ -9,13 +9,12 @@
     </div>
 
     {{-- Filter Outlet, Kategori, Status, dan Pencarian --}}
-    <div class="card mb-4 filter-card" >
-        <div class="card-body">
-            <form action="{{ route('admin.products.index') }}" method="GET">
-                <div class="row g-3 align-items-end">
+    <div class="card mb-4 filter-card" style="padding: 1.5rem;">
+            <form action="{{ route('admin.products.index') }}" method="GET" class="filter-form">
+                <div class="filter-container">
                     {{-- Filter Outlet --}}
-                    <div class="col-md-3">
-                        <label for="outlet_id" class="form-label">Filter Outlet</label>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="outlet_id">Filter Outlet</label>
                         <select name="outlet_id" id="outlet_id" class="form-control">
                             <option value="">Semua Outlet</option>
                             @foreach ($outlets as $outlet)
@@ -25,10 +24,9 @@
                             @endforeach
                         </select>
                     </div>
-
                     {{-- Filter Kategori --}}
-                    <div class="col-md-3">
-                        <label for="category_id" class="form-label">Filter Kategori</label>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="category_id">Filter Kategori</label>
                         <select name="category_id" id="category_id" class="form-control">
                             <option value="">Semua Kategori</option>
                             @foreach ($categories as $category)
@@ -38,31 +36,28 @@
                             @endforeach
                         </select>
                     </div>
-
                     {{-- Filter Status --}}
-                    <div class="col-md-3">
-                        <label for="status" class="form-label">Filter Status</label>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="status">Filter Status</label>
                         <select name="status" id="status" class="form-control">
                             <option value="">Semua Status</option>
                             <option value="available" {{ $selectedStatus == 'available' ? 'selected' : '' }}>Tersedia</option>
                             <option value="unavailable" {{ $selectedStatus == 'unavailable' ? 'selected' : '' }}>Habis</option>
                         </select>
                     </div>
-
                     {{-- Kolom Pencarian --}}
-                    <div class="col-md-4">
-                        <label for="search" class="form-label">Cari Menu</label>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="search">Cari Menu</label>
                         <input type="text" name="search" id="search" class="form-control" placeholder="Masukkan nama menu..." value="{{ request('search') }}">
                     </div>
 
                     {{-- Tombol Filter --}}
-                    <div class="col-md-2">
+                    <div class="form-group filter-buttons" style="flex-basis: 150px;">
                         <button type="submit" class="btn btn-primary w-100">Cari</button>
                         <a href="{{ route('admin.products.index') }}" class="btn btn-secondary mt-2 w-100">Reset</a>
                     </div>
                 </div>
             </form>
-        </div>
     </div>
     {{-- End Filter --}}
 
