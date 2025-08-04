@@ -38,12 +38,12 @@
                     </div>
                 </div>
                 <button type="submit" class="btn-submit">Masuk</button>
+                <div class="auth-link-container">
+                    <a href="{{ route('customer.login.form') }}" class="auth-link">
+                        Login sebagai Pelanggan
+                    </a>
+                </div>
             </form>
-        </div>
-        <div class="auth-footer">
-            <a href="{{ route('customer.login.form') }}" class="color-888 font-size-14 text-decoration-none">
-                Login sebagai Pelanggan
-            </a>
         </div>
     </div>
 </body>

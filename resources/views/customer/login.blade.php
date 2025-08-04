@@ -59,6 +59,11 @@
                         </div>
                     </div>
                     <button type="submit" class="btn-submit">Lihat Menu</button>
+                    <div class="auth-link-container">
+                        <a href="{{ route('admin.login') }}" class="auth-link">
+                            Login sebagai Admin
+                        </a>
+                    </div>
                 @else
                     <div class="alert alert-danger">
                         <i class="fas fa-info-circle"></i>
@@ -67,11 +72,6 @@
                     </div>
                 @endif
             </form>
-        </div>
-        <div class="auth-footer">
-            <a href="{{ route('admin.login') }}" class="color-888 font-size-14 text-decoration-none">
-                Login sebagai Admin
-            </a>
         </div>
     </div>
 
