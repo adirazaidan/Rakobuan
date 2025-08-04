@@ -127,6 +127,65 @@
     transform: translateX(-50%); 
     text-align: center; 
     color: #6c757d; 
+    width: 100%;
+    max-width: 420px;
+    padding: 0 1rem;
+    box-sizing: border-box;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+    .auth-page {
+        padding: 1rem;
+        align-items: flex-start;
+        padding-top: 2rem;
+    }
+    
+    .auth-card {
+        margin-bottom: 4rem;
+        padding: 2rem 1.5rem;
+    }
+    
+    .auth-footer {
+        position: relative;
+        bottom: auto;
+        left: auto;
+        transform: none;
+        margin-top: 2rem;
+        padding: 0;
+    }
+    
+    .auth-title {
+        font-size: 1.5rem;
+    }
+    
+    .auth-subtitle {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-page {
+        padding: 0.5rem;
+        padding-top: 1rem;
+    }
+    
+    .auth-card {
+        padding: 1.5rem 1rem;
+        margin-bottom: 3rem;
+    }
+    
+    .auth-footer {
+        margin-top: 1.5rem;
+    }
+    
+    .auth-title {
+        font-size: 1.3rem;
+    }
+    
+    .auth-subtitle {
+        font-size: 0.85rem;
+    }
 }
 
 /* Select2 Styling for Customer Login */
