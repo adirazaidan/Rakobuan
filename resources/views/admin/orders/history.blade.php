@@ -15,14 +15,14 @@
     @endif
 
 
-    <div class="card mb-4 filter-card" style="padding: 1.5rem;">
+    <div class="card mb-4 filter-card card-padding">
         <form action="{{ route('admin.orders.index') }}" method="GET" class="filter-form">
             <div class="filter-container">
-                <div class="form-group" style="flex: 1;">
+                <div class="form-group form-group-flex">
                     <label for="search">Cari ID Pesanan</label>
                     <input type="text" name="search" id="search" class="form-control" placeholder="Cari ID pesanan..." value="{{ request('search') }}">
                 </div>
-                <div class="form-group" style="flex: 1;">
+                <div class="form-group form-group-flex">
                     <label for="status">Filter Status</label>
                     <select name="status" id="status" class="form-control">
                         <option value="current" {{ request('status') == 'current' || !request('status') ? 'selected' : '' }}>Belum Diproses & Diproses</option>
@@ -84,7 +84,7 @@
                                     <div class="d-flex justify-content-end align-items-center gap-2 actions-wrapper">
                                         <a href="{{ route('admin.orders.print', $order) }}" target="_blank" class="custom-action-btn custom-action-btn-info" title="Cetak Struk"><i class="fas fa-print"></i> <span>Cetak</span></a>
 
-                                        <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus riwayat pesanan ini secara permanen?');">
+                                        <form action="{{ route('admin.orders.destroy', $order) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="custom-action-btn custom-action-btn-danger" title="Hapus Permanen"><i class="fas fa-trash"></i> <span>Hapus</span></button>
@@ -103,30 +103,46 @@
             
             {{-- Pagination --}}
             <div class="pagination-container">
-                {{-- Tombol Sebelumnya --}}
-                @if ($orders->onFirstPage())
-                    <li class="page-item disabled">
-                        <button class="page-link" disabled>Sebelumnya</button>
-                    </li>
-                @else
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $orders->previousPageUrl() . '&' . http_build_query(request()->except('page')) }}" rel="prev">Sebelumnya</a>
-                    </li>
-                @endif
+                <ul class="pagination" role="navigation">
+                    {{-- Previous Button --}}
+                    @if ($orders->onFirstPage())
+                        <li class="page-item disabled">
+                            <button class="page-link" disabled><i class="fas fa-chevron-left"></i></button>
+                        </li>
+                    @else
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $orders->previousPageUrl() . '&' . http_build_query(request()->except('page')) }}" rel="prev"><i class="fas fa-chevron-left"></i></a>
+                        </li>
+                    @endif
 
-                {{-- Link Halaman --}}
-                {{ $orders->appends(request()->query())->links('vendor.pagination.custom-numbered') }}
+                    {{-- Numbered Links (Limited) --}}
+                    @foreach ($orders->getUrlRange(1, $orders->lastPage()) as $page => $url)
+                        @if ($page == $orders->currentPage())
+                            <li class="page-item active" aria-current="page">
+                                <span class="page-link">{{ $page }}</span>
+                            </li>
+                        @elseif ($page == 1 || $page == $orders->lastPage() || ($page >= $orders->currentPage() - 1 && $page <= $orders->currentPage() + 1))
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $url . '&' . http_build_query(request()->except('page')) }}">{{ $page }}</a>
+                            </li>
+                        @elseif ($page == $orders->currentPage() - 2 || $page == $orders->currentPage() + 2)
+                            <li class="page-item disabled d-none d-md-block">
+                                <span class="page-link">...</span>
+                            </li>
+                        @endif
+                    @endforeach
 
-                {{-- Tombol Berikutnya --}}
-                @if ($orders->hasMorePages())
-                    <li class="page-item">
-                        <a class="page-link" href="{{ $orders->nextPageUrl() . '&' . http_build_query(request()->except('page')) }}" rel="next">Berikutnya</a>
-                    </li>
-                @else
-                    <li class="page-item disabled">
-                        <button class="page-link" disabled>Berikutnya</button>
-                    </li>
-                @endif
+                    {{-- Next Button --}}
+                    @if ($orders->hasMorePages())
+                        <li class="page-item">
+                            <a class="page-link" href="{{ $orders->nextPageUrl() . '&' . http_build_query(request()->except('page')) }}" rel="next"><i class="fas fa-chevron-right"></i></a>
+                        </li>
+                    @else
+                        <li class="page-item disabled">
+                            <button class="page-link" disabled><i class="fas fa-chevron-right"></i></button>
+                        </li>
+                    @endif
+                </ul>
             </div>
 
         </div>

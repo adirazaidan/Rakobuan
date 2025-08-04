@@ -7,22 +7,22 @@
     <p>Analisis penjualan berdasarkan rentang tanggal yang dipilih.</p>
 
     {{-- Filter Form --}}
-    <div class="card mb-4 " style="padding: 1.5rem;">
+    <div class="card mb-4 card-padding">
         <form action="{{ route('admin.sales.report.index') }}" method="GET" class="sales-filter-form" >
-            <div style="display: flex; gap: 1rem; align-items: flex-end;">
+            <div class="display-flex gap-1rem align-items-end">
                 {{-- Form Tanggal Mulai (tidak berubah) --}}
-                <div class="form-group" style="flex: 1;">
+                <div class="form-group form-group-flex">
                     <label for="start_date">Tanggal Mulai</label>
                     <input type="date" name="start_date" id="start_date" class="form-control" value="{{ $startDate->format('Y-m-d') }}">
                 </div>
                 {{-- Form Tanggal Selesai (tidak berubah) --}}
-                <div class="form-group" style="flex: 1;">
+                <div class="form-group form-group-flex">
                     <label for="end_date">Tanggal Selesai</label>
                     <input type="date" name="end_date" id="end_date" class="form-control" value="{{ $endDate->format('Y-m-d') }}">
                 </div>
 
                 {{-- TAMBAHKAN DROPDOWN OUTLET INI --}}
-                <div class="form-group" style="flex: 1;">
+                <div class="form-group form-group-flex">
                     <label for="outlet_id">Pilih Outlet</label>
                     <select name="outlet_id" id="outlet_id" class="form-control">
                         <option value="">Semua Outlet</option>
@@ -33,21 +33,20 @@
                         @endforeach
                     </select>
                 </div>
-
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <button type="submit" class="btn btn-primary">Cari</button>
                 </div>
             </div>
         </form>
     </div>
 
     {{-- Ringkasan Penjualan --}}
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;" class="mb-4">
-        <div class="card" style="padding: 1.5rem;">
+    <div class="grid-2-columns mb-4">
+        <div class="card card-padding">
             <h4>Total Pendapatan</h4>
             <h2>Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h2>
         </div>
-        <div class="card" style="padding: 1.5rem;">
+        <div class="card card-padding">
             <h4>Total Transaksi</h4>
             <h2>{{ $totalOrders }} Pesanan</h2>
         </div>
@@ -93,7 +92,7 @@
 
 
     {{-- Tabel Rincian Pesanan --}}
-    <div class="card" style="padding:1.5rem">
+    <div class="card card-padding">
         <h3>Rincian Transaksi ({{ $startDate->format('d M Y') }} - {{ $endDate->format('d M Y') }})</h3>
         <table class="table">
             <thead>

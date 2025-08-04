@@ -1,0 +1,27 @@
+/* --- Print Styles --- */
+body { font-family: 'Courier New', Courier, monospace; color: #000; margin: 0; padding: 0; font-size: 12px; }
+.receipt { width: 300px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
+.header { text-align: center; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px dashed #000; }
+.header h1 { margin: 0; font-size: 20px; text-transform: uppercase; }
+.header p { margin: 3px 0; font-size: 11px; }
+.details { margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px dashed #000; }
+.details p { margin: 2px 0; font-size: 12px; display: flex; justify-content: space-between; }
+.details p strong { flex-basis: 45%; text-align: left; }
+.details p span { flex-basis: 55%; text-align: right; }
+.items { margin-top: 15px; }
+table { width: 100%; font-size: 12px; border-collapse: collapse; margin-bottom: 10px; }
+th, td { padding: 5px 0; vertical-align: top; }
+thead th { border-bottom: 1px dashed #000; padding-bottom: 8px; }
+tbody tr:not(:last-child) td { padding-bottom: 8px; }
+.item-col { text-align: left; width: 50%; }
+.qty-col { text-align: center; width: 15%; }
+.price-col { text-align: right; width: 35%; }
+.notes { font-size: 10px; font-style: italic; color: #555; padding-top: 2px; padding-left: 10px; text-align: left; }
+.total-item-row td, .total-row td { border-top: 1px dashed #000; padding-top: 8px; font-weight: bold; }
+.footer { text-align: center; margin-top: 20px; font-size: 11px; border-top: 1px dashed #000; padding-top: 10px; }
+
+@media print { 
+    body { margin: 0; padding: 0; }
+    .receipt { width: 100%; margin: 0; padding: 5mm; box-shadow: none; }
+    .no-print { display: none; }
+} 

@@ -43,7 +43,7 @@
                 </li>
             @endforeach
 
-            <hr style="margin: 1rem 1.5rem;">
+            <hr class="margin-1rem">
 
             <li class="{{ request()->routeIs('cart.index') ? 'active' : '' }}">
                 <a href="{{ route('cart.index') }}">
@@ -61,11 +61,11 @@
             </li>
 
             <li>
-                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <a href="#" onclick="event.preventDefault(); showLogoutConfirm();">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Keluar dari Meja</span>
                 </a>
-                <form id="logout-form" action="{{ route('customer.logout') }}" method="POST" style="display: none;">
+                <form id="logout-form" action="{{ route('customer.logout') }}" method="POST" class="display-none">
                     @csrf
                 </form>
             </li>
@@ -87,7 +87,7 @@
         </div>
     </div>
     @include('customer.partials.modal-call-waiter')
-    <div class="modal-overlay" id="notesModal" style="display: none;">
+    <div class="modal-overlay" id="notesModal" class="display-none">
         <div class="modal-content">
             <div class="modal-header">
                 <h4>Catatan untuk <span id="notesModalProductName"></span></h4>
@@ -97,8 +97,41 @@
                 <form id="notesForm">
                     <input type="hidden" id="notesModalProductId">
                     <textarea id="notesModalTextArea" class="form-control" rows="4" placeholder="Contoh: Tidak pedas, banyakin bawang, dll."></textarea>
-                    <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">Simpan Catatan</button>
+                    <button type="submit" class="btn-primary width-100 margin-top-1rem">Simpan Catatan</button>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert Dialog Modal -->
+    <div class="modal-overlay" id="customAlertModal" class="display-none">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="alertModalTitle">Pesan</h4>
+                <button class="modal-close" id="closeAlertModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert-icon-wrapper">
+                    <i id="alertModalIcon" class="fas fa-info-circle"></i>
+                </div>
+                <p id="alertModalMessage" class="alert-message"></p>
+                <div class="alert-actions">
+                    <button type="button" class="btn-primary" id="alertModalConfirmBtn">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Order Modal -->
+    <div class="modal-overlay" id="cancelOrderModal" class="display-none">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Pembatalan Pesanan</h4>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Untuk membatalkan pesanan ini, silakan panggil pelayan kami.</p>
+                <p>Mohon informasikan nomor pesanan Anda: <strong class="text-danger">#<span id="modalOrderNumber"></span></strong>.</p>
             </div>
         </div>
     </div>

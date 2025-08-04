@@ -1,7 +1,317 @@
 import './bootstrap';
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded event fired');
     const csrfToken = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : null;
+
+    // Global DOM elements
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilterDropdown = document.getElementById('categoryFilterDropdown');
+    const priceFilterButtons = document.querySelectorAll('.filter-price-buttons button');
+    const bestsellerFilter = document.getElementById('bestsellerFilter');
+    const discountFilter = document.getElementById('discountFilter');
+    const menuGrid = document.getElementById('menu-list');
+    const allProductCards = document.querySelectorAll('.product-card');
+
+    /**
+     * =================================
+     * CUSTOM ALERT DIALOG FUNCTIONALITY
+     * =================================
+     */
+    const customAlertModal = document.getElementById('customAlertModal');
+    const alertModalTitle = document.getElementById('alertModalTitle');
+    const alertModalMessage = document.getElementById('alertModalMessage');
+    const alertModalIcon = document.getElementById('alertModalIcon');
+    const closeAlertModalBtn = document.getElementById('closeAlertModalBtn');
+    const alertModalConfirmBtn = document.getElementById('alertModalConfirmBtn');
+
+    // Custom alert function to replace all alert() calls
+    window.customAlert = function(message, type = 'info', title = 'Pesan') {
+        if (!customAlertModal) return;
+
+        // Set modal content
+        alertModalTitle.textContent = title;
+        alertModalMessage.textContent = message;
+
+        // Set icon based on type
+        alertModalIcon.className = 'fas';
+        switch (type) {
+            case 'success':
+                alertModalIcon.classList.add('fa-check-circle', 'alert-success');
+                break;
+            case 'warning':
+                alertModalIcon.classList.add('fa-exclamation-triangle', 'alert-warning');
+                break;
+            case 'danger':
+            case 'error':
+                alertModalIcon.classList.add('fa-times-circle', 'alert-danger');
+                break;
+            case 'info':
+            default:
+                alertModalIcon.classList.add('fa-info-circle', 'alert-info');
+                break;
+        }
+
+        // Set modal class for styling
+        customAlertModal.className = 'modal-overlay';
+        customAlertModal.classList.add(`alert-${type}`);
+
+        // Show modal
+        customAlertModal.style.display = 'flex';
+    };
+
+    // Close alert modal
+    const closeAlertModal = () => {
+        if (customAlertModal) {
+            customAlertModal.style.display = 'none';
+            // Remove type classes
+            customAlertModal.classList.remove('alert-success', 'alert-warning', 'alert-danger', 'alert-info');
+        }
+    };
+
+    // Event listeners for alert modal
+    if (closeAlertModalBtn) {
+        closeAlertModalBtn.addEventListener('click', closeAlertModal);
+    }
+    if (alertModalConfirmBtn) {
+        alertModalConfirmBtn.addEventListener('click', closeAlertModal);
+    }
+    if (customAlertModal) {
+        customAlertModal.addEventListener('click', (e) => {
+            if (e.target === customAlertModal) {
+                closeAlertModal();
+            }
+        });
+    }
+
+    // Override the default alert function
+    window.alert = function(message) {
+        customAlert(message, 'info', 'Pesan');
+    };
+
+    // Override native confirm
+    window.confirm = function(message) {
+        return new Promise((resolve) => {
+            const confirmModal = document.createElement('div');
+            confirmModal.className = 'modal-overlay';
+            confirmModal.style.display = 'flex';
+            confirmModal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4>Konfirmasi</h4>
+                        <button class="modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert-icon-wrapper">
+                            <i class="fas fa-question-circle" style="color: var(--warning-color);"></i>
+                        </div>
+                        <p class="alert-message">${message}</p>
+                        <div class="alert-actions">
+                            <button class="btn btn-secondary" id="cancelBtn">Batal</button>
+                            <button class="btn btn-primary" id="confirmBtn">Ya</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const closeModal = (result) => {
+                document.body.removeChild(confirmModal);
+                resolve(result);
+            };
+
+            document.body.appendChild(confirmModal);
+
+            confirmModal.querySelector('#cancelBtn').addEventListener('click', () => closeModal(false));
+            confirmModal.querySelector('#confirmBtn').addEventListener('click', () => closeModal(true));
+            confirmModal.querySelector('.modal-close').addEventListener('click', () => closeModal(false));
+            confirmModal.addEventListener('click', (e) => {
+                if (e.target === confirmModal) {
+                    closeModal(false);
+                }
+            });
+        });
+    };
+
+    // Logout confirmation function
+    window.showLogoutConfirm = function() {
+        confirm('Apakah Anda yakin ingin keluar dari meja ini?').then((confirmed) => {
+            if (confirmed) {
+                document.getElementById('logout-form').submit();
+            }
+        });
+    };
+
+    /**
+     * ==========================================================
+     * MENU FILTERING AND SORTING FUNCTIONALITY
+     * ==========================================================
+     */
+    // Check if we're on the menu page
+    if (searchInput && menuGrid) {
+        console.log('Menu filtering elements found, initializing filters');
+        console.log('searchInput:', searchInput);
+        console.log('menuGrid:', menuGrid);
+        console.log('categoryFilterDropdown:', categoryFilterDropdown);
+        console.log('priceFilterButtons:', priceFilterButtons);
+        console.log('bestsellerFilter:', bestsellerFilter);
+        console.log('discountFilter:', discountFilter);
+        console.log('allProductCards:', allProductCards);
+        
+        let currentPriceSortOrder = null;
+
+        function filterAndSortProducts() {
+            console.log('filterAndSortProducts called');
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedCategory = categoryFilterDropdown ? categoryFilterDropdown.value : 'all';
+            const isBestsellerChecked = bestsellerFilter ? bestsellerFilter.checked : false;
+            const isDiscountChecked = discountFilter ? discountFilter.checked : false;
+            
+            console.log('Filter values:', {
+                searchTerm,
+                selectedCategory,
+                isBestsellerChecked,
+                isDiscountChecked,
+                currentPriceSortOrder
+            });
+            
+            const productCardsArray = Array.from(allProductCards);
+            let filteredProducts = productCardsArray.filter(card => {
+                const productName = card.getAttribute('data-product-name') || '';
+                const productCategoryId = card.getAttribute('data-category-id') || '';
+                const isBestseller = card.getAttribute('data-is-bestseller') === 'true';
+                const hasDiscount = card.getAttribute('data-has-discount') === 'true';
+                
+                const matchesSearch = productName.includes(searchTerm);
+                const matchesCategory = selectedCategory === 'all' || productCategoryId === selectedCategory;
+                const matchesBestseller = !isBestsellerChecked || isBestseller;
+                const matchesDiscount = !isDiscountChecked || hasDiscount;
+                
+                return matchesSearch && matchesCategory && matchesBestseller && matchesDiscount;
+            });
+            
+            // Enhanced sorting logic
+            if (currentPriceSortOrder) {
+                filteredProducts.sort((a, b) => {
+                    const priceA = parseFloat(a.getAttribute('data-price')) || 0;
+                    const priceB = parseFloat(b.getAttribute('data-price')) || 0;
+                    if (currentPriceSortOrder === 'asc') {
+                        return priceA - priceB;
+                    } else {
+                        return priceB - priceA;
+                    }
+                });
+            }
+            
+            // Check for bestseller and discount availability
+            const hasBestsellerItems = productCardsArray.some(card => card.getAttribute('data-is-bestseller') === 'true');
+            const hasDiscountItems = productCardsArray.some(card => card.getAttribute('data-has-discount') === 'true');
+            
+            // Update filter button states and show messages
+            updateFilterButtonStates(hasBestsellerItems, hasDiscountItems);
+            
+            menuGrid.innerHTML = '';
+            
+            if (filteredProducts.length > 0) {
+                filteredProducts.forEach(card => {
+                    menuGrid.appendChild(card);
+                    card.style.display = 'block';
+                });
+            } else {
+                menuGrid.innerHTML = '<p style="padding: 0 1.5rem;">Tidak ada menu yang sesuai dengan filter yang dipilih.</p>';
+            }
+        }
+        
+        function updateFilterButtonStates(hasBestsellerItems, hasDiscountItems) {
+            if (!bestsellerFilter || !discountFilter) return;
+            
+            const bestsellerLabel = bestsellerFilter.nextElementSibling;
+            const discountLabel = discountFilter.nextElementSibling;
+            
+            // Update bestseller filter
+            if (!hasBestsellerItems) {
+                bestsellerFilter.disabled = true;
+                bestsellerFilter.checked = false;
+                if (bestsellerLabel) {
+                    bestsellerLabel.textContent = 'Terlaris (belum ada)';
+                    bestsellerLabel.style.color = 'var(--gray-500)';
+                }
+            } else {
+                bestsellerFilter.disabled = false;
+                if (bestsellerLabel) {
+                    bestsellerLabel.textContent = 'Terlaris';
+                    bestsellerLabel.style.color = '';
+                }
+            }
+            
+            // Update discount filter
+            if (!hasDiscountItems) {
+                discountFilter.disabled = true;
+                discountFilter.checked = false;
+                if (discountLabel) {
+                    discountLabel.textContent = 'Diskon (belum ada)';
+                    discountLabel.style.color = 'var(--gray-500)';
+                }
+            } else {
+                discountFilter.disabled = false;
+                if (discountLabel) {
+                    discountLabel.textContent = 'Diskon';
+                    discountLabel.style.color = '';
+                }
+            }
+        }
+
+        // Add event listeners for filters
+        if (searchInput) {
+            searchInput.addEventListener('input', filterAndSortProducts);
+            console.log('Search input listener added');
+        }
+        
+        if (categoryFilterDropdown) {
+            categoryFilterDropdown.addEventListener('change', filterAndSortProducts);
+            console.log('Category dropdown listener added');
+        }
+        
+        if (bestsellerFilter) {
+            bestsellerFilter.addEventListener('change', filterAndSortProducts);
+            console.log('Bestseller filter listener added');
+        }
+        
+        if (discountFilter) {
+            discountFilter.addEventListener('change', filterAndSortProducts);
+            console.log('Discount filter listener added');
+        }
+        
+        if (priceFilterButtons.length > 0) {
+            priceFilterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const sortOrder = this.getAttribute('data-sort-order');
+                    
+                    // Remove active class from all price buttons
+                    priceFilterButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.style.transform = '';
+                    });
+                    
+                    // Toggle active state
+                    if (currentPriceSortOrder === sortOrder) {
+                        currentPriceSortOrder = null;
+                    } else {
+                        currentPriceSortOrder = sortOrder;
+                        this.classList.add('active');
+                        this.style.transform = 'scale(1.1)';
+                    }
+                    
+                    filterAndSortProducts();
+                });
+            });
+            console.log('Price filter buttons listeners added');
+        }
+
+        // Initialize filter states on page load
+        filterAndSortProducts();
+    } else {
+        console.log('Menu filtering elements not found, skipping filter initialization');
+    }
 
     /**
      * =================================
@@ -59,8 +369,65 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     const closeDescriptionModal = () => {
-        if (descriptionModal) descriptionModal.style.display = 'none';
+        const descriptionModal = document.getElementById('descriptionModal');
+        if (descriptionModal) {
+            descriptionModal.style.display = 'none';
+        }
     };
+
+    // Payment Modal Functionality
+    const paymentModal = document.getElementById('paymentModal');
+    const paymentBtn = document.getElementById('paymentBtn');
+    const closePaymentModalBtn = document.getElementById('closePaymentModalBtn');
+    const callWaiterFromPayment = document.getElementById('callWaiterFromPayment');
+
+    const openPaymentModal = () => {
+        if (paymentModal) {
+            paymentModal.style.display = 'flex';
+            // Add entrance animation
+            paymentModal.style.opacity = '0';
+            setTimeout(() => {
+                paymentModal.style.opacity = '1';
+            }, 10);
+        }
+    };
+
+    const closePaymentModalFunc = () => {
+        if (paymentModal) {
+            paymentModal.style.opacity = '0';
+            setTimeout(() => {
+                paymentModal.style.display = 'none';
+            }, 300);
+        }
+    };
+
+    // Event listeners for payment modal
+    if (paymentBtn) {
+        paymentBtn.addEventListener('click', openPaymentModal);
+    }
+
+    if (closePaymentModalBtn) {
+        closePaymentModalBtn.addEventListener('click', closePaymentModalFunc);
+    }
+
+    if (callWaiterFromPayment) {
+        callWaiterFromPayment.addEventListener('click', () => {
+            closePaymentModalFunc();
+            // Trigger call waiter functionality
+            const callWaiterBtn = document.querySelector('.call-waiter-btn');
+            if (callWaiterBtn) {
+                callWaiterBtn.click();
+            }
+        });
+    }
+
+    if (paymentModal) {
+        paymentModal.addEventListener('click', (e) => {
+            if (e.target === paymentModal) {
+                closePaymentModalFunc();
+            }
+        });
+    }
 
     if (closeDescriptionModalBtn) {
         closeDescriptionModalBtn.addEventListener('click', closeDescriptionModal);
@@ -93,16 +460,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.querySelectorAll('.modal-close').forEach(button => {
         button.addEventListener('click', function() {
-            cancelOrderModal.style.display = 'none';
+            const modal = this.closest('.modal-overlay');
+            if (modal) {
+                modal.style.display = 'none';
+            }
         });
     });
-    if (cancelOrderModal) {
-        cancelOrderModal.addEventListener('click', function(e) {
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.addEventListener('click', function(e) {
             if (e.target === this) {
                 this.style.display = 'none';
             }
         });
-    };
+    });
 
     const updateMiniCartBar = (count, total) => {
         const miniCartBar = document.getElementById('mini-cart-bar');
@@ -236,7 +606,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (notesTextOnCartPage) notesTextOnCartPage.textContent = notes || '-';
             closeNotes();
         } else {
-            alert('Gagal menyimpan catatan.');
+            customAlert('Gagal menyimpan catatan.', 'danger', 'Error');
         }
         saveButton.textContent = 'Simpan Catatan';
         saveButton.disabled = false;
@@ -247,7 +617,6 @@ document.addEventListener('DOMContentLoaded', function() {
      * BAGIAN INTERAKSI SPESIFIK HALAMAN MENU
      * ==========================================================
      */
-    const menuGrid = document.getElementById('menu-list');
     if (menuGrid) {
         const updateProductCardUI = (productId, newQuantity) => {
             const productCard = document.getElementById(`product-card-${productId}`);
@@ -302,12 +671,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             showStockFeedback(productCard, `Stok tersisa ${maxStock}`);
                         }
                     } else {
-                        alert(response.message || 'Gagal menambahkan item.');
+                        customAlert(response.message || 'Gagal menambahkan item.', 'danger', 'Error');
                         updateProductCardUI(productId, 0); 
                     }
                 } catch (error) {
                     console.error("Cart action failed:", error);
-                    alert('Terjadi kesalahan jaringan. Gagal menambahkan item.');
+                    customAlert('Terjadi kesalahan jaringan. Gagal menambahkan item.', 'danger', 'Error Jaringan');
                     updateProductCardUI(productId, 0); 
                 } finally {
                     initialAddBtn.disabled = false;
@@ -344,7 +713,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     } else {
                         display.textContent = currentQty; 
-                        alert(response.message || 'Gagal memperbarui item.');
+                        customAlert(response.message || 'Gagal memperbarui item.', 'danger', 'Error');
                     }
                 } catch (error) {
                     console.error("Cart action failed:", error);
@@ -381,7 +750,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             updateMiniCartBar(response.cartCount, response.grandTotal);
                         } else {
                             display.textContent = currentQty; 
-                            alert(response.message || 'Gagal memperbarui item.');
+                            customAlert(response.message || 'Gagal memperbarui item.', 'danger', 'Error');
                         }
                     } else { 
                         const response = await handleRemoveAction(productId);
@@ -390,7 +759,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             updateMiniCartBar(response.cartCount, response.grandTotal);
                         } else {
                             display.textContent = currentQty; 
-                            alert(response.message || 'Gagal menghapus item.');
+                            customAlert(response.message || 'Gagal menghapus item.', 'danger', 'Error');
                         }
                     }
                 } catch (error) {
@@ -491,7 +860,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!response.success) {
                     display.textContent = currentQty;
                     updateCartPageTotals();
-                    alert('Gagal memperbarui keranjang.');
+                    customAlert('Gagal memperbarui keranjang.', 'danger', 'Error');
                 }
             } else if (decreaseBtn) {
                 const itemCard = decreaseBtn.closest('.cart-item-card-new');
@@ -520,7 +889,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }, 300);
                     } else {
                         itemCard.style.opacity = '1';
-                        alert('Gagal menghapus item.');
+                        customAlert('Gagal menghapus item.', 'danger', 'Error');
                     }
                 }
             } else if (notesBtn) {
@@ -536,7 +905,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         cartPage.addEventListener('change', async (e) => {
             const target = e.target;
-            if (target.classList.contains('bungkus-checkbox')) {
+            if (target.classList.contains('bungkus-checkbox') || target.classList.contains('option-checkbox')) {
                 const itemCard = target.closest('.cart-item-card-new');
                 if (!itemCard) return;
 
@@ -544,13 +913,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const quantity = itemCard.querySelector('.quantity-inline-display').textContent;
                 const notesButton = itemCard.querySelector('.btn-edit-notes');
                 let currentNotes = notesButton ? notesButton.dataset.notes : '';
-                const takeawayText = '(Bungkus)';
+                const optionText = `(${target.dataset.option})`;
                 let newNotes = '';
 
-                currentNotes = currentNotes.replace(takeawayText, '').trim();
+                // Remove the specific option from current notes
+                currentNotes = currentNotes.replace(optionText, '').trim();
 
                 if (target.checked) {
-                    newNotes = currentNotes ? `${takeawayText} ${currentNotes}` : takeawayText;
+                    newNotes = currentNotes ? `${optionText} ${currentNotes}` : optionText;
                 } else {
                     newNotes = currentNotes;
                 }
@@ -567,7 +937,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 } else {
                     target.checked = !target.checked;
-                    alert('Gagal memperbarui opsi bungkus.');
+                    customAlert('Gagal memperbarui opsi.', 'danger', 'Error');
                 }
             }
         });
@@ -637,10 +1007,10 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.message) {
-                    alert(data.message);
+                    customAlert(data.message, 'success', 'Berhasil');
                     closeCallModal();
                 } else if (data.error) {
-                    alert('Error: ' + data.error);
+                    customAlert('Error: ' + data.error, 'danger', 'Error');
                 }
             }).catch(error => console.error('Error:', error));
         });
@@ -653,7 +1023,6 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     const productCards = document.querySelectorAll('.product-card');
     const categoryDropdown = document.getElementById('categoryFilterDropdown');
-    const searchInput = document.getElementById('searchInput');
 
     if (categoryDropdown) {
         categoryDropdown.addEventListener('change', function() {
@@ -743,14 +1112,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     window.location.href = data.redirect_url;
                 } else {
-                    alert(data.message || 'Terjadi kesalahan saat memproses pesanan.');
+                    customAlert(data.message || 'Terjadi kesalahan saat memproses pesanan.', 'danger', 'Error');
                     button.textContent = 'Kirim Orderan';
                     button.disabled = false;
                 }
             })
             .catch(error => {
                 console.error('Checkout Error:', error);
-                alert('Terjadi kesalahan teknis. Silakan coba lagi.');
+                customAlert('Terjadi kesalahan teknis. Silakan coba lagi.', 'danger', 'Error Teknis');
                 button.textContent = 'Kirim Orderan';
                 button.disabled = false;
             });
@@ -832,7 +1201,7 @@ document.addEventListener('DOMContentLoaded', function() {
         window.Echo.channel(channelName)
             .listen('SessionCleared', (e) => {
                 console.log('Logout signal received from admin!', e);
-                alert('Sesi Anda untuk meja ini telah dihentikan oleh admin. Anda akan dikembalikan ke halaman login.');
+                customAlert('Sesi Anda untuk meja ini telah dihentikan oleh admin. Anda akan dikembalikan ke halaman login.', 'warning', 'Sesi Dihentikan');
                 
                 const logoutForm = document.getElementById('logout-form');
                 if (logoutForm) {
@@ -859,7 +1228,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (elapsedTimeInSeconds >= sessionTimeoutInSeconds) {
                 clearInterval(sessionTimer);
-                alert('Sesi Anda telah berakhir. Anda akan di-logout.');
+                customAlert('Sesi Anda telah berakhir. Anda akan di-logout.', 'warning', 'Sesi Berakhir');
                 
                 if(tableId) {
                     window.location.href = `/logout/${tableId}`;
@@ -969,6 +1338,4 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         }
     }
-
-
 });

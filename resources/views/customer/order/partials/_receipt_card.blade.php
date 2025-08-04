@@ -57,15 +57,3 @@
     </div>
 </div>
 
-<div id="cancelOrderModal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h4>Pembatalan Pesanan</h4>
-            <button class="modal-close">&times;</button>
-        </div>
-        <div class="modal-body">
-            <p>Untuk membatalkan pesanan ini, silakan panggil pelayan kami.</p>
-            <p>Mohon informasikan nomor pesanan Anda: <strong class="text-danger">#<span id="modalOrderNumber"></span></strong>.</p>
-        </div>
-    </div>
-</div>

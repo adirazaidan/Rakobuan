@@ -148,7 +148,7 @@ class DiningTableController extends Controller
         TableStatusUpdated::dispatch($diningTable->id);
         AvailableTablesUpdated::dispatch();
 
-        return response()->json(['success' => true, 'message' => 'Sesi berhasil dibersihkan.']);
+        return redirect()->route('admin.dining-tables.index')->with('success', 'Sesi meja berhasil dibersihkan.');
     }
 
     /**

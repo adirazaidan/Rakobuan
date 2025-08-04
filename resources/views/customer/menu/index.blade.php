@@ -118,7 +118,7 @@
                             <button class="btn-edit-notes {{ $hasNotes ? 'has-notes' : '' }}" 
                                     data-product-id="{{ $product->id }}" 
                                     data-notes="{{ $cart[$product->id]['notes'] ?? '' }}" 
-                                    style="display: {{ isset($cart[$product->id]) ? 'flex' : 'none' }};">
+                                    class="{{ isset($cart[$product->id]) ? 'display-flex' : 'display-none' }}">
                                 <i class="fas fa-pen-to-square"></i>
                             </button>
                         </div>
@@ -127,7 +127,7 @@
                 </div>
             </div>
         @empty
-            <p style="padding: 0 1.5rem;">Tidak ada menu yang tersedia untuk outlet ini.</p>
+            <p class="padding-0-1-5rem">Tidak ada menu yang tersedia untuk outlet ini.</p>
         @endforelse
     </div>
 </div>
@@ -155,97 +155,5 @@
             </div>
         </div>
     </div>
-
-    @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const initialItemCount = {{ $cartItemCount ?? 0 }};
-            const initialTotalPrice = {{ $cartTotalPrice ?? 0 }};
-
-            if (typeof updateMiniCartBar === 'function') {
-                updateMiniCartBar(initialItemCount, initialTotalPrice);
-            }
-            
-            // Logika baru untuk filter
-            const searchInput = document.getElementById('searchInput');
-            const categoryFilterDropdown = document.getElementById('categoryFilterDropdown');
-            const priceFilterButtons = document.querySelectorAll('.filter-price-buttons button');
-            const bestsellerFilter = document.getElementById('bestsellerFilter');
-            const discountFilter = document.getElementById('discountFilter');
-            const menuGrid = document.getElementById('menu-list');
-            const allProductCards = document.querySelectorAll('.product-card');
-
-            let currentPriceSortOrder = null;
-
-            function filterAndSortProducts() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const selectedCategory = categoryFilterDropdown.value;
-                const isBestsellerChecked = bestsellerFilter.checked;
-                const isDiscountChecked = discountFilter.checked;
-                
-                const productCardsArray = Array.from(allProductCards);
-                let filteredProducts = productCardsArray.filter(card => {
-                    const productName = card.getAttribute('data-product-name');
-                    const productCategoryId = card.getAttribute('data-category-id');
-                    const isBestseller = card.getAttribute('data-is-bestseller') === 'true';
-                    const hasDiscount = card.getAttribute('data-has-discount') === 'true';
-                    
-                    const matchesSearch = productName.includes(searchTerm);
-                    const matchesCategory = selectedCategory === 'all' || productCategoryId === selectedCategory;
-                    const matchesBestseller = !isBestsellerChecked || isBestseller;
-                    const matchesDiscount = !isDiscountChecked || hasDiscount;
-                    
-                    return matchesSearch && matchesCategory && matchesBestseller && matchesDiscount;
-                });
-                
-                if (currentPriceSortOrder) {
-                    filteredProducts.sort((a, b) => {
-                        const priceA = parseFloat(a.getAttribute('data-price'));
-                        const priceB = parseFloat(b.getAttribute('data-price'));
-                        if (currentPriceSortOrder === 'asc') {
-                            return priceA - priceB;
-                        } else {
-                            return priceB - priceA;
-                        }
-                    });
-                }
-                
-                menuGrid.innerHTML = '';
-                
-                if (filteredProducts.length > 0) {
-                    filteredProducts.forEach(card => {
-                        menuGrid.appendChild(card);
-                        card.style.display = 'block';
-                    });
-                } else {
-                    menuGrid.innerHTML = '<p style="padding: 0 1.5rem;">Tidak ada menu yang sesuai dengan filter yang dipilih.</p>';
-                }
-            }
-
-            // Tambahkan event listener untuk setiap filter
-            searchInput.addEventListener('input', filterAndSortProducts);
-            categoryFilterDropdown.addEventListener('change', filterAndSortProducts);
-            bestsellerFilter.addEventListener('change', filterAndSortProducts);
-            discountFilter.addEventListener('change', filterAndSortProducts);
-            
-            // Event listener untuk tombol filter harga
-            priceFilterButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const sortOrder = this.getAttribute('data-sort-order');
-                    
-                    if (this.classList.contains('active')) {
-                        this.classList.remove('active');
-                        currentPriceSortOrder = null;
-                    } else {
-                        priceFilterButtons.forEach(btn => btn.classList.remove('active'));
-                        this.classList.add('active');
-                        currentPriceSortOrder = sortOrder;
-                    }
-                    filterAndSortProducts();
-                });
-            });
-        });
-    </script>
-    @endpush
 
 @endsection

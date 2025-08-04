@@ -32,5 +32,8 @@
     </div>
     @endisset
 
-    <button type="submit" class="btn btn-primary">Simpan</button>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ isset($diningTable) ? 'Perbarui' : 'Simpan' }}</button>
+        <a href="{{ route('admin.dining-tables.index') }}" class="btn btn-secondary">Batal</a>
+    </div>
 </div>

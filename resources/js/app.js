@@ -2,6 +2,89 @@ import './bootstrap';
 import 'bootstrap';
 
 document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : null;
+
+    /**
+     * =================================
+     * CUSTOM ALERT DIALOG FUNCTIONALITY
+     * =================================
+     */
+    const customAlertModal = document.getElementById('customAlertModal');
+    const alertModalTitle = document.getElementById('alertModalTitle');
+    const alertModalMessage = document.getElementById('alertModalMessage');
+    const alertModalIcon = document.getElementById('alertModalIcon');
+    const closeAlertModalBtn = document.getElementById('closeAlertModalBtn');
+    const alertModalConfirmBtn = document.getElementById('alertModalConfirmBtn');
+
+    // Custom alert function to replace all alert() calls
+    window.customAlert = function(message, type = 'info', title = 'Pesan') {
+        if (!customAlertModal) return;
+
+        // Set modal content
+        alertModalTitle.textContent = title;
+        alertModalMessage.textContent = message;
+
+        // Set icon based on type
+        alertModalIcon.className = 'fas';
+        switch (type) {
+            case 'success':
+                alertModalIcon.classList.add('fa-check-circle', 'alert-success');
+                break;
+            case 'warning':
+                alertModalIcon.classList.add('fa-exclamation-triangle', 'alert-warning');
+                break;
+            case 'danger':
+            case 'error':
+                alertModalIcon.classList.add('fa-times-circle', 'alert-danger');
+                break;
+            case 'info':
+            default:
+                alertModalIcon.classList.add('fa-info-circle', 'alert-info');
+                break;
+        }
+
+        // Set modal class for styling
+        customAlertModal.className = 'modal-overlay';
+        customAlertModal.classList.add(`alert-${type}`);
+
+        // Show modal
+        customAlertModal.style.display = 'flex';
+    };
+
+    // Close alert modal
+    const closeAlertModal = () => {
+        if (customAlertModal) {
+            customAlertModal.style.display = 'none';
+            // Remove type classes
+            customAlertModal.classList.remove('alert-success', 'alert-warning', 'alert-danger', 'alert-info');
+        }
+    };
+
+    // Event listeners for alert modal
+    if (closeAlertModalBtn) {
+        closeAlertModalBtn.addEventListener('click', closeAlertModal);
+    }
+    if (alertModalConfirmBtn) {
+        alertModalConfirmBtn.addEventListener('click', closeAlertModal);
+    }
+    if (customAlertModal) {
+        customAlertModal.addEventListener('click', (e) => {
+            if (e.target === customAlertModal) {
+                closeAlertModal();
+            }
+        });
+    }
+
+    // Override the default alert function
+    window.alert = function(message) {
+        customAlert(message, 'info', 'Pesan');
+    };
+
+    /**
+     * =================================
+     * BAGIAN UTAMA ADMIN DASHBOARD
+     * =================================
+     */
     
     /**
      * =================================
@@ -115,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .catch(error => {
                     console.error("Error:", error);
                     if(button) button.disabled = false;
-                    alert('Terjadi kesalahan. Silakan refresh halaman.');
+                    customAlert('Terjadi kesalahan. Silakan refresh halaman.', 'danger', 'Error');
                 });
             }
         });

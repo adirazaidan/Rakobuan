@@ -1,4 +1,4 @@
-<div class="modal-overlay" id="historyModal" style="display: none; z-index: 1050;">
+<div class="modal-overlay" id="historyModal" class="display-none z-index-1050">
     <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title">Riwayat Aktivitas Terakhir</h5>

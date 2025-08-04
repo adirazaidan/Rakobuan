@@ -1,0 +1,118 @@
+/* --- Print Styles --- */
+body { font-family: 'Courier New', Courier, monospace; color: #000; margin: 0; padding: 0; font-size: 12px; }
+.receipt { width: 300px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
+.header { text-align: center; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px dashed #000; }
+.header h1 { margin: 0; font-size: 20px; text-transform: uppercase; }
+.header p { margin: 3px 0; font-size: 11px; }
+.details { margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px dashed #000; }
+.details p { margin: 2px 0; font-size: 12px; display: flex; justify-content: space-between; }
+.details p strong { flex-basis: 45%; text-align: left; }
+.details p span { flex-basis: 55%; text-align: right; }
+.items { margin-top: 15px; }
+table { width: 100%; font-size: 12px; border-collapse: collapse; margin-bottom: 10px; }
+th, td { padding: 5px 0; vertical-align: top; }
+thead th { border-bottom: 1px dashed #000; padding-bottom: 8px; }
+tbody tr:not(:last-child) td { padding-bottom: 8px; }
+.item-col { text-align: left; width: 50%; }
+.qty-col { text-align: center; width: 15%; }
+.price-col { text-align: right; width: 35%; }
+.notes { font-size: 10px; font-style: italic; color: #555; padding-top: 2px; padding-left: 10px; text-align: left; }
+.total-item-row td, .total-row td { border-top: 1px dashed #000; padding-top: 8px; font-weight: bold; }
+.footer { text-align: center; margin-top: 20px; font-size: 11px; border-top: 1px dashed #000; padding-top: 10px; }
+
+/* --- Custom Action Button Styles for Print Pages --- */
+.custom-action-btn { 
+    font-family: 'Inter', sans-serif; 
+    -webkit-appearance: none; 
+    -moz-appearance: none; 
+    appearance: none; 
+    border: none; 
+    cursor: pointer; 
+    text-decoration: none; 
+    outline: none; 
+    width: auto;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.custom-action-btn::before { 
+    content: ''; 
+    position: absolute; 
+    top: 0; 
+    left: -100%; 
+    width: 100%; 
+    height: 100%; 
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+
+.custom-action-btn:hover::before { 
+    left: 100%; 
+}
+
+.custom-action-btn i { 
+    margin-right: 0.5rem; 
+    flex-shrink: 0; 
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+
+.custom-action-btn:hover i { 
+    transform: scale(1.1); 
+}
+
+.custom-action-btn span { 
+    display: block; 
+    min-width: 0; 
+}
+
+.custom-action-btn-info { 
+    background: linear-gradient(135deg, #4299e1, #3182ce); 
+    color: #ffffff; 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); 
+}
+
+.custom-action-btn-info:hover { 
+    background: linear-gradient(135deg, #3182ce, #4299e1); 
+    transform: translateY(-2px); 
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); 
+}
+
+.custom-action-btn-secondary { 
+    background: linear-gradient(135deg, #4b5563, #374151); 
+    color: #ffffff; 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); 
+}
+
+.custom-action-btn-secondary:hover { 
+    background: linear-gradient(135deg, #374151, #4b5563); 
+    transform: translateY(-2px); 
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); 
+}
+
+/* --- Utility Classes for Print Pages --- */
+.no-print { display: block; }
+@media print {
+    .no-print { display: none !important; }
+}
+.d-flex { display: flex !important; }
+.justify-content-center { justify-content: center !important; }
+.align-items-center { align-items: center !important; }
+.gap-2 { gap: 0.5rem !important; }
+.text-center { text-align: center !important; }
+.margin-top-20 { margin-top: 1.25rem !important; }
+
+@media print { 
+    body { margin: 0; padding: 0; }
+    .receipt { width: 100%; margin: 0; padding: 5mm; box-shadow: none; }
+    .no-print { display: none; }
+} 

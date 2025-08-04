@@ -1,3 +1,4 @@
+<div class="card-body">
 <div class="row">
     <div class="col-md-8">
         <div class="form-group">
@@ -39,7 +40,7 @@
             <label for="image">Gambar Menu</label>
             <input type="file" id="image" name="image" class="form-control">
             @isset($product->image)
-                <img src="{{ Storage::url('products/' . $product->image) }}" alt="Preview" class="img-preview" style="margin-top: 10px; max-width: 150px;">
+                <img src="{{ Storage::url('products/' . $product->image) }}" alt="Preview" class="img-preview margin-top-10px max-width-150px">
             @endisset
         </div>
         <div class="form-group">
@@ -56,13 +57,8 @@
     </div>
 </div>
 <hr>
-<button type="submit" class="btn btn-primary">{{ isset($product) ? 'Perbarui Menu' : 'Simpan Menu' }}</button>
-<a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Batal</a>
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        
-    });
-</script>
-@endpush
+<div class="form-actions">
+    <button type="submit" class="btn btn-primary">{{ isset($product) ? 'Perbarui Menu' : 'Simpan Menu' }}</button>
+    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Batal</a>
+</div>
+</div>

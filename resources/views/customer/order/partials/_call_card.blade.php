@@ -18,7 +18,7 @@
                 <tr>
                     <td>
                         <div class="item-name">
-                            <i class="fas fa-comment-dots" style="margin-right: 0.5rem; color: var(--text-muted);"></i>
+                            <i class="fas fa-comment-dots margin-right-0-5rem color-text-muted"></i>
                             Catatan Panggilan
                         </div>
                         <div class="receipt-item-notes">

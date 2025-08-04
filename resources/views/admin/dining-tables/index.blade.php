@@ -5,16 +5,20 @@
 
 @include('admin.dining-tables._modal_history')
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="mb-4">
     <h1>Layout Meja</h1>
-    <a href="{{ route('admin.dining-tables.create') }}" class="btn btn-primary">Tambah Meja</a>
+    <div class="mt-3">
+        <a href="{{ route('admin.dining-tables.create') }}" class="custom-action-btn-tambah custom-action-btn-tambah-primary">
+            <i class="fas fa-plus"></i> <span>Tambah Meja</span>
+        </a>
+    </div>
 </div>
 
-<div class="card mb-4 filter-card" style="padding: 1.5rem;">
+    <div class="card mb-4 filter-card card-padding">
     <form action="{{ route('admin.dining-tables.index') }}" method="GET" class="filter-form">
         <div class="filter-container">
             {{-- Filter Lokasi --}}
-            <div class="form-group" style="flex: 1;">
+                            <div class="form-group form-group-flex">
                 <label for="location">Filter Lokasi</label>
                 <select name="location" id="location" class="form-control">
                     <option value="">Semua Lokasi</option>
@@ -55,7 +59,7 @@
     @forelse ($tables as $table)
         @include('admin.dining-tables._card', ['table' => $table])
     @empty
-        <div class="card" style="padding: 2rem; text-align: center;">
+        <div class="card card-padding-lg text-center">
             <p>Belum ada data meja. Silakan tambahkan meja baru.</p>
         </div>
     @endforelse

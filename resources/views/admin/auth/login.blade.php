@@ -40,8 +40,8 @@
                 <button type="submit" class="btn-submit">Masuk</button>
             </form>
         </div>
-        <div class="auth-footer" style="position: absolute; bottom: 20px; text-align: center;">
-            <a href="{{ route('customer.login.form') }}" style="color: #888; font-size: 14px; text-decoration: none;">
+        <div class="auth-footer">
+            <a href="{{ route('customer.login.form') }}" class="color-888 font-size-14 text-decoration-none">
                 Login sebagai Pelanggan
             </a>
         </div>

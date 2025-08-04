@@ -2,7 +2,7 @@
 @section('title', 'Sunting Diskon')
 @section('content')
     <h1>Sunting Diskon</h1>
-    <div class="card" style="padding: 2rem;">
+    <div class="card form-card">
         <form action="{{ route('admin.discounts.update', $discount) }}" method="POST">
             @csrf
             @method('PUT')

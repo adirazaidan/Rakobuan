@@ -27,7 +27,25 @@ class MenuController extends Controller
         $products = Product::whereHas('category', function ($query) use ($outlet) {
             $query->where('outlet_id', $outlet->id);
         })
-        ->with('activeDiscount')->get();
+        ->with('activeDiscount')
+        ->orderByRaw('
+            CASE 
+                WHEN is_bestseller = 1 AND EXISTS (
+                    SELECT 1 FROM discounts 
+                    WHERE discounts.product_id = products.id 
+                    AND discounts.is_active = 1
+                ) THEN 1
+                WHEN is_bestseller = 1 THEN 2
+                WHEN EXISTS (
+                    SELECT 1 FROM discounts 
+                    WHERE discounts.product_id = products.id 
+                    AND discounts.is_active = 1
+                ) THEN 3
+                ELSE 4
+            END
+        ')
+        ->orderBy('name')
+        ->get();
         
         $cart = session()->get('cart', []);
         $cartItemCount = count($cart);

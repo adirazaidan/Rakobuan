@@ -33,11 +33,11 @@
                 <li class="{{ request()->routeIs('admin.sales.report.index') ? 'active' : '' }}"><a href="{{ route('admin.sales.report.index') }}"><i class="fa-solid fa-chart-line"></i><span>Hasil Penjualan</span></a></li>
                 <hr>
                 <li>
-                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <a href="#" onclick="event.preventDefault(); showLogoutConfirm();">
                         <i class="fa-solid fa-right-from-bracket"></i>
                         <span>Keluar</span>
                     </a>
-                    <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
+                    <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="display-none">
                         @csrf
                     </form>
                 </li>
@@ -57,7 +57,24 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    
+    <!-- Custom Alert Dialog Modal -->
+    <div class="modal-overlay" id="customAlertModal" class="display-none">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="alertModalTitle">Pesan</h4>
+                <button class="modal-close" id="closeAlertModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert-icon-wrapper">
+                    <i id="alertModalIcon" class="fas fa-info-circle"></i>
+                </div>
+                <p id="alertModalMessage" class="alert-message"></p>
+                <div class="alert-actions">
+                    <button type="button" class="btn-primary" id="alertModalConfirmBtn">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     @stack('scripts')
 </body>

@@ -1,3 +1,4 @@
+<div class="card-body">
 <div class="form-group">
     <label for="name">Nama Diskon (Contoh: Diskon Gajian)</label>
     <input type="text" id="name" name="name" class="form-control" value="{{ old('name', $discount->name ?? '') }}" required>
@@ -27,16 +28,8 @@
     </div>
 </div>
 
-<button type="submit" class="btn btn-primary">{{ isset($discount) ? 'Perbarui' : 'Simpan' }}</button>
-<a href="{{ route('admin.discounts.index') }}" class="btn btn-secondary">Batal</a>
-
-@push('scripts')
-<script>
-    $(document).ready(function() {
-        $('.select2').select2({
-            placeholder: '-- Pilih Menu --',
-            allowClear: true
-        });
-    });
-</script>
-@endpush
+<div class="form-actions">
+    <button type="submit" class="btn btn-primary">{{ isset($discount) ? 'Perbarui' : 'Simpan' }}</button>
+    <a href="{{ route('admin.discounts.index') }}" class="btn btn-secondary">Batal</a>
+</div>
+</div>

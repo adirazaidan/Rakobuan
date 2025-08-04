@@ -52,6 +52,12 @@ class OrderController extends Controller
     {
         $order->delete();
 
+        // Check if the request came from the history page
+        $referer = $request->header('referer');
+        if ($referer && str_contains($referer, '/orders/history')) {
+            return redirect()->route('admin.orders.history', $request->query())->with('success', 'Pesanan berhasil dihapus.');
+        }
+
         return redirect()->route('admin.orders.index', $request->query())->with('success', 'Pesanan berhasil dihapus.');
     }
 
