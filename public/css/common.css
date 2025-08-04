@@ -121,20 +121,55 @@
 
 /* Auth Link Container and Link Styling */
 .auth-link-container {
-    margin-top: 1.5rem;
-    text-align: center;
+    margin-top: 1.5rem !important;
+    text-align: center !important;
 }
 
 .auth-link {
-    color: #6c757d;
-    font-size: 14px;
-    text-decoration: none;
-    transition: color 0.3s;
+    color: #6c757d !important;
+    font-size: 14px !important;
+    text-decoration: none !important;
+    transition: color 0.3s !important;
+    display: inline-block !important;
 }
 
 .auth-link:hover {
-    color: var(--primary-color);
-    text-decoration: none;
+    color: var(--primary-color) !important;
+    text-decoration: none !important;
+}
+
+.auth-link:visited {
+    color: #6c757d !important;
+    text-decoration: none !important;
+}
+
+.auth-link:active {
+    color: var(--primary-color) !important;
+    text-decoration: none !important;
+}
+
+/* Additional specific selectors to ensure styles are applied */
+.auth-card .auth-link-container .auth-link {
+    color: #6c757d !important;
+    font-size: 14px !important;
+    text-decoration: none !important;
+    transition: color 0.3s !important;
+    display: inline-block !important;
+}
+
+.auth-card .auth-link-container .auth-link:hover {
+    color: var(--primary-color) !important;
+    text-decoration: none !important;
+}
+
+.auth-card .auth-link-container .auth-link:visited {
+    color: #6c757d !important;
+    text-decoration: none !important;
+}
+
+.auth-card .auth-link-container .auth-link:active {
+    color: var(--primary-color) !important;
+    text-decoration: none !important;
 }
 
 /* Auth Footer for Login Links (keeping for backward compatibility) */
@@ -165,7 +200,7 @@
     }
     
     .auth-link-container {
-        margin-top: 1.5rem;
+        margin-top: 1.5rem !important;
     }
     
     .auth-footer {
@@ -198,7 +233,7 @@
     }
     
     .auth-link-container {
-        margin-top: 1rem;
+        margin-top: 1rem !important;
     }
     
     .auth-footer {
